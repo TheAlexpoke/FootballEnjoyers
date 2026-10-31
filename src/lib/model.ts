@@ -53,6 +53,8 @@ export type Standing = {
   points: string;
   finishes: number[];
   previousRank?: number;
+  averagePlacement?: string | null;
+  consistencyBonus?: string;
 };
 export type Snapshot = {
   id: string;

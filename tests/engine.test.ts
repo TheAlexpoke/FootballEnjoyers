@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { initialState, NAMES, type State } from "../src/lib/model";
 import { actionSchema, applyAction, type Action } from "../src/lib/actions";
-import { placements, standings, phase } from "../src/lib/scoring";
+import {
+  placements,
+  standings,
+  phase,
+  consistencyAward,
+  rebuildHistory,
+} from "../src/lib/scoring";
 import { seedKart, selectWinner } from "../src/lib/kart";
 import { restoreBackup, safeBackup } from "../src/lib/validation";
 import { verifyPassword } from "../src/lib/server/auth";
@@ -48,7 +54,7 @@ describe("exact scoring", () => {
       s.participants.map((p) => p.id).reverse(),
     );
   });
-  it("uses every default weight and reaches exactly 195", () => {
+  it("uses every default weight and reaches exactly 200 including consistency", () => {
     const s = full();
     expect(s.events.map((e) => e.weight)).toEqual([
       "1",
@@ -64,7 +70,7 @@ describe("exact scoring", () => {
       resultEvent(s, i);
       e.direction = "asc";
     });
-    expect(standings(s)[0].points).toBe("195");
+    expect(standings(s)[0].points).toBe("200");
     expect(phase(s)).toBe("Complete");
   });
   it("averages two tied places and skips their occupied positions", () => {
@@ -114,7 +120,7 @@ describe("exact scoring", () => {
     fantasy.status = "active";
     expect(standings(s)[0].points).toBe("60");
     fantasy.status = "finalized";
-    expect(standings(s)[0].points).toBe("60");
+    expect(standings(s)[0].points).toBe("65");
   });
   it("uses outright firsts, subsequent finishes, then shared rank", () => {
     const s = full();
@@ -160,17 +166,111 @@ describe("exact scoring", () => {
     const f = resultEvent(s, 1);
     f.weight = "0.5";
     f.results = [{ participantId: b, value: "1", absent: false }];
-    expect(standings(s).find((r) => r.id === b)?.points).toBe("17.5");
+    expect(standings(s).find((r) => r.id === b)?.points).toBe("22.5");
     f.weight = "1";
     f.results = [
       { participantId: b, value: "2", absent: false },
       { participantId: s.participants[2].id, value: "1", absent: false },
+      { participantId: a, value: "3", absent: false },
     ];
-    e.weight = "2";
+    e.weight = "0.8";
     const rows = standings(s);
-    expect(rows.find((r) => r.id === a)?.points).toBe("30");
-    expect(rows.find((r) => r.id === b)?.points).toBe("30");
+    // Equal average places share the bonus, and points still use the normal tiebreak.
+    expect(rows.find((r) => r.id === a)?.points).toBe("23");
+    expect(rows.find((r) => r.id === b)?.points).toBe("23");
     expect(rows[0].id).toBe(a);
+  });
+});
+describe("moving Consistency Award", () => {
+  it("starts at zero, awards the first winner, and transfers without accumulating", () => {
+    const s = full();
+    expect(
+      consistencyAward(s).every(
+        (r) => r.consistencyBonus === "0" && r.averagePlacement === null,
+      ),
+    ).toBe(true);
+    resultEvent(s);
+    const [a, b] = s.participants;
+    expect(standings(s).find((r) => r.id === a.id)).toMatchObject({
+      points: "20",
+      consistencyBonus: "5",
+      averagePlacement: "1",
+    });
+    const second = resultEvent(s, 1, ["7", "1", "2", "3", "4", "5", "6"]);
+    second.direction = "asc";
+    const rows = standings(s);
+    expect(rows.find((r) => r.id === a.id)).toMatchObject({
+      points: "15",
+      consistencyBonus: "0",
+      averagePlacement: "4",
+    });
+    expect(rows.find((r) => r.id === b.id)).toMatchObject({
+      points: "30",
+      consistencyBonus: "5",
+      averagePlacement: "1.5",
+    });
+    expect(standings(s)).toEqual(rows);
+    rebuildHistory(s);
+    expect(
+      s.snapshots[0].standings.find((r) => r.id === a.id)?.consistencyBonus,
+    ).toBe("5");
+    expect(
+      s.snapshots[1].standings.find((r) => r.id === b.id)?.consistencyBonus,
+    ).toBe("5");
+    second.status = "active";
+    expect(standings(s).find((r) => r.id === a.id)?.points).toBe("20");
+    second.status = "finalized";
+    second.deleted = true;
+    expect(standings(s).find((r) => r.id === a.id)?.points).toBe("20");
+    const reset = action(s, { type: "reset", confirm: "RESET RESULTS" });
+    expect(
+      standings(reset).every(
+        (r) => r.points === "0" && r.consistencyBonus === "0",
+      ),
+    ).toBe(true);
+  });
+  it("gives every tied leader 5 points using official shared placements", () => {
+    const s = full();
+    resultEvent(s, 0, ["1", "1", "3", "4", "5", "6", "7"]);
+    const winners = standings(s).filter((r) => r.consistencyBonus === "5");
+    expect(winners).toHaveLength(2);
+    expect(
+      winners.every((r) => r.averagePlacement === "1" && r.points === "17.5"),
+    ).toBe(true);
+  });
+  it("ignores weights and provisional fantasy when choosing the leader", () => {
+    const s = full();
+    resultEvent(s).weight = "4";
+    resultEvent(s, 1, ["6", "1", "2", "3", "4", "5", "7"]).direction = "asc";
+    expect(
+      consistencyAward(s)
+        .filter((r) => r.consistencyBonus === "5")
+        .map((r) => r.id),
+    ).toEqual([s.participants[1].id]);
+    const fantasy = resultEvent(s, 7);
+    fantasy.direction = "asc";
+    fantasy.status = "active";
+    expect(
+      consistencyAward(s).find((r) => r.id === s.participants[1].id)
+        ?.averagePlacement,
+    ).toBe("1.5");
+    fantasy.status = "finalized";
+    expect(
+      consistencyAward(s).find((r) => r.id === s.participants[1].id)
+        ?.averagePlacement,
+    ).toBe("1.6666666666666666667");
+  });
+  it("recalculates the award after correcting a finalized result", () => {
+    const s = full();
+    const event = resultEvent(s);
+    event.results[0].value = "8";
+    rebuildHistory(s);
+    expect(standings(s).find((r) => r.consistencyBonus === "5")?.id).toBe(
+      s.participants[1].id,
+    );
+    expect(
+      s.snapshots[0].standings.find((r) => r.consistencyBonus === "5")?.id,
+    ).toBe(s.participants[1].id);
   });
 });
 describe("lifecycle and authorization", () => {

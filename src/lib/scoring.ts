@@ -64,10 +64,43 @@ export function counts(event: Event) {
       (event.kind === "fantasy" && event.status === "active"))
   );
 }
+export const CONSISTENCY_POINTS = 5;
+// Placements are unweighted. Tied event results use their official shared place,
+// including Mario Kart's shared 5th. Missing/absent legacy results count as 7th.
+export function consistencyAward(
+  state: Pick<State, "participants" | "events">,
+) {
+  const completed = state.events.filter(
+    (event) => !event.deleted && event.status === "finalized",
+  );
+  const totals = new Map(state.participants.map((player) => [player.id, 0]));
+  for (const event of completed) {
+    const places = new Map(placements(event).map((row) => [row.id, row.place]));
+    for (const player of state.participants)
+      totals.set(
+        player.id,
+        totals.get(player.id)! + (places.get(player.id) ?? 7),
+      );
+  }
+  const best = Math.min(...totals.values());
+  return state.participants.map((player) => ({
+    id: player.id,
+    averagePlacement: completed.length
+      ? new Decimal(totals.get(player.id)!).div(completed.length).toString()
+      : null,
+    consistencyBonus:
+      completed.length && totals.get(player.id) === best
+        ? String(CONSISTENCY_POINTS)
+        : "0",
+  }));
+}
 export function standings(state: State): Standing[] {
+  const awards = new Map(
+    consistencyAward(state).map((award) => [award.id, award]),
+  );
   const rows = state.participants.map((p) => ({
     id: p.id,
-    ticks: new Decimal(0),
+    ticks: new Decimal(awards.get(p.id)!.consistencyBonus).mul(SCALE),
     finishes: Array<number>(7).fill(0),
   }));
   for (const event of state.events.filter(counts))
@@ -96,6 +129,8 @@ export function standings(state: State): Standing[] {
           .toFixed(8)
           .replace(/\.?0+$/, "") || "0",
       finishes: r.finishes,
+      averagePlacement: awards.get(r.id)!.averagePlacement,
+      consistencyBonus: awards.get(r.id)!.consistencyBonus,
     };
   });
 }

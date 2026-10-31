@@ -93,7 +93,11 @@ describe("Sunday-only scoring", () => {
     expect(out.events[7].results[0].value).toBe("10.25");
     expect(out.events[7].status).toBe("active");
     expect(out.fantasy.lineups["0"][1].eligible).toBe(false);
-    expect(standings(out).every((r) => r.points === "21.14285714")).toBe(true);
+    expect(
+      standings(out).every(
+        (r) => r.points === "26.14285714" && r.consistencyBonus === "5",
+      ),
+    ).toBe(true);
   });
   it("refuses missing player data, stale feeds, and mismatched league rules", () => {
     const { s, feed, matchups } = setup();

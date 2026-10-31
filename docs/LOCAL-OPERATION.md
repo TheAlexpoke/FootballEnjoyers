@@ -25,7 +25,13 @@ Local mode is the default. Copying `.env.example` is optional. `LOCAL_DATA_DIR` 
 
 ## History progression
 
-The History page shows all competitors automatically, including when data loads after the page opens, without a separate player key. Bold rank badges highlight first in gold, second in silver and third in bronze; ranks 4–7 use matching slate badges. Event labels are larger and bolder. Both Rank and Points views use profile photos as markers; initials appear until a photo is added. Tied or crowded markers are separated with leader lines to their exact chart positions, preserving the recorded standings. The chart scrolls horizontally on smaller screens. Add each photo in Control room → Players to use it throughout the site and in history.
+The History page shows all competitors automatically, without a separate player key. Profile photos appear only on the latest completed event; earlier points use dots. Tied photos have leader lines to their exact positions. Event names follow completion order, and the graph compresses to fit the screen without horizontal scrolling. Standings and individual event finishes use numbered gold, silver and bronze trophies for the top three places.
+
+## Moving Consistency Award
+
+The best unweighted average placement across finalized, non-deleted events earns **5 extra points**, already included in standings totals. Every player tied for the best average receives the full 5 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.
+
+Official shared places are used for event ties, including Mario Kart's shared 5th. Legacy absent or missing results count as 7th for the average. Corrections, reopened events, deleted events and resets recalculate the award and history automatically. The standings badge identifies recipients and shows their average; player profiles show their current award status. With the default eight event weights, a perfect tournament earns 195 event points plus 5 consistency points, for a **200-point maximum per player**. Ties can award more than 5 bonus points across the entire field.
 
 ## Storage and recovery
 

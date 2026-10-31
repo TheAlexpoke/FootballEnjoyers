@@ -139,7 +139,7 @@ test("real HTTP routes: atomic registration, token scope, admin scoring, backup 
   await expect(page.getByText("Saved.", { exact: true })).toBeVisible();
   s = await (await api.get("/api/state")).json();
   expect(s.events[0].status).toBe("finalized");
-  expect(s.standings[0].points).toBe("15");
+  expect(s.standings[0].points).toBe("20");
   expect(s.snapshots).toHaveLength(1);
   const download = await adminApi.get("/api/admin?mode=json");
   const backup = await download.json();
@@ -160,7 +160,7 @@ test("real HTTP routes: atomic registration, token scope, admin scoring, backup 
   });
   expect(recovery.ok(), await recovery.text()).toBe(true);
   s = await (await api.get("/api/state")).json();
-  expect(s.standings[0].points).toBe("15");
+  expect(s.standings[0].points).toBe("20");
   expect(
     (await (await adminApi.get("/api/admin?mode=backups")).json()).length,
   ).toBeGreaterThan(0);

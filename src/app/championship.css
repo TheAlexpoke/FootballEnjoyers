@@ -72,6 +72,40 @@ body {
 .standing-row {
   border-color: #82704d33;
 }
+.consistency-badge {
+  display: block;
+  margin-top: 5px;
+  color: #edc66e;
+  font-size: 9px;
+  line-height: 1.4;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.consistency-summary {
+  color: #edc66e;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.performance-place {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.performance-place .rank-trophy--1 {
+  width: 36px;
+  height: 43px;
+}
+.performance-place .rank-trophy--2 {
+  width: 31px;
+  height: 37px;
+}
+.performance-place .rank-trophy--3 {
+  width: 27px;
+  height: 32px;
+}
 .rank-trophy {
   display: block;
   overflow: visible;
@@ -111,6 +145,64 @@ body {
 }
 .standing-row:hover {
   background: #c7a45309;
+}
+.rank-trophy.rank-trophy--small {
+  width: 25px;
+  height: 29px;
+}
+.rank-trophy.rank-trophy--inline {
+  display: inline-block;
+  width: 17px;
+  height: 20px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.rank-trophy.rank-trophy--profile {
+  display: inline-block;
+  width: 40px;
+  height: 46px;
+}
+.rank-trophy.rank-trophy--chart {
+  width: 36px;
+  height: 43px;
+}
+.chart-scroll .rank-trophy {
+  min-width: 0;
+}
+.rank-trophy.rank-trophy--chart.rank-trophy--2 {
+  width: 32px;
+  height: 39px;
+}
+.rank-trophy.rank-trophy--chart.rank-trophy--3 {
+  width: 28px;
+  height: 35px;
+}
+.history-table .order-row > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.points-scale small {
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scoring-maximum {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #82704d55;
+}
+.scoring-maximum strong {
+  color: #edc66e;
+  font-size: 17px;
+}
+.scoring-maximum span {
+  color: #b0a795;
+  font-size: 10px;
 }
 .standing-row.leader {
   background: linear-gradient(90deg, #d5ab571c, transparent);

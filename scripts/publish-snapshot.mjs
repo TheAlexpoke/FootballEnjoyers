@@ -57,6 +57,8 @@ const events = local.events
     description: event.description,
     rules: event.rules,
     status: event.status,
+    finalizedAt: event.finalizedAt,
+    startedAt: event.startedAt,
     order: event.order,
     results: event.results.map(({ participantId, value, absent }) => ({
       participantId,
@@ -79,12 +81,16 @@ const snapshot = {
     eventId,
     at,
     label,
-    standings: standings.map(({ id, rank, points, finishes }) => ({
-      id,
-      rank,
-      points,
-      finishes,
-    })),
+    standings: standings.map(
+      ({ id, rank, points, finishes, averagePlacement, consistencyBonus }) => ({
+        id,
+        rank,
+        points,
+        finishes,
+        averagePlacement,
+        consistencyBonus,
+      }),
+    ),
   })),
   config: { layout: "standings", draftOrder: local.config.draftOrder },
   fantasy: {
@@ -103,12 +109,16 @@ const snapshot = {
     status: "Published scores",
     warning: "",
   },
-  standings: local.standings.map(({ id, rank, points, finishes }) => ({
-    id,
-    rank,
-    points,
-    finishes,
-  })),
+  standings: local.standings.map(
+    ({ id, rank, points, finishes, averagePlacement, consistencyBonus }) => ({
+      id,
+      rank,
+      points,
+      finishes,
+      averagePlacement,
+      consistencyBonus,
+    }),
+  ),
   phase: local.phase,
   configured: true,
   readOnly: true,

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { assertOrigin, requireAdmin } from "@/lib/server/auth";
 import { backup, db, load, mutate } from "@/lib/server/store";
 import { safeBackup, restoreBackup } from "@/lib/validation";
-import { placements, standings } from "@/lib/scoring";
+import { placements, standings, rebuildHistory } from "@/lib/scoring";
 const quote = (v: unknown) =>
   `"${String(v ?? "")
     .replaceAll('"', '""')
@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
         ? "practice"
         : "production";
     const s = await load(env);
+    rebuildHistory(s);
     const mode = req.nextUrl.searchParams.get("mode");
     if (mode === "audit") return NextResponse.json(s.audit.toReversed());
     if (mode === "backups")
@@ -108,7 +109,10 @@ export async function GET(req: NextRequest) {
           String(r.rank),
           "",
           r.points,
-          "",
+          JSON.stringify({
+            consistencyBonus: r.consistencyBonus,
+            averagePlacement: r.averagePlacement,
+          }),
         ]);
       }
       return new NextResponse(

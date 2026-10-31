@@ -28,6 +28,7 @@ import { placements, phase, standings } from "@/lib/scoring";
 import { Admin } from "./admin";
 import { EventIllustration } from "./event-illustration";
 import { eventPresentation } from "@/lib/event-presentation";
+import { RankTrophy, PlacementRank } from "./placement-rank";
 import { spreadHistoryMarkers } from "@/lib/history-markers";
 type Player = PublicState["participants"][number];
 let realtimeClient: ReturnType<typeof createClient> | undefined;
@@ -480,6 +481,15 @@ export default function TournamentApp({
                                       p.name.toLowerCase() && (
                                       <small>{p.name}</small>
                                     )}
+                                    {r.consistencyBonus === "5" && (
+                                      <span
+                                        className="consistency-badge"
+                                        title={`Included in total · average placement ${Number(r.averagePlacement).toFixed(2)}`}
+                                      >
+                                        +5 Consistency · avg{" "}
+                                        {Number(r.averagePlacement).toFixed(2)}
+                                      </span>
+                                    )}
                                   </span>
                                 </span>
                                 <span
@@ -587,9 +597,15 @@ export default function TournamentApp({
                           .map((r, i) => (
                             <div className="order-row" key={r.id}>
                               <b>
-                                {state.config.draftOrder.length
-                                  ? i + 1
-                                  : r.rank}
+                                <PlacementRank
+                                  rank={
+                                    state.config.draftOrder.length
+                                      ? i + 1
+                                      : r.rank
+                                  }
+                                  size="small"
+                                  prefix=""
+                                />
                               </b>
                               {
                                 state.participants.find((p) => p.id === r.id)
@@ -632,7 +648,7 @@ export default function TournamentApp({
                       <NextEvent state={state} link={link} />
                     )}
                     <FinaleCard state={state} link={link} />
-                    <ScoringCard />
+                    <ScoringCard events={state.events} />
                   </aside>
                 </div>
               </>
@@ -651,7 +667,7 @@ export default function TournamentApp({
                     }
                     detail="From the first throw to Sunday Night Football. Follow every result here."
                   />
-                  <ScoringCard />
+                  <ScoringCard events={state.events} />
                 </div>
                 <div className="all-events">
                   {state.events
@@ -754,39 +770,6 @@ export default function TournamentApp({
 }
 export const displayPoints = (s: string) =>
   Number(s).toLocaleString(undefined, { maximumFractionDigits: 3 });
-function RankTrophy({ rank }: { rank: number }) {
-  return (
-    <svg
-      className={`rank-trophy rank-trophy--${rank}`}
-      viewBox="0 0 48 54"
-      role="img"
-      aria-label={`Rank ${rank}`}
-    >
-      <path
-        d="M13 8H4v9c0 9 6 14 14 15M35 8h9v9c0 9-6 14-14 15"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        d="M11 3h26v17c0 10-5 16-11 18v7h10v6H12v-6h10v-7c-6-2-11-8-11-18Z"
-        fill="currentColor"
-      />
-      <path d="M14 6h20" stroke="#fff" strokeOpacity=".55" strokeWidth="2" />
-      <text
-        x="24"
-        y="26"
-        textAnchor="middle"
-        fill="#252018"
-        fontFamily="Impact, Arial Narrow, sans-serif"
-        fontSize="22"
-        fontWeight="900"
-      >
-        {rank}
-      </text>
-    </svg>
-  );
-}
 function ordinal(n: number) {
   return n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
 }
@@ -807,7 +790,10 @@ export function PageHeading({
     </div>
   );
 }
-function ScoringCard() {
+function ScoringCard({ events }: { events: Event[] }) {
+  const eventMaximum = events
+    .filter((event) => !event.deleted)
+    .reduce((sum, event) => sum + 15 * Number(event.weight), 0);
   return (
     <section className="panel scoring-card" aria-label="Scoring breakdown">
       <div className="eyebrow">KNOW THE SCORE</div>
@@ -817,8 +803,14 @@ function ScoringCard() {
         {[15, 10, 6, 3, 2, 1, 0].map((n, i) => (
           <span key={n}>
             <small>
-              {i + 1}
-              {ordinal(i + 1)}
+              {i < 3 ? (
+                <RankTrophy rank={i + 1} size="inline" />
+              ) : (
+                <>
+                  {i + 1}
+                  {ordinal(i + 1)}
+                </>
+              )}
             </small>
             <b>{n}</b>
           </span>
@@ -828,6 +820,20 @@ function ScoringCard() {
         Ties share the average of occupied places.
         <br />
         Mario Kart Wild Card losers: 1 base point each.
+        <br />
+        Consistency Award: +5 points for the best unweighted average placement
+        across completed events. Every tied leader gets +5. Recalculated after
+        each event; included in standings totals. Tied event finishes use their
+        shared placement.
+      </div>
+      <div className="scoring-maximum">
+        <strong>
+          {displayPoints(String(eventMaximum + 5))} points possible
+        </strong>
+        <span>
+          {displayPoints(String(eventMaximum))} event points + 5 consistency
+          points
+        </span>
       </div>
     </section>
   );
@@ -1062,7 +1068,7 @@ export function EventDetail({
                   href={link(`/players/${id}`)}
                 >
                   <span className="rank">
-                    {score?.place ?? "—"}
+                    <PlacementRank rank={score?.place} size="small" prefix="" />
                     {(score?.tie ?? 0) > 1 ? "=" : ""}
                   </span>
                   <Avatar player={p} small />
@@ -1149,7 +1155,7 @@ export function Bracket({
             <h3>{name}</h3>
             {round === 0 && event.seeds[0] && (
               <div className="bye">
-                <span className="gold">#1</span>{" "}
+                <span className="gold">Seed 1</span>{" "}
                 {players.find((p) => p.id === event.seeds[0])?.name}{" "}
                 <small>BYE TO SEMIFINAL</small>
               </div>
@@ -1295,7 +1301,14 @@ function PlayerDetail({
         </div>
         <div className="player-stats">
           <span>
-            <b>{ranked && r ? `#${r.rank}` : "-"}</b>OVERALL
+            <b>
+              {ranked && r ? (
+                <PlacementRank rank={r.rank} size="profile" />
+              ) : (
+                "-"
+              )}
+            </b>
+            OVERALL
           </span>
           <span>
             <b>{displayPoints(r?.points ?? "0")}</b>POINTS
@@ -1307,6 +1320,22 @@ function PlayerDetail({
           <h2>Event performance</h2>
           <span className="muted">{r?.finishes[0] ?? 0} outright wins</span>
         </div>
+        {r?.averagePlacement && (
+          <div className="performance-row consistency-summary">
+            <span>
+              <b>Consistency Award</b>
+              <small>
+                Average placement: {Number(r.averagePlacement).toFixed(2)} ·
+                completed events only
+              </small>
+            </span>
+            <b>
+              {r.consistencyBonus === "5"
+                ? "+5 pts included in total"
+                : "No current bonus"}
+            </b>
+          </div>
+        )}
         {state.events
           .filter((e) => !e.deleted)
           .map((e) => {
@@ -1329,10 +1358,19 @@ function PlayerDetail({
                   </small>
                 </span>
                 <Badge event={e} />
-                <span>
-                  {score?.place
-                    ? `#${score.place}${score.tie > 1 ? " (tie)" : ""}`
-                    : "—"}
+                <span className="performance-place">
+                  {score?.place ? (
+                    <>
+                      {score.place <= 3 ? (
+                        <RankTrophy rank={score.place} />
+                      ) : (
+                        `#${score.place}`
+                      )}
+                      {score.tie > 1 && <small>(tie)</small>}
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </span>
                 <b>{score ? `${displayPoints(score.points)} pts` : "—"}</b>
               </Link>
@@ -1400,11 +1438,6 @@ export function HistoryChart({
     110 + (i / Math.max(snapshots.length - 1, 1)) * (width - 220);
   const y = (v: number) =>
     metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
-  const medals = [
-    { light: "#fff0b4", mid: "#e9bd5a", dark: "#a27324", back: "#352b1c" },
-    { light: "#f5f8ff", mid: "#becbdd", dark: "#77899e", back: "#252f3c" },
-    { light: "#f6d6b6", mid: "#cd9467", dark: "#8a532e", back: "#34271f" },
-  ];
   const chartPoints = snapshots.map((snapshot, j) =>
     spreadHistoryMarkers(
       state.participants
@@ -1476,48 +1509,37 @@ export function HistoryChart({
                       data-rank={i + 1}
                       transform={"translate(27 " + (80 + (i * 280) / 6) + ")"}
                     >
-                      {i < 3 && (
-                        <defs>
-                          <linearGradient
-                            id={chartId + "-medal-" + i}
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
+                      {i < 3 ? (
+                        <g transform="translate(-18 -22)">
+                          <RankTrophy rank={i + 1} size="chart" />
+                        </g>
+                      ) : (
+                        <>
+                          <path
+                            d="M-13-20H12L20-12V12L12 20H-13L-20 12V-12Z"
+                            fill="#172231"
+                            stroke="#3b4c62"
+                            strokeWidth="1.2"
+                          />
+                          <path
+                            d="M-10-16H10"
+                            stroke="#667b96"
+                            strokeWidth="2"
+                          />
+                          <text
+                            y="2"
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            fill="#b4c3d7"
+                            fontSize="29"
+                            fontFamily="Impact, Arial Narrow, sans-serif"
+                            fontWeight="900"
+                            fontStyle="italic"
                           >
-                            <stop offset="0%" stopColor={medals[i].light} />
-                            <stop offset="55%" stopColor={medals[i].mid} />
-                            <stop offset="100%" stopColor={medals[i].dark} />
-                          </linearGradient>
-                        </defs>
+                            {i + 1}
+                          </text>
+                        </>
                       )}
-                      <path
-                        d="M-13-20H12L20-12V12L12 20H-13L-20 12V-12Z"
-                        fill={i < 3 ? medals[i].back : "#172231"}
-                        stroke={i < 3 ? medals[i].mid : "#3b4c62"}
-                        strokeWidth="1.2"
-                      />
-                      <path
-                        d="M-10-16H10"
-                        stroke={i < 3 ? medals[i].light : "#667b96"}
-                        strokeWidth="2"
-                      />
-                      <text
-                        y="2"
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        fill={
-                          i < 3
-                            ? "url(#" + chartId + "-medal-" + i + ")"
-                            : "#b4c3d7"
-                        }
-                        fontSize="29"
-                        fontFamily="Impact, Arial Narrow, sans-serif"
-                        fontWeight="900"
-                        fontStyle="italic"
-                      >
-                        {i + 1}
-                      </text>
                     </g>
                   ) : (
                     <text
@@ -1694,7 +1716,7 @@ export function HistoryChart({
                   .map((r) => (
                     <div className="order-row" key={r.id}>
                       <span>
-                        #{r.rank}{" "}
+                        <PlacementRank rank={r.rank} />{" "}
                         {state.participants.find((p) => p.id === r.id)?.name}
                       </span>
                       <b>{displayPoints(r.points)} pts</b>

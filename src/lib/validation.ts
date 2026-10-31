@@ -76,6 +76,12 @@ export const backupSchema = z.object({
                 rank: z.number().int().min(1).max(7),
                 points: number,
                 finishes: z.array(z.number().int().nonnegative()).length(7),
+                averagePlacement: z
+                  .string()
+                  .regex(/^\d+(\.\d+)?$/)
+                  .nullable()
+                  .optional(),
+                consistencyBonus: z.enum(["0", "5"]).optional(),
               }),
             )
             .max(7),

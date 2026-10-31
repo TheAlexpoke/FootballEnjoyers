@@ -48,10 +48,14 @@ test("public dashboard fits viewport and shows all competitors", async ({
     page.getByRole("heading", { name: "Tournament standings" }),
   ).toBeVisible();
   await expect(page.locator(".standing-row")).toHaveCount(7);
-  await expect(page.locator(".rank-trophy")).toHaveCount(3);
+  await expect(page.locator(".standing-row .rank-trophy")).toHaveCount(3);
   await expect(page.locator(".standing-row .rank").nth(3)).toHaveText("4");
   await expect(page.locator(".standing-row .points").first()).toHaveText(
-    "15.0PTS",
+    "20.0PTS",
+  );
+  await expect(page.locator(".consistency-badge")).toHaveCount(1);
+  await expect(page.locator(".consistency-badge")).toContainText(
+    "+5 Consistency",
   );
   await expect(page.locator(".is-me")).toContainText("YOU");
   expect(
@@ -77,6 +81,20 @@ test("event rules and player details navigate correctly", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Event performance" }),
   ).toBeVisible();
+  await expect(page.locator(".performance-place .rank-trophy--1")).toHaveCount(
+    1,
+  );
+  await expect(page.locator(".consistency-summary")).toContainText(
+    "+5 pts included in total",
+  );
+  await page.goto("/players/p1");
+  await expect(page.locator(".performance-place .rank-trophy--2")).toHaveCount(
+    1,
+  );
+  await page.goto("/players/p2");
+  await expect(page.locator(".performance-place .rank-trophy--3")).toHaveCount(
+    1,
+  );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -298,6 +316,13 @@ test("history selects everyone after loading and gives tied players separate pho
   await page.goto("/history");
   await expect(page.locator(".chart-filters")).toHaveCount(0);
   await expect(page.locator(".history-rank-label")).toHaveCount(7);
+  expect(
+    await page
+      .locator(".history-rank-label .rank-trophy")
+      .evaluateAll((trophies) =>
+        trophies.every((trophy) => trophy.getBoundingClientRect().width <= 44),
+      ),
+  ).toBe(true);
   await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
   await expect(page.locator("[data-history-connector]")).toHaveCount(7);
   expect(

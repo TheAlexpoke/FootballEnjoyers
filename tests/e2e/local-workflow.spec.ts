@@ -143,7 +143,7 @@ test("local organizer manages competitors, scores, photos, and recovery without 
     await page.locator(".standing-row .rank").allTextContents(),
   ).not.toContain("-");
   s = await state();
-  expect(s.standings[0].points).toBe("15");
+  expect(s.standings[0].points).toBe("20");
   await act({ type: "start", eventId: "event-4", order });
   await page.goto(`${origin}/admin`);
   await page.getByRole("button", { name: /Mario Kart/ }).click();

@@ -15,6 +15,7 @@ import {
 import type { PublicState, Event, Audit } from "@/lib/model";
 import { NAMES } from "@/lib/model";
 import { placements } from "@/lib/scoring";
+import { PlacementRank } from "./placement-rank";
 import { FantasyAdmin } from "./fantasy-admin";
 import {
   Avatar,
@@ -939,11 +940,16 @@ function EventEditor({
                         }}
                       />
                       <small>
-                        {saving.includes(id)
-                          ? "Saving…"
-                          : place
-                            ? `#${place.place ?? "—"} · ${place.points} pts`
-                            : e.unit}
+                        {saving.includes(id) ? (
+                          "Saving…"
+                        ) : place ? (
+                          <>
+                            <PlacementRank rank={place.place} /> ·{" "}
+                            {place.points} pts
+                          </>
+                        ) : (
+                          e.unit
+                        )}
                       </small>
                     </label>
                   </div>

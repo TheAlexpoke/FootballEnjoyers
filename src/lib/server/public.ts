@@ -1,12 +1,14 @@
 import "server-only";
 import type { State, PublicState } from "../model";
-import { movement, phase } from "../scoring";
+import { movement, phase, rebuildHistory } from "../scoring";
 import { localPortrait } from "./portraits";
 export function publicState(
   s: State,
   configured: boolean,
   device = "",
 ): PublicState {
+  // Recalculate derived history under current rules without rewriting saved results.
+  rebuildHistory(s);
   const { audit: _audit, ...rest } = s;
   return {
     ...rest,
