@@ -334,3 +334,36 @@ test("up-next browsing keeps events in order and duplicate player names stay hid
     panel.getByRole("link", { name: "Event details & rules" }),
   ).toHaveAttribute("href", "/events/event-8");
 });
+
+test("completed event posters pin winner photos and include tied winners", async ({
+  page,
+}) => {
+  const s = fixture();
+  s.participants = s.participants.map((p) => ({
+    ...p,
+    avatar: "/images/events/beer-pong.svg",
+  }));
+  await page.route("**/api/state*", (r) => r.fulfill({ json: s }));
+  await page.goto("/events");
+  const first = page.locator('.event-card[href="/events/event-1"]');
+  await expect(
+    first.getByRole("group", { name: "EVENT WINNER: Mark", exact: true }),
+  ).toBeVisible();
+  await expect(first.locator(".winner-note img")).toHaveCount(1);
+  await expect(page.locator(".event-card.scheduled .winner-note")).toHaveCount(
+    0,
+  );
+  s.events[0].results[1].value = s.events[0].results[0].value;
+  await page.reload();
+  await expect(
+    first.getByRole("group", { name: "TIED WINNERS: Mark, Hong", exact: true }),
+  ).toBeVisible();
+  await expect(first.locator(".winner-note img")).toHaveCount(2);
+  await first.click();
+  await expect(
+    page.locator(".event-detail-banner .winner-note img"),
+  ).toHaveCount(2);
+  s.events[0].status = "active";
+  await page.goto("/events");
+  await expect(first.locator(".winner-note")).toHaveCount(0);
+});

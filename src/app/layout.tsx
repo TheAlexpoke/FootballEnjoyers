@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./championship.css";
 export const metadata: Metadata = {
   title: "Football Enjoyers · Draft Order Tournament",
   description: "Seven competitors. Eight events. Every point earns your pick.",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0b1019",
+  themeColor: "#101012",
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

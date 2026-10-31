@@ -611,6 +611,7 @@ export default function TournamentApp({
                           <EventCard
                             key={e.id}
                             event={e}
+                            players={state.participants}
                             index={i}
                             link={link}
                           />
@@ -632,7 +633,13 @@ export default function TournamentApp({
                 <div className="events-page-header">
                   <PageHeading
                     label="THE COMPETITION"
-                    title="Eight events. Everything to play for."
+                    title={
+                      <>
+                        EARN YOUR
+                        <br />
+                        <span className="poster-gold">FIRST PICK.</span>
+                      </>
+                    }
                     detail="From the first throw to Sunday Night Football. Follow every result here."
                   />
                   <ScoringCard />
@@ -641,7 +648,13 @@ export default function TournamentApp({
                   {state.events
                     .filter((e) => !e.deleted)
                     .map((e, i) => (
-                      <EventCard key={e.id} event={e} index={i} link={link} />
+                      <EventCard
+                        key={e.id}
+                        event={e}
+                        players={state.participants}
+                        index={i}
+                        link={link}
+                      />
                     ))}
                 </div>
               </>
@@ -741,7 +754,7 @@ export function PageHeading({
   detail,
 }: {
   label: string;
-  title: string;
+  title: ReactNode;
   detail?: string;
 }) {
   return (
@@ -832,6 +845,7 @@ function NextEvent({
             <span className="weight">{event.weight}×</span>
           </div>
           <p>{event.description}</p>
+          <EventWinnerNote event={event} players={state.participants} />
           <Link className="button secondary" href={link(`/events/${event.id}`)}>
             Event details & rules <ArrowUpRight size={15} />
           </Link>
@@ -879,16 +893,18 @@ function FinaleCard({
 }
 function EventCard({
   event,
+  players,
   index,
   link,
 }: {
   event: Event;
+  players: Player[];
   index: number;
   link: (p: string) => string;
 }) {
   return (
     <Link
-      className={`event-card panel ${event.status}`}
+      className={`event-card panel ${event.status} ${event.kind === "fantasy" ? "event-card--finale" : ""}`}
       href={link(`/events/${event.id}`)}
     >
       <div className="event-card-top">
@@ -901,12 +917,46 @@ function EventCard({
       <p>{eventPresentation(event).subtitle}</p>
       <div className="event-card-illustration">
         <EventIllustration event={event} />
+        <EventWinnerNote event={event} players={players} />
       </div>
       <div className="event-card-bottom">
         <Badge event={event} />
         <ArrowUpRight size={17} />
       </div>
     </Link>
+  );
+}
+function EventWinnerNote({
+  event,
+  players,
+}: {
+  event: Event;
+  players: Player[];
+}) {
+  if (event.status !== "finalized") return null;
+  const winners = placements(event)
+    .filter((result) => result.place === 1 && !result.absent)
+    .flatMap((result) => {
+      const player = players.find((p) => p.id === result.id);
+      return player ? [player] : [];
+    });
+  if (!winners.length) return null;
+  const label = winners.length === 1 ? "EVENT WINNER" : "TIED WINNERS";
+  return (
+    <div
+      className={`winner-note ${winners.length > 1 ? "winner-note--tied" : ""}`}
+      role="group"
+      aria-label={`${label}: ${winners.map((p) => p.name).join(", ")}`}
+    >
+      <span className="winner-note-tape" aria-hidden="true" />
+      <div className="winner-note-photos">
+        {winners.map((player) => (
+          <Avatar key={player.id} player={player} />
+        ))}
+      </div>
+      <span className="winner-note-label">{label}</span>
+      <strong>{winners.map((p) => p.name).join(" · ")}</strong>
+    </div>
   );
 }
 export function EventDetail({
@@ -937,7 +987,10 @@ export function EventDetail({
         title={e.name}
         detail={e.description}
       />
-      <Badge event={e} />
+      <div className="event-detail-banner">
+        <Badge event={e} />
+        <EventWinnerNote event={e} players={state.participants} />
+      </div>
       <div className="detail-grid">
         <section className="panel">
           <div className="section-heading">
