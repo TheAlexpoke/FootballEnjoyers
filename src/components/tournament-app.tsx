@@ -804,20 +804,36 @@ export function PageHeading({
   );
 }
 function BonusNote() {
+  const [collapsed, setCollapsed] = useState(false);
+  if (collapsed)
+    return (
+      <button
+        className="bonus-note-toggle"
+        onClick={() => setCollapsed(false)}
+        aria-label="Show bonus note"
+      >
+        <Trophy size={16} /> Bonus notes
+      </button>
+    );
   return (
     <section className="bonus-note" aria-label="Bonus awards explained">
+      <button
+        className="bonus-note-close"
+        aria-label="Minimize bonus note"
+        onClick={() => setCollapsed(true)}
+      >
+        <X size={15} />
+      </button>
       <h3>The bonus points</h3>
       <p>
-        <strong>+10 Consistency:</strong> best average finish. Tied leaders each
-        get 10.
+        <strong>+10 Consistency</strong>Best average finish. Each tied leader
+        gets 10.
       </p>
       <p>
-        <strong>10-point Last Place pool:</strong> most last-place finishes.
-        Tied leaders split the 10 points; shared last places count.
+        <strong>10-point Last Place pool</strong>Most last-place finishes. Tied
+        leaders split 10; shared last places count.
       </p>
-      <small>
-        Moves after each completed event · Already included in totals
-      </small>
+      <small>Updates after completed events. Included in totals.</small>
     </section>
   );
 }

@@ -89,13 +89,19 @@ body {
   flex-wrap: wrap;
 }
 .bonus-note {
-  position: relative;
-  margin: 14px 5px 25px;
-  padding: 22px 24px 18px;
+  position: fixed;
+  z-index: 45;
+  right: 24px;
+  bottom: 24px;
+  width: 240px;
+  height: 240px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 24px 22px 18px;
   background: #f3dc91;
   color: #332812;
-  transform: rotate(-0.7deg);
-  box-shadow: 3px 6px 0 #0003;
+  transform: rotate(-2deg);
+  box-shadow: 3px 8px 20px #0006;
 }
 .bonus-note::before {
   content: "";
@@ -109,33 +115,92 @@ body {
   border: 1px solid #fff4d044;
 }
 .bonus-note h3 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font:
-    22px Impact,
+    21px Impact,
     "Arial Narrow",
     sans-serif;
   text-transform: uppercase;
 }
 .bonus-note p {
-  margin: 7px 0;
+  margin: 10px 0;
   color: #332812;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.bonus-note p strong {
+  display: block;
 }
 .bonus-note small {
   display: block;
-  margin-top: 11px;
+  margin-top: 12px;
   color: #65532b;
-  font-size: 10px;
-  line-height: 1.5;
+  font-size: 9px;
+  line-height: 1.4;
 }
 .events-intro {
   min-width: 0;
 }
 .events-intro .bonus-note {
-  max-width: 520px;
-  margin-top: 27px;
-  margin-bottom: 5px;
+  margin: 0;
+}
+.bonus-note-close {
+  position: absolute;
+  top: 8px;
+  right: 7px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #65532b;
+  cursor: pointer;
+}
+.bonus-note-close:hover {
+  background: #33281214;
+}
+.bonus-note-toggle {
+  position: fixed;
+  z-index: 45;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 16px;
+  border: 1px solid #c5ad62;
+  background: #f3dc91;
+  color: #332812;
+  box-shadow: 2px 4px 12px #0005;
+  cursor: pointer;
+  font-weight: 700;
+}
+@media (max-width: 760px) {
+  .bonus-note {
+    right: 16px;
+    bottom: 18px;
+    width: 220px;
+    height: 220px;
+    padding: 21px 18px 15px;
+  }
+  .bonus-note h3 {
+    font-size: 19px;
+    margin-bottom: 10px;
+  }
+  .bonus-note p {
+    font-size: 10px;
+    margin: 9px 0;
+  }
+  .bonus-note small {
+    margin-top: 10px;
+    font-size: 8px;
+  }
+  .bonus-note-toggle {
+    right: 16px;
+    bottom: 18px;
+  }
 }
 .performance-place {
   display: flex;
