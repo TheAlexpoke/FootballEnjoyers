@@ -94,6 +94,18 @@ test("registration closes at seven and spectators can read standings", async ({
 test("local control room needs no password or participant sign-up", async ({
   page,
 }) => {
+  const empty = initialState();
+  await page.route("**/api/state*", (r) =>
+    r.fulfill({
+      json: {
+        ...empty,
+        configured: true,
+        localMode: true,
+        standings: [],
+        phase: phase(empty),
+      },
+    }),
+  );
   await page.goto("/admin");
   await expect(
     page.getByRole("heading", { name: "Make every result count." }),
@@ -182,6 +194,18 @@ test("all event cards retain navigation and show distinct local illustrations", 
 }) => {
   await page.route("**/api/state*", (r) => r.fulfill({ json: fixture() }));
   await page.goto("/events");
+  await expect(
+    page.getByRole("region", { name: "Scoring breakdown" }),
+  ).toBeVisible();
+  await expect(page.locator(".events-page-header .points-scale b")).toHaveText([
+    "15",
+    "10",
+    "6",
+    "3",
+    "2",
+    "1",
+    "0",
+  ]);
   const cards = page.locator(".all-events .event-card");
   await expect(cards).toHaveCount(8);
   const subtitles = [
@@ -253,9 +277,8 @@ test("history selects everyone after loading and gives tied players separate pho
     await route.fulfill({ json: s });
   });
   await page.goto("/history");
-  await expect(
-    page.locator('.chart-filters button[aria-pressed="true"]'),
-  ).toHaveCount(7);
+  await expect(page.locator(".chart-filters")).toHaveCount(0);
+  await expect(page.locator(".history-rank-label")).toHaveCount(7);
   await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
   await expect(page.locator("[data-history-connector]")).toHaveCount(7);
   const photos = await page
@@ -264,11 +287,50 @@ test("history selects everyone after loading and gives tied players separate pho
       images.map((image) => Number(image.getAttribute("y"))),
     );
   expect(new Set(photos).size).toBe(7);
-  await page
-    .locator(".chart-filters")
-    .getByRole("button", { name: "Mark", exact: true })
-    .click();
-  await expect(page.locator('[data-history-marker="p0"]')).toHaveCount(0);
   await page.getByRole("button", { name: "Points", exact: true }).click();
-  await expect(page.locator("[data-history-marker] image")).toHaveCount(6);
+  await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
+});
+
+test("up-next browsing keeps events in order and duplicate player names stay hidden", async ({
+  page,
+}) => {
+  const s = fixture();
+  s.participants = s.participants.map((p) => ({
+    ...p,
+    team: p.name,
+    nickname: "Old nickname",
+  }));
+  await page.route("**/api/state*", (r) => r.fulfill({ json: s }));
+  await page.goto("/");
+  const panel = page.locator(".next-card");
+  await expect(
+    panel.getByRole("heading", { name: "Pigskin Accuracy Toss", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".standing-row .competitor small")).toHaveCount(0);
+  await expect(page.getByText("Old nickname", { exact: false })).toHaveCount(0);
+  await panel
+    .getByRole("button", { name: "Previous event", exact: true })
+    .click();
+  await expect(
+    panel.getByRole("heading", { name: "Beer Pong", exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Previous event", exact: true }),
+  ).toBeDisabled();
+  for (let i = 1; i < 8; i++)
+    await panel
+      .getByRole("button", { name: "Next event", exact: true })
+      .click();
+  await expect(
+    panel.getByRole("heading", {
+      name: "Single Week Fantasy Score",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Next event", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    panel.getByRole("link", { name: "Event details & rules" }),
+  ).toHaveAttribute("href", "/events/event-8");
 });

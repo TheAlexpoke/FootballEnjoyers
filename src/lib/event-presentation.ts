@@ -24,8 +24,8 @@ const artwork = {
   },
   "event-5": {
     subtitle: "Fast Time Wins",
-    file: "relay-race.svg",
-    alt: "Two athletic figures passing a gold relay baton",
+    file: "paper-airplane.svg",
+    alt: "A folded white and gold paper airplane with a curved flight trail",
   },
   "event-6": {
     subtitle: "Most Flips Wins",

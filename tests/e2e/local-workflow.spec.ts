@@ -6,10 +6,38 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   page,
   request,
 }) => {
-  await page.goto("http://localhost:3002/admin");
+  await page.goto("http://localhost:3002/");
   await expect(
-    page.getByRole("heading", { name: "Run the tournament locally." }),
-  ).toBeVisible();
+    page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
+  ).toHaveText(["Standings", "Events"]);
+  await expect(page.locator(".standing-row")).toHaveCount(7);
+  await expect(
+    page.getByRole("link", { name: "Commissioner access" }),
+  ).toHaveCount(0);
+  await expect(page.locator('a[href^="/players/"]')).toHaveCount(0);
+  const publicData = await (
+    await request.get("http://localhost:3002/api/state")
+  ).json();
+  expect(publicData.readOnly).toBe(true);
+  expect(JSON.stringify(publicData)).not.toMatch(
+    /credentialHash|deviceHash|admin_sessions|profileToken/,
+  );
+  for (const path of [
+    "admin",
+    "history",
+    "register",
+    "manage/private",
+    "players/test",
+  ]) {
+    expect((await request.get(`http://localhost:3002/${path}`)).status()).toBe(
+      404,
+    );
+  }
+  expect(
+    (await request.get("http://localhost:3002/api/state?env=practice")).ok(),
+  ).toBe(false);
+  await page.goto("http://localhost:3002/events");
+  await expect(page.locator(".all-events .event-card")).toHaveCount(8);
   await expect(page.getByLabel("Administrator password")).toHaveCount(0);
   expect(
     (await (await request.get("http://localhost:3002/api/auth")).json()).admin,
@@ -78,11 +106,26 @@ test("local organizer manages competitors, scores, photos, and recovery without 
   expect(s.participants).toHaveLength(7);
   expect((await state("practice")).participants).toHaveLength(0);
   const order = s.participants.map((p: { id: string }) => p.id);
+  await page.goto(origin);
+  await expect(page.locator(".standing-row .rank")).toHaveText(
+    Array(7).fill("-"),
+  );
+  await page.goto(`${origin}/players/${order[0]}`);
+  await expect(page.locator(".player-stats b").first()).toHaveText("-");
   await act({ type: "start", eventId: "event-1", order });
   await page.goto(`${origin}/admin`);
   await page.getByRole("button", { name: /Beer Pong/ }).click();
   await expect(page.getByRole("checkbox", { name: /absent/i })).toHaveCount(0);
   await expect(page.getByLabel("Mark result", { exact: true })).toBeEnabled();
+  await page
+    .getByText("Edit event rules & configuration", { exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Save event configuration", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Event configuration saved." }),
+  ).toBeVisible();
   for (let i = 0; i < 7; i++)
     await act({
       type: "result",
@@ -91,9 +134,16 @@ test("local organizer manages competitors, scores, photos, and recovery without 
       value: String(30 + i * 5),
       absent: false,
     });
+  await page.goto(origin);
+  await expect(page.locator(".standing-row .rank")).toHaveText(
+    Array(7).fill("-"),
+  );
   await act({ type: "finalize", eventId: "event-1", confirm: "FINALIZE" });
   await page.goto(origin);
   await expect(page.locator(".standing-row")).toHaveCount(7);
+  expect(
+    await page.locator(".standing-row .rank").allTextContents(),
+  ).not.toContain("-");
   s = await state();
   expect(s.standings[0].points).toBe("15");
   await act({ type: "start", eventId: "event-4", order });

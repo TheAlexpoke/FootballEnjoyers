@@ -3,6 +3,7 @@ import { loadPublic, db, configured } from "@/lib/server/store";
 import { requireAdmin, deviceHash } from "@/lib/server/auth";
 import { initialState } from "@/lib/model";
 import { publicState } from "@/lib/server/public";
+import { sharedSnapshot } from "@/lib/server/shared-snapshot";
 import {
   localMode,
   hostedReadOnly,
@@ -21,6 +22,10 @@ export async function GET(req: NextRequest) {
         ? "practice"
         : "production";
     if (env === "practice") await requireAdmin();
+    if (hostedReadOnly())
+      return NextResponse.json(sharedSnapshot(), {
+        headers: { "Cache-Control": "no-store" },
+      });
     const ready = configured();
     const state = publicState(
       ready ? await loadPublic(env) : initialState(env),

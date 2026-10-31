@@ -358,7 +358,10 @@ export function Admin({
             <details key={p.id}>
               <summary>
                 <Avatar player={p} small />
-                {p.name} · {p.team}
+                {p.name}
+                {p.team.trim().toLowerCase() !== p.name.toLowerCase()
+                  ? ` · ${p.team}`
+                  : ""}
               </summary>
               <ProfileForm
                 initial={p}
@@ -802,6 +805,7 @@ function EventEditor({
   busy: boolean;
 }) {
   const [error, setError] = useState(""),
+    [configurationSaved, setConfigurationSaved] = useState(false),
     [saving, setSaving] = useState<string[]>([]);
   const run = (fn: () => Promise<unknown>) => {
     setError("");
@@ -916,7 +920,9 @@ function EventEditor({
                     <Avatar player={p} small />
                     <span className="entry-person">
                       <b>{p.name}</b>
-                      <small>{p.team}</small>
+                      {p.team.trim().toLowerCase() !== p.name.toLowerCase() && (
+                        <small>{p.team}</small>
+                      )}
                     </span>
                     <label className="raw-input">
                       <span className="sr-only">{p.name} result</span>
@@ -1072,11 +1078,13 @@ function EventEditor({
         )}
         <form
           key={`${e.id}-config`}
+          onChange={() => setConfigurationSaved(false)}
           onSubmit={(ev) => {
             ev.preventDefault();
             const f = new FormData(ev.currentTarget);
-            run(() =>
-              act({
+            run(async () => {
+              setConfigurationSaved(false);
+              await act({
                 type: "event",
                 eventId: e.id,
                 name: f.get("name"),
@@ -1085,8 +1093,9 @@ function EventEditor({
                 direction: f.get("direction"),
                 description: f.get("description"),
                 rules: String(f.get("rules")).split("\n").filter(Boolean),
-              }),
-            );
+              });
+              setConfigurationSaved(true);
+            });
           }}
         >
           <div className="form-columns">
@@ -1143,8 +1152,13 @@ function EventEditor({
             />
           </label>
           <button className="button secondary" disabled={busy}>
-            Save event configuration
+            {busy ? "Saving…" : "Save event configuration"}
           </button>
+          {configurationSaved && (
+            <p className="success" role="status">
+              <Check size={14} /> Event configuration saved.
+            </p>
+          )}
         </form>
       </details>
     </section>

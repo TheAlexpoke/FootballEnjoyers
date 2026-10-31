@@ -461,7 +461,9 @@ export function FantasyAdmin({
               <label className="fantasy-manual-row" key={p.id}>
                 <span>
                   <b>{p.name}</b>
-                  <small>{p.team}</small>
+                  {p.team.trim().toLowerCase() !== p.name.toLowerCase() && (
+                    <small>{p.team}</small>
+                  )}
                 </span>
                 <input
                   aria-label={`${p.name} fantasy score`}

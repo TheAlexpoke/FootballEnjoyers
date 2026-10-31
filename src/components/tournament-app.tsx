@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState, useId } from "react";
+import { useCallback, useEffect, useState, useId, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Check,
   ChevronRight,
+  ChevronLeft,
   Flag,
   History,
   LayoutGrid,
@@ -96,7 +97,30 @@ export function ErrorMessage({ message }: { message: string }) {
 export function TournamentProvider() {
   return null;
 }
-export default function TournamentApp() {
+function PlayerLink({
+  readOnly,
+  href,
+  className,
+  children,
+}: {
+  readOnly: boolean;
+  href: string;
+  className: string;
+  children: ReactNode;
+}) {
+  return readOnly ? (
+    <div className={className}>{children}</div>
+  ) : (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+export default function TournamentApp({
+  publicOnly = false,
+}: {
+  publicOnly?: boolean;
+}) {
   const pathname = usePathname();
   const [data, setData] = useState<PublicState | null>(null);
   const [error, setError] = useState("");
@@ -107,7 +131,8 @@ export default function TournamentApp() {
   const [manualLayout, setManualLayout] = useState(false);
   useEffect(() => {
     setEnv(
-      new URLSearchParams(window.location.search).get("env") === "practice"
+      !publicOnly &&
+        new URLSearchParams(window.location.search).get("env") === "practice"
         ? "practice"
         : "production",
     );
@@ -116,7 +141,7 @@ export default function TournamentApp() {
       setLayout(saved);
       setManualLayout(true);
     }
-  }, []);
+  }, [publicOnly]);
   const refresh = useCallback(async () => {
     try {
       const state = await request(`/api/state?env=${env}`);
@@ -191,6 +216,7 @@ export default function TournamentApp() {
   const link = (path: string) =>
     env === "practice" ? `${path}?env=practice` : path;
   const state = data ?? fallback;
+  const sharedView = publicOnly || state.readOnly;
   const completed = state.events.filter(
     (e) => !e.deleted && e.status === "finalized",
   ).length;
@@ -225,19 +251,25 @@ export default function TournamentApp() {
             className={menu ? "nav open" : "nav"}
             aria-label="Main navigation"
           >
-            {[
-              ["/", "Standings"],
-              ["/events", "Events"],
-              ["/history", "History"],
-              [
-                state.localMode || state.readOnly ? "/admin" : "/register",
-                state.localMode
-                  ? "Control room"
-                  : state.readOnly
-                    ? "About this preview"
-                    : "The lobby",
-              ],
-            ].map(([path, label]) => (
+            {(sharedView
+              ? [
+                  ["/", "Standings"],
+                  ["/events", "Events"],
+                ]
+              : [
+                  ["/", "Standings"],
+                  ["/events", "Events"],
+                  ["/history", "History"],
+                  [
+                    state.localMode || state.readOnly ? "/admin" : "/register",
+                    state.localMode
+                      ? "Control room"
+                      : state.readOnly
+                        ? "About this preview"
+                        : "The lobby",
+                  ],
+                ]
+            ).map(([path, label]) => (
               <Link
                 className={
                   pathname === path || pathname.startsWith(`${path}/`)
@@ -255,13 +287,15 @@ export default function TournamentApp() {
           <span className="season">
             DRAFT ORDER TOURNAMENT <b>2026</b>
           </span>
-          <Link
-            className="admin-link"
-            href={link("/admin")}
-            aria-label="Administrator"
-          >
-            <Shield size={18} />
-          </Link>
+          {!sharedView && (
+            <Link
+              className="admin-link"
+              href={link("/admin")}
+              aria-label="Administrator"
+            >
+              <Shield size={18} />
+            </Link>
+          )}
           <button
             className="menu-button icon-button"
             aria-label="Toggle menu"
@@ -415,17 +449,20 @@ export default function TournamentApp() {
                               (p) => p.id === r.id,
                             )!;
                             const change =
-                              r.previousRank === undefined
+                              completed === 0 || r.previousRank === undefined
                                 ? 0
                                 : r.previousRank - r.rank;
                             return (
-                              <Link
+                              <PlayerLink
+                                readOnly={Boolean(sharedView)}
                                 href={link(`/players/${p.id}`)}
                                 key={p.id}
                                 className={`standing-row ${r.rank === 1 && r.points !== "0" ? "leader" : ""} ${state.me === p.id ? "is-me" : ""}`}
                               >
                                 <span className="rank">
-                                  {r.rank === 1 && r.points !== "0" ? (
+                                  {completed === 0 ? (
+                                    "-"
+                                  ) : r.rank === 1 && r.points !== "0" ? (
                                     <Trophy size={21} />
                                   ) : (
                                     String(r.rank).padStart(2, "0")
@@ -438,10 +475,10 @@ export default function TournamentApp() {
                                       {p.team}
                                       {state.me === p.id && <em>YOU</em>}
                                     </b>
-                                    <small>
-                                      {p.name}
-                                      {p.nickname ? ` · ${p.nickname}` : ""}
-                                    </small>
+                                    {p.team.trim().toLowerCase() !==
+                                      p.name.toLowerCase() && (
+                                      <small>{p.name}</small>
+                                    )}
                                   </span>
                                 </span>
                                 <span
@@ -465,7 +502,7 @@ export default function TournamentApp() {
                                   {displayPoints(r.points)}
                                   <small>PTS</small>
                                 </span>
-                              </Link>
+                              </PlayerLink>
                             );
                           })}
                         </div>
@@ -490,15 +527,17 @@ export default function TournamentApp() {
                           <Link
                             className="button primary"
                             href={link(
-                              state.localMode || state.readOnly
-                                ? "/admin"
-                                : "/register",
+                              sharedView
+                                ? "/events"
+                                : state.localMode
+                                  ? "/admin"
+                                  : "/register",
                             )}
                           >
                             {state.localMode
                               ? "Open control room"
-                              : state.readOnly
-                                ? "About this preview"
+                              : sharedView
+                                ? "View events"
                                 : "Enter the lobby"}{" "}
                             <ArrowUpRight size={16} />
                           </Link>
@@ -520,9 +559,11 @@ export default function TournamentApp() {
                             ? "Includes provisional fantasy points"
                             : "Official finalized event points"}
                         </span>
-                        <Link href={link("/history")}>
-                          Standings history <ChevronRight size={13} />
-                        </Link>
+                        {!sharedView && (
+                          <Link href={link("/history")}>
+                            Standings history <ChevronRight size={13} />
+                          </Link>
+                        )}
                       </div>
                     </section>
                     {state.phase === "Complete" && (
@@ -582,40 +623,21 @@ export default function TournamentApp() {
                       <NextEvent state={state} link={link} />
                     )}
                     <FinaleCard state={state} link={link} />
-                    <section className="panel scoring-card">
-                      <div className="eyebrow">KNOW THE SCORE</div>
-                      <h3>Placement × weight.</h3>
-                      <p>
-                        Every finish counts. Bigger events raise the stakes.
-                      </p>
-                      <div className="points-scale">
-                        {[15, 10, 6, 3, 2, 1, 0].map((n, i) => (
-                          <span key={n}>
-                            <small>
-                              {i + 1}
-                              {ordinal(i + 1)}
-                            </small>
-                            <b>{n}</b>
-                          </span>
-                        ))}
-                      </div>
-                      <div className="fine-print">
-                        Ties share the average of occupied places.
-                        <br />
-                        Mario Kart Wild Card losers: 1 base point each.
-                      </div>
-                    </section>
+                    <ScoringCard />
                   </aside>
                 </div>
               </>
             )}
             {page === "events" && !segments[1] && (
               <>
-                <PageHeading
-                  label="THE COMPETITION"
-                  title="Eight events. Everything to play for."
-                  detail="From the first cup to Sunday Night Football. Follow every result here."
-                />
+                <div className="events-page-header">
+                  <PageHeading
+                    label="THE COMPETITION"
+                    title="Eight events. Everything to play for."
+                    detail="From the first throw to Sunday Night Football. Follow every result here."
+                  />
+                  <ScoringCard />
+                </div>
                 <div className="all-events">
                   {state.events
                     .filter((e) => !e.deleted)
@@ -693,8 +715,17 @@ export default function TournamentApp() {
         </span>
         <p>Seven friends. Eight events. Bragging rights forever.</p>
         <span>
-          {lastFetch ? `Updated ${lastFetch}` : "Connecting"} ·{" "}
-          <Link href={link("/admin")}>Commissioner access</Link>
+          {sharedView && state.sharedSnapshotAt
+            ? `Published ${new Date(state.sharedSnapshotAt).toLocaleDateString()}`
+            : lastFetch
+              ? `Updated ${lastFetch}`
+              : "Connecting"}{" "}
+          ·{" "}
+          {sharedView ? (
+            "View-only tournament snapshot"
+          ) : (
+            <Link href={link("/admin")}>Commissioner access</Link>
+          )}
         </span>
       </footer>
     </>
@@ -722,6 +753,31 @@ export function PageHeading({
     </div>
   );
 }
+function ScoringCard() {
+  return (
+    <section className="panel scoring-card" aria-label="Scoring breakdown">
+      <div className="eyebrow">KNOW THE SCORE</div>
+      <h3>Placement × weight.</h3>
+      <p>Every finish counts. Bigger events raise the stakes.</p>
+      <div className="points-scale">
+        {[15, 10, 6, 3, 2, 1, 0].map((n, i) => (
+          <span key={n}>
+            <small>
+              {i + 1}
+              {ordinal(i + 1)}
+            </small>
+            <b>{n}</b>
+          </span>
+        ))}
+      </div>
+      <div className="fine-print">
+        Ties share the average of occupied places.
+        <br />
+        Mario Kart Wild Card losers: 1 base point each.
+      </div>
+    </section>
+  );
+}
 function NextEvent({
   state,
   link,
@@ -729,14 +785,43 @@ function NextEvent({
   state: PublicState;
   link: (p: string) => string;
 }) {
-  const event =
-    state.events.find((e) => !e.deleted && e.status === "active") ??
-    state.events.find((e) => !e.deleted && e.status === "scheduled");
+  const events = state.events.filter((e) => !e.deleted);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const automatic =
+    events.find((e) => e.status === "active") ??
+    events.find((e) => e.status === "scheduled");
+  const event = events.find((e) => e.id === previewId) ?? automatic;
+  const index = event
+    ? events.findIndex((e) => e.id === event.id)
+    : events.length;
   return (
     <section className="panel next-card">
-      <div className="eyebrow">
-        <Flag size={13} />
-        {event?.status === "active" ? "ON THE FIELD" : "UP NEXT"}
+      <div className="next-event-heading">
+        <div className="eyebrow">
+          <Flag size={13} />
+          {event?.status === "active" ? "ON THE FIELD" : "UP NEXT"}
+        </div>
+        <div className="event-browse-controls">
+          <button
+            type="button"
+            aria-label="Previous event"
+            disabled={index === 0 || !events.length}
+            onClick={() => setPreviewId(events[index - 1].id)}
+          >
+            <ChevronLeft size={17} />
+          </button>
+          <span aria-live="polite">
+            {event ? `${index + 1} / ${events.length}` : "Complete"}
+          </span>
+          <button
+            type="button"
+            aria-label="Next event"
+            disabled={index >= events.length - 1}
+            onClick={() => setPreviewId(events[index + 1].id)}
+          >
+            <ChevronRight size={17} />
+          </button>
+        </div>
       </div>
       {event ? (
         <>
@@ -876,7 +961,8 @@ export function EventDetail({
               const r = e.results.find((r) => r.participantId === id),
                 score = scores.find((r) => r.id === id);
               return (
-                <Link
+                <PlayerLink
+                  readOnly={Boolean(state.readOnly)}
                   className="result-row"
                   key={id}
                   href={link(`/players/${id}`)}
@@ -888,7 +974,9 @@ export function EventDetail({
                   <Avatar player={p} small />
                   <span className="result-person">
                     <b>{p.team}</b>
-                    <small>{p.name}</small>
+                    {p.team.trim().toLowerCase() !== p.name.toLowerCase() && (
+                      <small>{p.name}</small>
+                    )}
                   </span>
                   <span className="raw">
                     {r?.absent
@@ -902,7 +990,7 @@ export function EventDetail({
                         : "Not scored"}
                     </small>
                   </span>
-                </Link>
+                </PlayerLink>
               );
             })}
             {!sorted.length && (
@@ -1069,7 +1157,10 @@ function FantasyDetail({ state }: { state: PublicState }) {
       {state.participants.map((p) => (
         <div className="order-row fantasy-public-row" key={p.id}>
           <span>
-            {p.team} · {p.name}
+            {p.team}
+            {p.team.trim().toLowerCase() !== p.name.toLowerCase()
+              ? ` · ${p.name}`
+              : ""}
           </span>
           <b>
             {event?.results.find((r) => r.participantId === p.id)?.value ?? "—"}{" "}
@@ -1092,6 +1183,9 @@ function PlayerDetail({
   const p = state.participants.find((p) => p.id === id);
   if (!p) return <PageHeading label="COMPETITOR" title="Profile not found" />;
   const r = state.standings.find((r) => r.id === id);
+  const ranked = state.events.some(
+    (event) => !event.deleted && event.status === "finalized",
+  );
   return (
     <>
       <Link className="back-link" href={link("/")}>
@@ -1100,15 +1194,14 @@ function PlayerDetail({
       <section className="player-hero">
         <Avatar player={p} />
         <div>
-          <div className="eyebrow">
-            {p.name}
-            {p.nickname ? ` / “${p.nickname}”` : ""}
-          </div>
+          {p.team.trim().toLowerCase() !== p.name.toLowerCase() && (
+            <div className="eyebrow">{p.name}</div>
+          )}
           <h1>{p.team}</h1>
         </div>
         <div className="player-stats">
           <span>
-            <b>#{r?.rank}</b>OVERALL
+            <b>{ranked && r ? `#${r.rank}` : "-"}</b>OVERALL
           </span>
           <span>
             <b>{displayPoints(r?.points ?? "0")}</b>POINTS
@@ -1163,10 +1256,7 @@ export function HistoryChart({
   state: PublicState;
   initial?: string[];
 }) {
-  const [selection, setSelection] = useState<Record<string, boolean>>({});
-  const selected = state.participants
-    .filter((p) => selection[p.id] ?? (initial ? initial.includes(p.id) : true))
-    .map((p) => p.id);
+  const selected = initial ?? state.participants.map((p) => p.id);
   const chartId = useId().replace(/:/g, "");
   const [metric, setMetric] = useState<"rank" | "points">("rank");
   const colors = [
@@ -1189,9 +1279,14 @@ export function HistoryChart({
   const width = Math.max(850, snapshots.length * 190 + 130),
     height = 460;
   const x = (i: number) =>
-    65 + (i / Math.max(snapshots.length - 1, 1)) * (width - 150);
+    86 + (i / Math.max(snapshots.length - 1, 1)) * (width - 171);
   const y = (v: number) =>
     metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
+  const medals = [
+    { light: "#fff0b4", mid: "#e9bd5a", dark: "#a27324", back: "#352b1c" },
+    { light: "#f5f8ff", mid: "#becbdd", dark: "#77899e", back: "#252f3c" },
+    { light: "#f6d6b6", mid: "#cd9467", dark: "#8a532e", back: "#34271f" },
+  ];
   const chartPoints = snapshots.map((snapshot, j) =>
     spreadHistoryMarkers(
       state.participants
@@ -1238,27 +1333,6 @@ export function HistoryChart({
           </button>
         </div>
       </div>
-      <div className="chart-filters">
-        {state.participants.map((p, i) => (
-          <button
-            aria-pressed={selected.includes(p.id)}
-            key={p.id}
-            onClick={() =>
-              setSelection((previous) => ({
-                ...previous,
-                [p.id]: !selected.includes(p.id),
-              }))
-            }
-          >
-            <span
-              style={{
-                background: selected.includes(p.id) ? colors[i % 7] : "#343d4e",
-              }}
-            />
-            {p.name}
-          </button>
-        ))}
-      </div>
       {snapshots.length ? (
         <>
           <div className="chart-scroll">
@@ -1272,20 +1346,73 @@ export function HistoryChart({
               {Array.from({ length: 7 }, (_, i) => (
                 <g key={i}>
                   <line
-                    x1="48"
+                    x1="59"
                     x2={width - 35}
                     y1={80 + (i * 280) / 6}
                     y2={80 + (i * 280) / 6}
                     stroke="#273142"
                   />
-                  <text
-                    x="25"
-                    y={85 + (i * 280) / 6}
-                    fill="#8290a6"
-                    fontSize="12"
-                  >
-                    {metric === "rank" ? i + 1 : Math.round(max * (1 - i / 6))}
-                  </text>
+                  {metric === "rank" ? (
+                    <g
+                      className="history-rank-label"
+                      data-rank={i + 1}
+                      transform={"translate(27 " + (80 + (i * 280) / 6) + ")"}
+                    >
+                      {i < 3 && (
+                        <defs>
+                          <linearGradient
+                            id={chartId + "-medal-" + i}
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop offset="0%" stopColor={medals[i].light} />
+                            <stop offset="55%" stopColor={medals[i].mid} />
+                            <stop offset="100%" stopColor={medals[i].dark} />
+                          </linearGradient>
+                        </defs>
+                      )}
+                      <path
+                        d="M-13-20H12L20-12V12L12 20H-13L-20 12V-12Z"
+                        fill={i < 3 ? medals[i].back : "#172231"}
+                        stroke={i < 3 ? medals[i].mid : "#3b4c62"}
+                        strokeWidth="1.2"
+                      />
+                      <path
+                        d="M-10-16H10"
+                        stroke={i < 3 ? medals[i].light : "#667b96"}
+                        strokeWidth="2"
+                      />
+                      <text
+                        y="2"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill={
+                          i < 3
+                            ? "url(#" + chartId + "-medal-" + i + ")"
+                            : "#b4c3d7"
+                        }
+                        fontSize="29"
+                        fontFamily="Impact, Arial Narrow, sans-serif"
+                        fontWeight="900"
+                        fontStyle="italic"
+                      >
+                        {i + 1}
+                      </text>
+                    </g>
+                  ) : (
+                    <text
+                      x="27"
+                      y={85 + (i * 280) / 6}
+                      textAnchor="middle"
+                      fill="#a7b7cd"
+                      fontSize="16"
+                      fontWeight="700"
+                    >
+                      {Math.round(max * (1 - i / 6))}
+                    </text>
+                  )}
                 </g>
               ))}
               {snapshots.map((s, i) => (
@@ -1294,8 +1421,11 @@ export function HistoryChart({
                   x={x(i)}
                   y="445"
                   textAnchor="middle"
-                  fill="#8290a6"
-                  fontSize="11"
+                  fill="#d6bd86"
+                  fontSize="19"
+                  fontWeight="800"
+                  fontFamily="Impact, Arial Narrow, sans-serif"
+                  letterSpacing="0.8"
                 >
                   {s.id.startsWith("live-") ? "Fantasy live" : `Event ${i + 1}`}
                 </text>

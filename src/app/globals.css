@@ -747,6 +747,46 @@ em {
 .next-card {
   padding: 23px;
 }
+.next-event-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.event-browse-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.event-browse-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--gold);
+}
+.event-browse-controls button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.event-browse-controls span {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .next-event-heading {
+    grid-column: 1 / -1;
+  }
+  .event-browse-controls button {
+    width: 40px;
+    height: 40px;
+  }
+}
 .event-art {
   height: 106px;
   margin-top: 19px;
@@ -1084,6 +1124,27 @@ em {
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
   margin-top: 5px;
+}
+.events-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: center;
+  gap: 30px;
+  margin: 32px 0 24px;
+}
+.events-page-header .page-heading {
+  padding: 0;
+}
+.events-page-header .scoring-card {
+  min-width: 0;
+  padding: 20px;
+}
+@media (max-width: 760px) {
+  .events-page-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    margin: 24px 0;
+  }
 }
 .all-events .event-card {
   min-height: 210px;

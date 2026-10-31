@@ -25,7 +25,7 @@ Local mode is the default. Copying `.env.example` is optional. `LOCAL_DATA_DIR` 
 
 ## History progression
 
-The History page selects all competitors by default, including when data loads after the page opens. Name buttons toggle individual competitors. Both Rank and Points views use profile photos as markers; initials appear until a photo is added. Tied or crowded markers are separated with leader lines to their exact chart positions, preserving the recorded standings. The chart scrolls horizontally on smaller screens. Add each photo in Control room → Players to use it throughout the site and in history.
+The History page shows all competitors automatically, including when data loads after the page opens, without a separate player key. Bold rank badges highlight first in gold, second in silver and third in bronze; ranks 4–7 use matching slate badges. Event labels are larger and bolder. Both Rank and Points views use profile photos as markers; initials appear until a photo is added. Tied or crowded markers are separated with leader lines to their exact chart positions, preserving the recorded standings. The chart scrolls horizontally on smaller screens. Add each photo in Control room → Players to use it throughout the site and in history.
 
 ## Storage and recovery
 
@@ -38,6 +38,16 @@ Use Control room → Recovery to export JSON/CSV, create recovery points or rest
 The `data` directory, environment files, generated OCR assets, dependencies and build output are excluded from GitHub. Keep custom `LOCAL_DATA_DIR` locations outside source control too. Existing Supabase data is not deleted or automatically imported. Existing compatible JSON backups can be restored from the local Recovery tab; photos must be copied separately.
 
 ## GitHub and Vercel
+
+### Current public sharing mode
+
+The shared Vercel site contains only Standings and Events, including read-only event detail pages. Admin, History, Players, registration, private management pages, practice access, and all editing APIs are unavailable there. The full local control room remains unchanged.
+
+With the local server running, `npm run snapshot:prepare` prepares a public copy of the current **official** standings, roster, event schedule, rules, and profile photos. It does not change the local tournament. This creates `src/data/shared-tournament.json` and copies the displayed photos into `public/images/players/` with versioned filenames. These files are intentionally public when pushed to GitHub and deployed to Vercel. Private database files, audit records, backups, credentials and practice results are excluded.
+
+Push the updated source, snapshot and public photo copies to the connected GitHub repository to update Vercel. The public view is a published snapshot: later local score edits do not appear until a new snapshot is prepared and published. Originals and the main tournament database stay in `data` on this computer. No shared database or paid API is required.
+
+### Earlier preview behavior (superseded by public sharing mode)
 
 GitHub stores the application source. Vercel serves a read-only public preview: no administrator login, participant registration or editable tournament controls. Backend writes are disabled whenever `VERCEL` is set, regardless of `LOCAL_MODE`.
 
