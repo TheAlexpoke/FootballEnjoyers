@@ -456,15 +456,39 @@ test("completed event posters pin winner photos and include tied winners", async
     first.getByRole("group", { name: "EVENT WINNER: Mark", exact: true }),
   ).toBeVisible();
   await expect(first.locator(".winner-note img")).toHaveCount(1);
+  await expect(
+    first.getByRole("group", { name: "LAST PLACE: Alex", exact: true }),
+  ).toBeVisible();
+  await expect(first.locator(".last-place-note img")).toHaveCount(1);
+  await expect(
+    page.locator(".event-card.scheduled .last-place-note"),
+  ).toHaveCount(0);
   await expect(page.locator(".event-card.scheduled .winner-note")).toHaveCount(
     0,
   );
   s.events[0].results[1].value = s.events[0].results[0].value;
+  s.events[0].results[5].value = s.events[0].results[6].value;
+  s.events[3].status = "finalized";
+  s.events[3].results = s.participants.map((p, i) => ({
+    participantId: p.id,
+    value: String(Math.min(i + 1, 5)),
+    absent: false,
+  }));
   await page.reload();
   await expect(
     first.getByRole("group", { name: "TIED WINNERS: Mark, Hong", exact: true }),
   ).toBeVisible();
   await expect(first.locator(".winner-note img")).toHaveCount(2);
+  await expect(
+    first.getByRole("group", {
+      name: "TIED LAST PLACE: Dabin, Alex",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(first.locator(".last-place-note img")).toHaveCount(2);
+  await expect(
+    page.locator('.event-card[href="/events/event-4"] .last-place-note img'),
+  ).toHaveCount(3);
   await first.click();
   await expect(
     page.locator(".event-detail-banner .winner-note img"),
@@ -472,4 +496,5 @@ test("completed event posters pin winner photos and include tied winners", async
   s.events[0].status = "active";
   await page.goto("/events");
   await expect(first.locator(".winner-note")).toHaveCount(0);
+  await expect(first.locator(".last-place-note")).toHaveCount(0);
 });

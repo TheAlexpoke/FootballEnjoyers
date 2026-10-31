@@ -1054,9 +1054,98 @@ function EventCard({
       </div>
       <div className="event-card-bottom">
         <Badge event={event} />
-        <ArrowUpRight size={17} />
+        <div className="event-card-finish">
+          <EventLastPlaceNote event={event} players={players} />
+          {event.status !== "finalized" && <ArrowUpRight size={17} />}
+        </div>
       </div>
     </Link>
+  );
+}
+function EventLastPlaceNote({
+  event,
+  players,
+}: {
+  event: Event;
+  players: Player[];
+}) {
+  if (event.status !== "finalized" || event.results.length !== players.length)
+    return null;
+  const results = placements(event).filter(
+    (result) => !result.absent && result.place !== null,
+  );
+  const last = Math.max(...results.map((result) => result.place!));
+  const losers = results
+    .filter((result) => result.place === last)
+    .flatMap((result) => {
+      const player = players.find((player) => player.id === result.id);
+      return player ? [player] : [];
+    });
+  if (!losers.length) return null;
+  const label = losers.length > 1 ? "TIED LAST PLACE" : "LAST PLACE";
+  return (
+    <div
+      className={`last-place-note ${losers.length > 1 ? "last-place-note--tied" : ""}`}
+      role="group"
+      aria-label={`${label}: ${losers.map((player) => player.name).join(", ")}`}
+    >
+      <div className="last-place-graphic">
+        <svg
+          viewBox="0 0 90 78"
+          aria-hidden="true"
+          className="last-place-toilet"
+        >
+          <path
+            d="M12 14h24v34H12z"
+            fill="#dfe8ee"
+            stroke="#647a8d"
+            strokeWidth="2.5"
+          />
+          <path
+            d="M10 12h28v7H10z"
+            fill="#f7fafb"
+            stroke="#647a8d"
+            strokeWidth="2.5"
+          />
+          <path
+            d="M31 45h48c-1 18-12 21-25 21H43c-7-2-11-11-12-21Z"
+            fill="#f7fafb"
+            stroke="#647a8d"
+            strokeWidth="2.5"
+          />
+          <ellipse
+            cx="55"
+            cy="45"
+            rx="25"
+            ry="7"
+            fill="#e5f1f7"
+            stroke="#647a8d"
+            strokeWidth="2.5"
+          />
+          <ellipse cx="55" cy="45" rx="16" ry="3" fill="#98bfd0" />
+          <path
+            d="M44 63h16l5 10H39z"
+            fill="#e5edf2"
+            stroke="#647a8d"
+            strokeWidth="2.5"
+          />
+          <path
+            d="M36 74h32M19 25h6"
+            fill="none"
+            stroke="#647a8d"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="last-place-photos">
+          {losers.map((player) => (
+            <Avatar key={player.id} player={player} />
+          ))}
+        </div>
+      </div>
+      <span className="last-place-label">{label}</span>
+      <strong>{losers.map((player) => player.name).join(" · ")}</strong>
+    </div>
   );
 }
 function EventWinnerNote({

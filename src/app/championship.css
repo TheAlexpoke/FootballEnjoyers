@@ -499,6 +499,119 @@ textarea:focus {
   padding-top: 11px;
   border-top: 1px solid #d3b56744;
 }
+.event-card-finish {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.last-place-note {
+  width: 94px;
+  flex-shrink: 0;
+  text-align: center;
+  color: #d2c7b1;
+  line-height: 1.2;
+}
+.last-place-graphic {
+  width: 90px;
+  height: 78px;
+  position: relative;
+  margin: 0 auto;
+}
+.last-place-toilet {
+  width: 90px;
+  height: 78px;
+  display: block;
+}
+.last-place-photos {
+  position: absolute;
+  top: 0;
+  left: 26px;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1px;
+}
+.last-place-note .avatar {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #f0d99c;
+}
+.last-place-note--tied .last-place-photos {
+  left: 0;
+}
+.last-place-note--tied .avatar {
+  width: 21px;
+  height: 21px;
+}
+.last-place-label {
+  display: block;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  margin-top: 2px;
+}
+.last-place-note strong {
+  display: block;
+  font-size: 10px;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+.all-events .event-card--finale .last-place-note {
+  color: #352a15;
+}
+.event-grid .last-place-note {
+  width: 77px;
+}
+.event-grid .last-place-graphic {
+  width: 72px;
+  height: 64px;
+}
+.event-grid .last-place-toilet {
+  width: 72px;
+  height: 64px;
+}
+.event-grid .last-place-note .avatar {
+  width: 27px;
+  height: 27px;
+}
+.event-grid .last-place-note--tied .avatar {
+  width: 17px;
+  height: 17px;
+}
+.event-grid .last-place-photos {
+  left: 20px;
+}
+.event-grid .last-place-note--tied .last-place-photos {
+  left: 0;
+}
+@media (max-width: 760px) {
+  .all-events .last-place-note {
+    width: 80px;
+  }
+  .all-events .last-place-graphic {
+    width: 76px;
+    height: 66px;
+  }
+  .all-events .last-place-toilet {
+    width: 76px;
+    height: 66px;
+  }
+  .all-events .last-place-note .avatar {
+    width: 29px;
+    height: 29px;
+  }
+  .all-events .last-place-note--tied .avatar {
+    width: 18px;
+    height: 18px;
+  }
+  .all-events .last-place-photos {
+    left: 22px;
+  }
+  .all-events .last-place-note--tied .last-place-photos {
+    left: 0;
+  }
+}
 .all-events .event-card:has(.winner-note) .event-illustration {
   position: absolute;
   left: 0;
