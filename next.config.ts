@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   devIndicators: false,
   poweredByHeader: false,
+  // Local tournament files must never be bundled into a public deployment.
+  outputFileTracingExcludes: { "/*": ["./data/**/*", "./.env.local"] },
   async headers() {
     return [
       {

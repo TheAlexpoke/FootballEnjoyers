@@ -129,6 +129,8 @@ export type PublicState = Omit<State, "participants" | "audit"> & {
   standings: Standing[];
   phase: string;
   configured: boolean;
+  localMode?: boolean;
+  readOnly?: boolean;
   me?: string;
 };
 export function initialState(

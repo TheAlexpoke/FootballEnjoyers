@@ -2,6 +2,8 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { fantasyScore } from "../fantasy-entry";
+import { localMode } from "./local-mode";
+import { localReceiptKey } from "./local-store";
 export const receiptSchema = z.object({
   version: z.literal(1),
   importId: z.uuid(),
@@ -25,6 +27,7 @@ export const receiptSchema = z.object({
 });
 export type Receipt = z.infer<typeof receiptSchema>;
 function key() {
+  if (localMode()) return localReceiptKey();
   if (!process.env.ADMIN_PASSWORD_HASH)
     throw Error("Configure administrator authentication first.");
   return process.env.ADMIN_PASSWORD_HASH;

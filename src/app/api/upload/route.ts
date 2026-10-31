@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { assertOrigin, isAdmin, hash, limit } from "@/lib/server/auth";
 import { mutate } from "@/lib/server/store";
+import { localMode } from "@/lib/server/local-mode";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve, dirname } from "node:path";
 export async function POST(req: NextRequest) {
   try {
     assertOrigin(req);
@@ -42,20 +45,31 @@ export async function POST(req: NextRequest) {
         (!admin && (!p.credentialHash || p.credentialHash !== hash(raw)))
       )
         throw Error("Profile authorization failed.");
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/avatars/${path}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-            "Content-Type": "image/webp",
-          },
-          body: new Uint8Array(bytes),
-        },
-      );
-      if (!res.ok) throw Error("Image upload failed.");
       const old = p.avatar;
-      p.avatar = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
+      if (localMode()) {
+        const destination = resolve(
+          process.env.LOCAL_DATA_DIR || "data",
+          "avatars",
+          path,
+        );
+        await mkdir(dirname(destination), { recursive: true });
+        await writeFile(destination, bytes);
+        p.avatar = `/api/local-avatar?file=${encodeURIComponent(path)}`;
+      } else {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/avatars/${path}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+              "Content-Type": "image/webp",
+            },
+            body: new Uint8Array(bytes),
+          },
+        );
+        if (!res.ok) throw Error("Image upload failed.");
+        p.avatar = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
+      }
       s.audit.push({
         id: crypto.randomUUID(),
         at: new Date().toISOString(),

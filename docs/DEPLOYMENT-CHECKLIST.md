@@ -1,5 +1,18 @@
 # Launch checklist
 
+## Current local workflow
+
+- [ ] Install Node.js 24 and dependencies with lifecycle scripts enabled.
+- [ ] Open `/admin` locally without a password and add competitors in Players.
+- [ ] Rehearse scoring and backups in practice; return to official mode for real results.
+- [ ] Keep a separate backup of `data/tournament.sqlite` and `data/avatars` while the server is stopped.
+- [ ] Verify the Vercel preview rejects edits and does not include local data files.
+- [ ] Follow [LOCAL-OPERATION.md](LOCAL-OPERATION.md). No Supabase or password configuration is required.
+
+## Archived legacy hosted-backend checklist
+
+These checks apply only to the older Supabase setup, not the current local workflow.
+
 - [ ] Install dependencies with lifecycle scripts enabled; OCR worker, core WASM and English model are generated under public/ocr.
 - [ ] Lint, typecheck, unit/SQL tests, responsive checks, actual screenshot workflow and production build pass.
 - [ ] Apply the existing migration once. Check RLS, service grants, avatars bucket and production-only Realtime revision notifications.

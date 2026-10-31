@@ -228,7 +228,14 @@ export default function TournamentApp() {
               ["/", "Standings"],
               ["/events", "Events"],
               ["/history", "History"],
-              ["/register", "The lobby"],
+              [
+                state.localMode || state.readOnly ? "/admin" : "/register",
+                state.localMode
+                  ? "Control room"
+                  : state.readOnly
+                    ? "About this preview"
+                    : "The lobby",
+              ],
             ].map(([path, label]) => (
               <Link
                 className={
@@ -288,11 +295,17 @@ export default function TournamentApp() {
               <div className="setup-notice">
                 <Lock size={15} />
                 <span>
-                  Preseason preview · Database setup is required before
-                  registration or scoring.{" "}
-                  <Link href="/admin">
-                    Setup details <ArrowUpRight size={12} />
-                  </Link>
+                  {state.readOnly ? (
+                    "Read-only preview · Run the site locally to manage competitors and scores. Local scores are not synchronized here."
+                  ) : (
+                    <>
+                      Preseason preview · Database setup is required before
+                      registration or scoring.{" "}
+                      <Link href="/admin">
+                        Setup details <ArrowUpRight size={12} />
+                      </Link>
+                    </>
+                  )}
                 </span>
               </div>
             )}
@@ -462,15 +475,31 @@ export default function TournamentApp() {
                           </div>
                           <h3>The field is wide open.</h3>
                           <p>
-                            Seven competitors. Eight events. Claim your identity
-                            <br className="desktop" /> and get ready to earn
-                            your draft position.
+                            {state.localMode ? (
+                              "Seven competitors. Eight events. Add your competitors in the control room."
+                            ) : (
+                              <>
+                                Seven competitors. Eight events. Claim your
+                                identity
+                                <br className="desktop" /> and get ready to earn
+                                your draft position.
+                              </>
+                            )}
                           </p>
                           <Link
                             className="button primary"
-                            href={link("/register")}
+                            href={link(
+                              state.localMode || state.readOnly
+                                ? "/admin"
+                                : "/register",
+                            )}
                           >
-                            Enter the lobby <ArrowUpRight size={16} />
+                            {state.localMode
+                              ? "Open control room"
+                              : state.readOnly
+                                ? "About this preview"
+                                : "Enter the lobby"}{" "}
+                            <ArrowUpRight size={16} />
                           </Link>
                           <div className="waiting-avatars">
                             {NAMES.map((name) => (
@@ -611,10 +640,25 @@ export default function TournamentApp() {
                 <HistoryChart state={state} />
               </>
             )}
-            {page === "register" && (
+            {(page === "register" || page === "manage") &&
+              (state.localMode || state.readOnly) && (
+                <section className="panel admin-content">
+                  <PageHeading
+                    label="COMPETITORS"
+                    title="No sign-up needed."
+                    detail="Competitors and profiles are managed by the tournament organizer on the local site."
+                  />
+                  <Link className="button primary" href={link("/admin")}>
+                    {state.localMode
+                      ? "Open control room"
+                      : "About this preview"}
+                  </Link>
+                </section>
+              )}
+            {page === "register" && !state.localMode && !state.readOnly && (
               <Registration state={state} refresh={refresh} />
             )}
-            {page === "manage" && (
+            {page === "manage" && !state.localMode && !state.readOnly && (
               <Manage
                 token={segments[1] ?? ""}
                 refresh={refresh}

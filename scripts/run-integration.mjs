@@ -16,6 +16,7 @@ for (const port of [3001, 54325])
 const hash = `scrypt$integration-salt$${scryptSync("integration-password-2026", "integration-salt", 64).toString("hex")}`;
 const env = {
   ...process.env,
+  LOCAL_MODE: "false",
   NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54325",
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "integration-anon",
   SUPABASE_SERVICE_ROLE_KEY: "integration-service-key",

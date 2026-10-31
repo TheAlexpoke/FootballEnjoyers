@@ -1,5 +1,19 @@
 # Football Enjoyers Draft Order Tournament
 
+## Current workflow: local tournament control room
+
+**Local operation is now the default. No administrator password, participant accounts, private links or Supabase setup is required.** Use Node.js 24, run `npm ci`, then `npm run dev`. Open http://127.0.0.1:3000/admin to add competitors and enter scores. On Windows, use `npm.cmd` if PowerShell blocks `npm.ps1`.
+
+Tournament data saves on this computer in `data/tournament.sqlite`; photos save in `data/avatars`. Practice and official data stay separate. Keep a separate copy of the entire `data` folder while the server is stopped, and use the Recovery tab for JSON/CSV exports and restore.
+
+GitHub stores the source. **Vercel is a read-only public preview and does not receive local scores or photos.** No Supabase or password environment variables are needed there. Vercel rejects writes even if `LOCAL_MODE=true` is set. The local server binds to `127.0.0.1`.
+
+See [the current local operating guide](docs/LOCAL-OPERATION.md) for setup, scoring, backups, publishing and tests. The hosted setup material below describes the retained legacy Supabase backend and is **not required for the current workflow**.
+
+---
+
+## Archived hosted setup and engine reference
+
 A mobile-first Next.js tournament application for Mark, Hong, Li, Arun, Erfan, Dabin and Alex. Public spectators need no account. Physical events use the tournament scoring engine; the fantasy finale now uses **ESPN scores entered manually or read from an administrator-reviewed screenshot**.
 
 No direct ESPN/Sleeper integration, external OCR/AI API key, fantasy scoring provider, or scheduled polling worker is required. Persistent hosting still needs Supabase and Vercel configuration. The application has been tested locally; no real hosted project has been provisioned in this session.

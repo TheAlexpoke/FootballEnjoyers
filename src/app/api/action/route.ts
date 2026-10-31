@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { actionSchema, applyAction } from "@/lib/actions";
 import { mutate, backup } from "@/lib/server/store";
+import { localMode } from "@/lib/server/local-mode";
 import {
   assertOrigin,
   isAdmin,
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
     const env = input.environment === "practice" ? "practice" : "production";
     const action = actionSchema.parse(input.action);
     const admin = await isAdmin();
+    if (localMode() && !admin)
+      throw Error("Open the local control room to edit.");
+    if (localMode() && action.type === "regenerate")
+      throw Error("Private profile links are not used in local mode.");
     if (env === "practice" && !admin)
       throw Error("Administrator access required.");
     if (!["register", "profile"].includes(action.type) && !admin)
@@ -46,14 +51,15 @@ export async function POST(req: NextRequest) {
       return applyAction(state, action, {
         admin,
         participantId,
-        credentialHash: hash(credential),
-        deviceHash: hash(device),
+        credentialHash: localMode() ? "" : hash(credential),
+        deviceHash: localMode() ? "" : hash(device),
       });
     });
-    if (action.type === "register") await setDevice(device);
-    const privateLink = ["register", "regenerate"].includes(action.type)
-      ? `${process.env.APP_ORIGIN}/manage/${credential}${env === "practice" ? "?env=practice" : ""}`
-      : undefined;
+    if (action.type === "register" && !localMode()) await setDevice(device);
+    const privateLink =
+      !localMode() && ["register", "regenerate"].includes(action.type)
+        ? `${process.env.APP_ORIGIN}/manage/${credential}${env === "practice" ? "?env=practice" : ""}`
+        : undefined;
     return NextResponse.json(
       { ok: true, revision: next.revision, privateLink },
       { headers: { "Cache-Control": "no-store" } },

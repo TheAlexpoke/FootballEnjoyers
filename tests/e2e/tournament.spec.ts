@@ -91,28 +91,38 @@ test("registration closes at seven and spectators can read standings", async ({
     page.getByRole("button", { name: "Join the tournament" }),
   ).toHaveCount(0);
 });
-test("unconfigured site exposes no invented scores and disables registration", async ({
+test("local control room needs no password or participant sign-up", async ({
   page,
 }) => {
-  await page.goto("/");
-  await expect(page.getByText("Preseason preview")).toBeVisible();
-  await expect(page.locator(".standing-row")).toHaveCount(0);
+  await page.goto("/admin");
+  await expect(
+    page.getByRole("heading", { name: "Make every result count." }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Administrator password")).toHaveCount(0);
+  await page.getByRole("button", { name: "players", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Add competitor" }),
+  ).toBeVisible();
   await page.goto("/register");
   await expect(
-    page.getByRole("button", { name: "Join the tournament" }),
-  ).toBeDisabled();
+    page.getByRole("heading", { name: "No sign-up needed." }),
+  ).toBeVisible();
 });
-test("anonymous clients cannot modify official data or access practice", async ({
+test("local editing rejects cross-origin and non-loopback requests", async ({
   request,
 }) => {
   const res = await request.post("/api/action", {
-    headers: { origin: "http://localhost:3000" },
+    headers: { origin: "https://unrelated.example" },
     data: { action: { type: "reset", confirm: "RESET RESULTS" } },
   });
   expect(res.ok()).toBe(false);
-  const practice = await request.get("/api/state?env=practice");
+  const practice = await request.get("/api/state?env=practice", {
+    headers: { host: "unrelated.example" },
+  });
   expect(practice.ok()).toBe(false);
-  const exportRes = await request.get("/api/admin?mode=json");
+  const exportRes = await request.get("/api/admin?mode=json", {
+    headers: { host: "unrelated.example" },
+  });
   expect(exportRes.status()).toBe(403);
   const cron = await request.get("/api/cron/fantasy");
   expect(cron.status()).toBe(401);

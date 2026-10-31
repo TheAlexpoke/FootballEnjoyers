@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { PublicState, Event, Audit } from "@/lib/model";
+import { NAMES } from "@/lib/model";
 import { placements } from "@/lib/scoring";
 import { FantasyAdmin } from "./fantasy-admin";
 import {
@@ -41,7 +42,8 @@ export function Admin({
     [selected, setSelected] = useState(""),
     [audit, setAudit] = useState<Audit[]>([]),
     [backups, setBackups] = useState<{ id: string; created_at: string }[]>([]),
-    [privateLink, setPrivateLink] = useState("");
+    [privateLink, setPrivateLink] = useState(""),
+    [addName, setAddName] = useState("");
   useEffect(() => {
     request("/api/auth")
       .then((r) => setAdmin(r.admin))
@@ -104,6 +106,20 @@ export function Admin({
         .then(setBackups)
         .catch((e) => setError(e.message));
   }, [admin, tab, env, state.revision]);
+  if (state.readOnly)
+    return (
+      <section className="panel admin-content">
+        <PageHeading
+          label="PUBLIC PREVIEW"
+          title="Run the tournament locally."
+          detail="This hosted copy is read-only. Open the site on your computer to add competitors, enter scores, and manage events. No accounts or participant links are needed."
+        />
+        <p>
+          Local tournament data stays on your computer and is not synchronized
+          to this preview.
+        </p>
+      </section>
+    );
   if (checking)
     return <p className="loading">Checking administrator session…</p>;
   if (!admin)
@@ -174,22 +190,27 @@ export function Admin({
           label="COMMISSIONER CONTROL ROOM"
           title="Make every result count."
         />
-        <button
-          className="button secondary"
-          onClick={() =>
-            run(async () => {
-              await request("/api/auth", {}, "DELETE");
-              setAdmin(false);
-            })
-          }
-        >
-          Log out
-        </button>
+        {!state.localMode && (
+          <button
+            className="button secondary"
+            onClick={() =>
+              run(async () => {
+                await request("/api/auth", {}, "DELETE");
+                setAdmin(false);
+              })
+            }
+          >
+            Log out
+          </button>
+        )}
       </div>
       <div className="admin-env">
         <Shield size={18} />
         <b>{env === "practice" ? "PRACTICE SANDBOX" : "OFFICIAL TOURNAMENT"}</b>
         <span>Changes save to {env} only.</span>
+        {state.localMode && (
+          <span>Saved on this computer · No login required</span>
+        )}
         <a
           className="button secondary"
           href={env === "practice" ? "/admin" : "/admin?env=practice"}
@@ -296,7 +317,43 @@ export function Admin({
       )}
       {tab === "players" && (
         <section className="panel admin-content">
-          <h2>Registrations & profiles</h2>
+          <h2>
+            {state.localMode
+              ? "Competitors & profiles"
+              : "Registrations & profiles"}
+          </h2>
+          {state.localMode && state.participants.length < 7 && (
+            <div className="admin-add-player">
+              <p>
+                Add each of the seven competitors here. You manage their
+                profiles and scores; nobody needs to sign up.
+              </p>
+              <label>
+                Competitor name
+                <select
+                  aria-label="Competitor name"
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                >
+                  <option value="">Choose a competitor</option>
+                  {NAMES.filter(
+                    (name) => !state.participants.some((p) => p.name === name),
+                  ).map((name) => (
+                    <option key={name}>{name}</option>
+                  ))}
+                </select>
+              </label>
+              <ProfileForm
+                key={addName}
+                disabled={!addName || busy}
+                button="Add competitor"
+                onSubmit={async (profile) => {
+                  await act({ type: "register", name: addName, profile });
+                  setAddName("");
+                }}
+              />
+            </div>
+          )}
           {state.participants.map((p) => (
             <details key={p.id}>
               <summary>
@@ -337,21 +394,24 @@ export function Admin({
                 />
               </label>
               <div className="button-row">
-                <button
-                  className="button secondary"
-                  disabled={busy}
-                  onClick={() =>
-                    run(() =>
-                      confirm(
-                        "Revoke the current private profile link and device association?",
-                        "REGENERATE",
-                        () => act({ type: "regenerate", participantId: p.id }),
-                      ),
-                    )
-                  }
-                >
-                  Regenerate private link
-                </button>
+                {!state.localMode && (
+                  <button
+                    className="button secondary"
+                    disabled={busy}
+                    onClick={() =>
+                      run(() =>
+                        confirm(
+                          "Revoke the current private profile link and device association?",
+                          "REGENERATE",
+                          () =>
+                            act({ type: "regenerate", participantId: p.id }),
+                        ),
+                      )
+                    }
+                  >
+                    Regenerate private link
+                  </button>
+                )}
                 <button
                   className="button danger"
                   disabled={busy}
@@ -375,7 +435,13 @@ export function Admin({
               </div>
             </details>
           ))}
-          {!state.participants.length && <p>No registrations yet.</p>}
+          {!state.participants.length && (
+            <p>
+              {state.localMode
+                ? "No competitors added yet."
+                : "No registrations yet."}
+            </p>
+          )}
         </section>
       )}
       {tab === "settings" && (
@@ -515,9 +581,15 @@ export function Admin({
         <section className="panel admin-content">
           <h2>Exports, backups & recovery</h2>
           <p>
-            Exports omit authentication secrets and private management tokens.
-            Restored profiles retain current credentials where identities match;
-            otherwise regenerate their private links.
+            {state.localMode ? (
+              "Download JSON backups to keep a separate copy of your tournament. Scores and profiles are stored in data/tournament.sqlite on this computer. Profile photos are stored alongside it in data/avatars. Keep a copy of the whole data folder when moving to another computer."
+            ) : (
+              <>
+                Exports omit authentication secrets and private management
+                tokens. Restored profiles retain current credentials where
+                identities match; otherwise regenerate their private links.
+              </>
+            )}
           </p>
           <div className="button-row">
             <a

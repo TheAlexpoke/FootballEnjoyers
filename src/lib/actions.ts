@@ -199,15 +199,15 @@ export function applyAction(
         throw Error(
           "This identity is already claimed or registration is full.",
         );
-      if (!auth.credentialHash || !auth.deviceHash)
+      if (!auth.admin && (!auth.credentialHash || !auth.deviceHash))
         throw Error("Secure registration credentials required.");
       state.participants.push({
         id: crypto.randomUUID(),
         name: a.name,
         ...a.profile,
         avatar: "",
-        credentialHash: auth.credentialHash,
-        deviceHash: auth.deviceHash,
+        credentialHash: auth.credentialHash ?? "",
+        deviceHash: auth.deviceHash ?? "",
       });
       break;
     }

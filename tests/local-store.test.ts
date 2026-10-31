@@ -1,0 +1,64 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { initialState } from "../src/lib/model";
+import {
+  readLocal,
+  commitLocal,
+  localRows,
+  localReceiptKey,
+} from "../src/lib/server/local-store";
+import { localMode } from "../src/lib/server/local-mode";
+import { applyAction } from "../src/lib/actions";
+
+describe("local persistence and hosted isolation", () => {
+  let directory: string;
+  beforeEach(() => {
+    directory = mkdtempSync(join(tmpdir(), "football-local-"));
+    vi.stubEnv("LOCAL_DATA_DIR", directory);
+    vi.stubEnv("LOCAL_MODE", "true");
+    vi.stubEnv("VERCEL", "");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    rmSync(directory, { recursive: true, force: true });
+  });
+  it("persists scores across database connections and rejects stale writes", () => {
+    const state = applyAction(
+      initialState(),
+      {
+        type: "register",
+        name: "Mark",
+        profile: { team: "Fourth & Gold", nickname: "", sleeper: "" },
+      },
+      { admin: true },
+    );
+    expect(state.participants[0].credentialHash).toBe("");
+    expect(commitLocal("production", 0, state)).toBe(true);
+    expect(commitLocal("production", 0, initialState())).toBe(false);
+    expect(readLocal("production").participants[0].team).toBe("Fourth & Gold");
+    expect(readLocal("production").revision).toBe(1);
+    expect(readLocal("practice").participants).toHaveLength(0);
+  });
+  it("keeps recoverable backups and screenshot signing keys across connections", () => {
+    const state = initialState("practice");
+    localRows("backups", { tournament_id: "practice", payload: state });
+    const rows = localRows<{ id: string }[]>(
+      "backups?tournament_id=eq.practice",
+    );
+    expect(rows).toHaveLength(1);
+    expect(
+      localRows<{ payload: unknown }[]>(
+        `backups?id=eq.${rows[0].id}&tournament_id=eq.practice`,
+      )[0].payload,
+    ).toEqual(state);
+    expect(localRows("backups?tournament_id=eq.production")).toEqual([]);
+    expect(localReceiptKey()).toBe(localReceiptKey());
+  });
+  it("never enables password-free storage on Vercel", () => {
+    vi.stubEnv("VERCEL", "1");
+    expect(localMode()).toBe(false);
+    expect(() => readLocal("production")).toThrow("disabled");
+  });
+});
