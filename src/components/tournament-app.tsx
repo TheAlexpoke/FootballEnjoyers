@@ -1091,7 +1091,26 @@ function EventLastPlaceNote({
     >
       <div className="last-place-graphic">
         <span className="last-place-poop" aria-hidden="true">
-          💩
+          <svg viewBox="0 0 48 42" focusable="false">
+            <path
+              d="M10 25h27c6 0 10 4 10 8s-4 8-11 8H12C5 41 1 38 1 33s4-8 9-8Z"
+              fill="#855035"
+              stroke="#643a28"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M15 14h16c6 0 11 4 11 8s-4 7-10 7H15c-6 0-10-3-10-7s4-8 10-8Z"
+              fill="#a76b45"
+              stroke="#75442d"
+              strokeWidth="1.3"
+            />
+            <path
+              d="M25 1c7 7-8 8-4 13h7c5 0 8 3 8 6 0 4-5 5-11 5H16c-7 0-10-6-6-10 4-4 14-5 15-14Z"
+              fill="#b77c50"
+              stroke="#855035"
+              strokeWidth="1.3"
+            />
+          </svg>
         </span>
         <div className="last-place-photos">
           {losers.map((player) => (

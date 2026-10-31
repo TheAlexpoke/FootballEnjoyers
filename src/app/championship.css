@@ -507,13 +507,28 @@ textarea:focus {
 }
 .last-place-note {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 78px;
+  right: 8px;
+  bottom: 8px;
+  width: 80px;
+  box-sizing: border-box;
+  padding: 7px 3px 4px;
+  background: #e9d9a6;
+  transform: rotate(3deg);
+  box-shadow: 2px 3px 5px #0004;
   flex-shrink: 0;
   text-align: center;
-  color: #d2c7b1;
+  color: #382b16;
   line-height: 1.1;
+}
+.last-place-note::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: calc(50% - 13px);
+  width: 26px;
+  height: 9px;
+  background: #fff3c799;
+  transform: rotate(-7deg);
 }
 .event-card:has(.last-place-note) {
   position: relative;
@@ -523,40 +538,47 @@ textarea:focus {
   min-height: 28px;
 }
 .last-place-graphic {
-  width: 56px;
-  height: 44px;
+  width: 48px;
+  height: 36px;
   position: relative;
   margin: 0 auto;
 }
 .last-place-poop {
+  display: flex;
+  justify-content: center;
+  height: 34px;
+  overflow: hidden;
+}
+.last-place-poop svg {
+  width: 38px;
+  height: 34px;
   display: block;
-  font-size: 43px;
-  line-height: 1;
-  font-family:
-    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 .last-place-photos {
   position: absolute;
-  top: 15px;
-  left: 0;
-  right: 0;
+  top: 8px;
+  left: -7px;
+  right: -7px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 1px;
-  max-width: 48px;
+  max-width: 62px;
   margin: 0 auto;
 }
 .last-place-note .avatar {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #f0d99c;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fffaf0;
+  outline: 1px solid #584328;
+  box-shadow: 0 1px 2px #0005;
   font-size: 6px;
 }
 .last-place-note--tied .avatar {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
+  border-width: 1px;
   font-size: 4px;
 }
 .last-place-label {
@@ -564,11 +586,11 @@ textarea:focus {
   font-size: 6px;
   font-weight: 800;
   letter-spacing: 0.4px;
-  margin-top: 1px;
+  margin-top: 4px;
 }
 .last-place-note strong {
   display: block;
-  font-size: 8px;
+  font-size: 7.5px;
   margin-top: 2px;
   overflow-wrap: anywhere;
 }
@@ -576,11 +598,11 @@ textarea:focus {
   color: #352a15;
 }
 .event-grid .last-place-note {
-  width: 66px;
+  width: 74px;
 }
 @media (max-width: 760px) {
   .all-events .last-place-note {
-    width: 66px;
+    width: 74px;
   }
 }
 .all-events .event-card:has(.winner-note) .event-illustration {
