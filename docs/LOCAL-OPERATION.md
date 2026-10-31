@@ -31,6 +31,8 @@ The History page selects all competitors by default, including when data loads a
 
 `data/tournament.sqlite` contains scores, profiles, configuration, history, audit records, recovery points and a generated key for validating screenshot reviews. `data/avatars` contains photos. Data survives server restarts. The database uses atomic revision checks so overlapping saves do not silently overwrite one another.
 
+Assigned portraits in `data/avatars/portraits/Mark.png`, `Hong.png`, `Li.png`, `Arun.png`, `Erfan.png`, `Dabin.png`, and `Alex.png` are used automatically for both practice and official competitors. They appear as circular photos in standings, profiles, and history. A later profile-photo upload overrides that competitor's assigned portrait. Originals stay local and are excluded from GitHub and Vercel; include the portraits folder when backing up or moving your data.
+
 Use Control room → Recovery to export JSON/CSV, create recovery points or restore a JSON backup. JSON does not include photo files. To move the whole installation, stop the server and copy the entire `data` folder into the new project folder before starting it. Keep an independent backup of this folder.
 
 The `data` directory, environment files, generated OCR assets, dependencies and build output are excluded from GitHub. Keep custom `LOCAL_DATA_DIR` locations outside source control too. Existing Supabase data is not deleted or automatically imported. Existing compatible JSON backups can be restored from the local Recovery tab; photos must be copied separately.

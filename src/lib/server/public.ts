@@ -1,6 +1,7 @@
 import "server-only";
 import type { State, PublicState } from "../model";
 import { movement, phase } from "../scoring";
+import { localPortrait } from "./portraits";
 export function publicState(
   s: State,
   configured: boolean,
@@ -10,7 +11,10 @@ export function publicState(
   return {
     ...rest,
     participants: s.participants.map(
-      ({ credentialHash: _c, deviceHash: _d, ...p }) => p,
+      ({ credentialHash: _c, deviceHash: _d, ...p }) => ({
+        ...p,
+        avatar: p.avatar || localPortrait(p.name),
+      }),
     ),
     standings: movement(s),
     phase: phase(s),
