@@ -545,10 +545,10 @@ export default function TournamentApp({
                           <h3>The field is wide open.</h3>
                           <p>
                             {state.localMode ? (
-                              "Seven competitors. Eight events. Add your competitors in the control room."
+                              "Seven competitors. Nine events. Add your competitors in the control room."
                             ) : (
                               <>
-                                Seven competitors. Eight events. Claim your
+                                Seven competitors. Nine events. Claim your
                                 identity
                                 <br className="desktop" /> and get ready to earn
                                 your draft position.
@@ -770,7 +770,7 @@ export default function TournamentApp({
         <span className="footer-mark">
           FE / <b>2026</b>
         </span>
-        <p>Seven friends. Eight events. Bragging rights forever.</p>
+        <p>Seven friends. {total} events. Bragging rights forever.</p>
         <span>
           {sharedView && state.sharedSnapshotAt
             ? `Published ${new Date(state.sharedSnapshotAt).toLocaleDateString()}`

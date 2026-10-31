@@ -25,7 +25,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     ).weight,
   ).toBe("3");
   await expect(page.locator(".scoring-maximum strong")).toHaveText(
-    "200 points available",
+    "215 points available",
   );
   expect(JSON.stringify(publicData)).not.toMatch(
     /credentialHash|deviceHash|admin_sessions|profileToken/,
@@ -43,7 +43,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     (await request.get("http://localhost:3002/api/state?env=practice")).ok(),
   ).toBe(false);
   await page.goto("http://localhost:3002/events");
-  await expect(page.locator(".all-events .event-card")).toHaveCount(8);
+  await expect(page.locator(".all-events .event-card")).toHaveCount(9);
   await expect(page.getByLabel("Administrator password")).toHaveCount(0);
   expect(
     (await (await request.get("http://localhost:3002/api/auth")).json()).admin,

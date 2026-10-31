@@ -37,7 +37,7 @@ Official shared places are used for event ties, including Mario Kart's shared 5t
 
 The most last-place finishes across completed events earns a **10-point pool**. Tied leaders split the pool equally, using exact scoring internally and one-decimal display. Every competitor tied for last in an event receives one last-place count, including Mario Kart's three wild-card losers. Absences and incomplete legacy results do not earn last-place counts. Provisional fantasy is excluded until finalized. This award also moves automatically and is not cumulative; recipients and their shares are marked in standings and profiles.
 
-Fantasy is **3×** in both official and practice tournaments. The default breakdown is **200 points available: 180 event maximum + 10 consistency + 10 most last places**. These award qualifications differ, so 200 is not an attainable individual maximum: a perfect sweep earns 190 and does not qualify for most last places. Tied consistency leaders each receive 10, so total bonus points across the field can exceed 20. The last-place pool itself always totals 10 when awarded.
+Fantasy is **3×** in both official and practice tournaments. The current nine-event breakdown is **215 points available: 195 event maximum + 10 consistency + 10 most last places**. These award qualifications differ, so 215 is not an attainable individual maximum: a perfect sweep earns 205 and does not qualify for most last places. Tied consistency leaders each receive 10, so total bonus points across the field can exceed 20. The last-place pool itself always totals 10 when awarded.
 
 ## Storage and recovery
 
@@ -78,3 +78,7 @@ npm run test:e2e
 ```
 
 Browser tests require installed Playwright Chromium and a production build. Isolated temporary test servers verify local scoring, photos, backup restore and hosted read-only behavior without adding test records to the organizer's database. The retained legacy integration suite explicitly disables local mode and uses its test-only platform adapter.
+
+## Choose Your Character
+
+The configured official and practice schedules include this 1× CPU-only seven-character free-for-all after Higher or Lower and before Mario Kart. Each competitor chooses a character to fight for them; there are no human controls. Enter the full finishing order as places 1–7 (last standing is 1st; first eliminated is 7th). Normal shared-placement scoring applies to ties. Event cards use a three-column desktop grid and two columns on smaller screens. This custom event is stored in the local tournament data and included in the published snapshot; include it when backing up or restoring your tournament.

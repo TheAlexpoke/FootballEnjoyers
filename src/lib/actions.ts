@@ -292,6 +292,12 @@ export function applyAction(
       if (!a.absent && a.value !== null) {
         if (e!.kind === "count" && !/^\d+$/.test(a.value))
           throw Error("Enter a whole-number count.");
+        if (
+          e!.kind === "count" &&
+          e!.unit === "place" &&
+          (Number(a.value) < 1 || Number(a.value) > 7)
+        )
+          throw Error("Enter a finishing place from 1 to 7.");
         if (e!.kind === "time" && new Decimal(a.value).decimalPlaces() > 2)
           throw Error("Times use at most 0.01-second precision.");
         if (

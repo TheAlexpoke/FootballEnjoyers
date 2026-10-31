@@ -44,7 +44,15 @@ const artwork = {
   },
 } as const;
 
-export function eventPresentation(event: Pick<Event, "id" | "direction">) {
+export function eventPresentation(
+  event: Pick<Event, "id" | "direction"> & Partial<Pick<Event, "name">>,
+) {
+  if (event.name === "Choose Your Character")
+    return {
+      subtitle: "Last Man Standing Wins",
+      file: "choose-your-character-1.svg",
+      alt: "A gold circle divided by bold crossing lines, inspired by a fighting-game arena emblem",
+    };
   return (
     (
       artwork as Partial<

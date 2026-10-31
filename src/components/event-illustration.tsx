@@ -5,7 +5,7 @@ import { eventPresentation } from "@/lib/event-presentation";
 export function EventIllustration({
   event,
 }: {
-  event: Pick<Event, "id" | "direction">;
+  event: Pick<Event, "id" | "direction"> & Partial<Pick<Event, "name">>;
 }) {
   const art = eventPresentation(event);
   return art.file ? (

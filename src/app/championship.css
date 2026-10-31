@@ -422,6 +422,7 @@ textarea:focus {
 }
 .all-events {
   gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .all-events .event-card {
   position: relative;
@@ -780,5 +781,11 @@ textarea:focus {
   .event-detail-banner .winner-note--tied .avatar {
     width: 28px;
     height: 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .all-events {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

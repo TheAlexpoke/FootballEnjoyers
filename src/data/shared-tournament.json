@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 30,
+  "revision": 33,
   "environment": "production",
   "participants": [
     {
@@ -150,6 +150,27 @@
         "Reveal a reference card. Predict higher or lower. Correct guesses add to the current streak.",
         "Wrong or equal rank resets the streak to zero; the revealed card becomes the next reference. Continue immediately.",
         "Stop at 60 seconds or deck exhaustion. No stopping or banking. Only the longest consecutive correct streak counts."
+      ],
+      "status": "scheduled",
+      "order": [],
+      "results": [],
+      "seeds": [],
+      "trials": {},
+      "matches": []
+    },
+    {
+      "id": "209a05fa-a47f-4143-9651-035b3811ee0a",
+      "name": "Choose Your Character",
+      "weight": "1",
+      "kind": "count",
+      "unit": "place",
+      "direction": "asc",
+      "description": "Pick a CPU fighter. Last character standing wins.",
+      "rules": [
+        "Set up one seven-character CPU-only free-for-all. Each competitor chooses a character to fight for them.",
+        "No human controls during the fight. This event is entirely luck.",
+        "Record the full elimination order: the last character standing finishes 1st; the first eliminated finishes 7th.",
+        "Enter a finishing place from 1 to 7 for each competitor. Shared finishing places use the normal tournament tie rules."
       ],
       "status": "scheduled",
       "order": [],
@@ -379,5 +400,5 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-10-31T19:00:56.046Z"
+  "sharedSnapshotAt": "2026-10-31T22:00:06.559Z"
 }

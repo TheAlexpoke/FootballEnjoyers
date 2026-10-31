@@ -353,6 +353,73 @@ describe("Most Last Places Award", () => {
   });
 });
 describe("lifecycle and authorization", () => {
+  it("supports the nine-event schedule and CPU character finishing places", () => {
+    let s = full();
+    s = action(s, {
+      type: "addEvent",
+      name: "Choose Your Character",
+      kind: "count",
+      weight: "1",
+    });
+    const e = s.events.find((event) => event.name === "Choose Your Character")!;
+    s = action(s, {
+      type: "event",
+      eventId: e.id,
+      name: e.name,
+      weight: "1",
+      unit: "place",
+      direction: "asc",
+      description: "CPU free-for-all",
+      rules: ["Last character standing wins."],
+    });
+    s = action(s, {
+      type: "reorder",
+      order: [
+        "event-2",
+        "event-3",
+        "event-1",
+        "event-6",
+        "event-7",
+        e.id,
+        "event-4",
+        "event-5",
+        "event-8",
+      ],
+    });
+    expect(s.events).toHaveLength(9);
+    expect(s.events[5].name).toBe("Choose Your Character");
+    expect(
+      s.events.reduce((sum, event) => sum + 15 * Number(event.weight), 20),
+    ).toBe(215);
+    s = action(s, {
+      type: "start",
+      eventId: e.id,
+      order: s.participants.map((p) => p.id),
+    });
+    for (const value of ["0", "8"])
+      expect(() =>
+        action(s, {
+          type: "result",
+          eventId: e.id,
+          participantId: s.participants[0].id,
+          value,
+          absent: false,
+        }),
+      ).toThrow("1 to 7");
+    for (let i = 0; i < 7; i++)
+      s = action(s, {
+        type: "result",
+        eventId: e.id,
+        participantId: s.participants[i].id,
+        value: String(i + 1),
+        absent: false,
+      });
+    s = action(s, { type: "finalize", eventId: e.id, confirm: "FINALIZE" });
+    expect(standings(s)[0]).toMatchObject({
+      id: s.participants[0].id,
+      points: "25",
+    });
+  });
   it("preserves original frozen order during an audited correction", () => {
     let s = full();
     const ids = s.participants.map((p) => p.id);
