@@ -1090,53 +1090,9 @@ function EventLastPlaceNote({
       aria-label={`${label}: ${losers.map((player) => player.name).join(", ")}`}
     >
       <div className="last-place-graphic">
-        <svg
-          viewBox="0 0 90 78"
-          aria-hidden="true"
-          className="last-place-toilet"
-        >
-          <path
-            d="M12 14h24v34H12z"
-            fill="#dfe8ee"
-            stroke="#647a8d"
-            strokeWidth="2.5"
-          />
-          <path
-            d="M10 12h28v7H10z"
-            fill="#f7fafb"
-            stroke="#647a8d"
-            strokeWidth="2.5"
-          />
-          <path
-            d="M31 45h48c-1 18-12 21-25 21H43c-7-2-11-11-12-21Z"
-            fill="#f7fafb"
-            stroke="#647a8d"
-            strokeWidth="2.5"
-          />
-          <ellipse
-            cx="55"
-            cy="45"
-            rx="25"
-            ry="7"
-            fill="#e5f1f7"
-            stroke="#647a8d"
-            strokeWidth="2.5"
-          />
-          <ellipse cx="55" cy="45" rx="16" ry="3" fill="#98bfd0" />
-          <path
-            d="M44 63h16l5 10H39z"
-            fill="#e5edf2"
-            stroke="#647a8d"
-            strokeWidth="2.5"
-          />
-          <path
-            d="M36 74h32M19 25h6"
-            fill="none"
-            stroke="#647a8d"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
+        <span className="last-place-poop" aria-hidden="true">
+          💩
+        </span>
         <div className="last-place-photos">
           {losers.map((player) => (
             <Avatar key={player.id} player={player} />
