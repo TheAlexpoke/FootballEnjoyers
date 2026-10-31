@@ -1,0 +1,1589 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpRight,
+  Check,
+  ChevronRight,
+  Flag,
+  History,
+  LayoutGrid,
+  ListOrdered,
+  Lock,
+  Menu,
+  Radio,
+  Shield,
+  Trophy,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
+import { initialState, NAMES, type PublicState, type Event } from "@/lib/model";
+import { placements, phase, standings } from "@/lib/scoring";
+import { Admin } from "./admin";
+import { EventIllustration } from "./event-illustration";
+import { eventPresentation } from "@/lib/event-presentation";
+type Player = PublicState["participants"][number];
+let realtimeClient: ReturnType<typeof createClient> | undefined;
+export async function request(url: string, body?: unknown, method = "POST") {
+  const res = await fetch(url, {
+    method: body === undefined ? "GET" : method,
+    headers:
+      body === undefined ? undefined : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    cache: "no-store",
+  });
+  const value = await res.json();
+  if (!res.ok || value.error) throw Error(value.error ?? "Request failed.");
+  return value;
+}
+const empty = initialState();
+export const fallback: PublicState = {
+  ...empty,
+  participants: [],
+  standings: standings(empty),
+  phase: phase(empty),
+  configured: false,
+};
+export function Avatar({
+  player,
+  small = false,
+}: {
+  player: { name: string; avatar?: string };
+  small?: boolean;
+}) {
+  return (
+    <span
+      className={`avatar avatar-${NAMES.indexOf(player.name as (typeof NAMES)[number])} ${small ? "small" : ""}`}
+    >
+      {player.avatar ? (
+        <img src={player.avatar} alt="" />
+      ) : (
+        player.name.slice(0, 2).toUpperCase()
+      )}
+    </span>
+  );
+}
+export function Badge({ event }: { event: Event }) {
+  return (
+    <span className={`badge ${event.status}`}>
+      {event.status === "active" ? (
+        <>
+          <span className="dot" /> In progress
+        </>
+      ) : event.status === "finalized" ? (
+        <>
+          <Check size={11} /> Final
+        </>
+      ) : (
+        "Upcoming"
+      )}
+    </span>
+  );
+}
+export function ErrorMessage({ message }: { message: string }) {
+  return message ? (
+    <p className="error" role="alert">
+      {message}
+    </p>
+  ) : null;
+}
+export function TournamentProvider() {
+  return null;
+}
+export default function TournamentApp() {
+  const pathname = usePathname();
+  const [data, setData] = useState<PublicState | null>(null);
+  const [error, setError] = useState("");
+  const [lastFetch, setLastFetch] = useState("");
+  const [menu, setMenu] = useState(false);
+  const [env, setEnv] = useState<"production" | "practice">("production");
+  const [layout, setLayout] = useState<"standings" | "events">("standings");
+  const [manualLayout, setManualLayout] = useState(false);
+  useEffect(() => {
+    setEnv(
+      new URLSearchParams(window.location.search).get("env") === "practice"
+        ? "practice"
+        : "production",
+    );
+    const saved = localStorage.getItem("fe_layout");
+    if (saved === "standings" || saved === "events") {
+      setLayout(saved);
+      setManualLayout(true);
+    }
+  }, []);
+  const refresh = useCallback(async () => {
+    try {
+      const state = await request(`/api/state?env=${env}`);
+      setData(state);
+      setError("");
+      setLastFetch(
+        new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Connection lost.");
+    }
+  }, [env]);
+  useEffect(() => {
+    setData(null);
+    void refresh();
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") void refresh();
+    }, 10000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    window.addEventListener("online", onVisible);
+    document.addEventListener("visibilitychange", onVisible);
+    let cleanup = () => {};
+    if (
+      env === "production" &&
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      const client = (realtimeClient ??= createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+        },
+      ));
+      const channel = client
+        .channel("tournament-revision")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "tournament_pulse",
+            filter: "id=eq.production",
+          },
+          () => void refresh(),
+        )
+        .subscribe();
+      cleanup = () => {
+        void client.removeChannel(channel);
+      };
+    }
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("online", onVisible);
+      document.removeEventListener("visibilitychange", onVisible);
+      cleanup();
+    };
+  }, [refresh, env]);
+  useEffect(() => {
+    if (data && !manualLayout) setLayout(data.config.layout);
+  }, [data, manualLayout]);
+  const link = (path: string) =>
+    env === "practice" ? `${path}?env=practice` : path;
+  const state = data ?? fallback;
+  const completed = state.events.filter(
+    (e) => !e.deleted && e.status === "finalized",
+  ).length;
+  const total = state.events.filter((e) => !e.deleted).length;
+  const changeLayout = () => {
+    const next = layout === "standings" ? "events" : "standings";
+    setLayout(next);
+    setManualLayout(true);
+    localStorage.setItem("fe_layout", next);
+  };
+  const segments = pathname.split("/").filter(Boolean);
+  const page = segments[0] ?? "home";
+  return (
+    <>
+      <header className="site-header">
+        <div className="header-inner">
+          <Link
+            className="brand"
+            href={link("/")}
+            aria-label="Football Enjoyers home"
+          >
+            <span className="brand-icon">
+              FE<span>★</span>
+            </span>
+            <span>
+              FOOTBALL
+              <br />
+              <b>ENJOYERS</b>
+            </span>
+          </Link>
+          <nav
+            className={menu ? "nav open" : "nav"}
+            aria-label="Main navigation"
+          >
+            {[
+              ["/", "Standings"],
+              ["/events", "Events"],
+              ["/history", "History"],
+              ["/register", "The lobby"],
+            ].map(([path, label]) => (
+              <Link
+                className={
+                  pathname === path || pathname.startsWith(`${path}/`)
+                    ? "selected"
+                    : ""
+                }
+                key={path}
+                href={link(path)}
+                onClick={() => setMenu(false)}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <span className="season">
+            DRAFT ORDER TOURNAMENT <b>2026</b>
+          </span>
+          <Link
+            className="admin-link"
+            href={link("/admin")}
+            aria-label="Administrator"
+          >
+            <Shield size={18} />
+          </Link>
+          <button
+            className="menu-button icon-button"
+            aria-label="Toggle menu"
+            onClick={() => setMenu(!menu)}
+          >
+            {menu ? <X /> : <Menu />}
+          </button>
+        </div>
+      </header>
+      {env === "practice" && (
+        <div className="practice-banner">
+          <Shield size={15} /> ADMIN PRACTICE SANDBOX · Isolated from the
+          official tournament <a href="/admin">Return to production</a>
+        </div>
+      )}
+      <main
+        className={`container ${state.participants.length ? "has-players" : ""}`}
+      >
+        {error && (
+          <div className="connection-error" role="alert">
+            {data ? "Connection interrupted. Showing last saved data. " : ""}
+            {error} <button onClick={() => void refresh()}>Retry</button>
+          </div>
+        )}
+        {!data && !error ? (
+          <div className="loading">
+            <span className="dot" /> Connecting to the tournament…
+          </div>
+        ) : (
+          <>
+            {!state.configured && (
+              <div className="setup-notice">
+                <Lock size={15} />
+                <span>
+                  Preseason preview · Database setup is required before
+                  registration or scoring.{" "}
+                  <Link href="/admin">
+                    Setup details <ArrowUpRight size={12} />
+                  </Link>
+                </span>
+              </div>
+            )}
+            {page === "home" && (
+              <>
+                <section className="hero">
+                  <div>
+                    <h1>
+                      MAY THE BEST
+                      <br />
+                      <span>MAN WIN</span>
+                    </h1>
+                    <p>The draft order isn’t given. It’s earned.</p>
+                  </div>
+                  <div className="hero-field">
+                    <span className="field-number n20" aria-hidden="true">
+                      20
+                    </span>
+                    <span className="field-number n30" aria-hidden="true">
+                      30
+                    </span>
+                    <div className="football" aria-hidden="true">
+                      〈<span>╪</span>〉
+                    </div>
+                    <span className="hero-stamp">
+                      THE ROAD TO
+                      <br />
+                      <b>PICKING FIRST</b>
+                      <small>FOOTBALL ENJOYERS / 2026</small>
+                    </span>
+                  </div>
+                </section>
+                <section className="tournament-strip">
+                  <span className="phase">
+                    <span className="dot" />
+                    {state.phase}
+                  </span>
+                  <div className="progress-label">
+                    <b>
+                      {completed}
+                      <span> / {total}</span>
+                    </b>
+                    <small>EVENTS COMPLETE</small>
+                  </div>
+                  <div className="progress-track">
+                    {state.events
+                      .filter((e) => !e.deleted)
+                      .map((e) => (
+                        <span key={e.id} className={e.status} />
+                      ))}
+                  </div>
+                  <div className="strip-stat">
+                    <b>
+                      {state.participants.length}
+                      <span> / 7</span>
+                    </b>
+                    <small>COMPETITORS</small>
+                  </div>
+                  <div className="strip-stat">
+                    <b>
+                      {state.events
+                        .filter((e) => !e.deleted)
+                        .reduce((n, e) => n + Number(e.weight) * 15, 0)}
+                    </b>
+                    <small>POINTS POSSIBLE</small>
+                  </div>
+                </section>
+                <div className="dashboard">
+                  <div className="main-column">
+                    {layout === "events" && (
+                      <NextEvent state={state} link={link} />
+                    )}
+                    <section className="panel leaderboard">
+                      <div className="section-heading">
+                        <div>
+                          <div className="eyebrow">
+                            THE RACE FOR DRAFT POSITION
+                          </div>
+                          <h2>
+                            <Trophy size={21} /> Tournament standings
+                          </h2>
+                        </div>
+                        <button
+                          className="icon-button"
+                          title="Switch between standings-first and event-first"
+                          aria-label="Switch homepage layout"
+                          onClick={changeLayout}
+                        >
+                          {layout === "standings" ? (
+                            <LayoutGrid size={18} />
+                          ) : (
+                            <ListOrdered size={18} />
+                          )}
+                        </button>
+                      </div>
+                      <div className="table-head">
+                        <span>RANK</span>
+                        <span>COMPETITOR</span>
+                        <span>MOVEMENT</span>
+                        <span>POINTS</span>
+                      </div>
+                      {state.participants.length ? (
+                        <div>
+                          {state.standings.map((r) => {
+                            const p = state.participants.find(
+                              (p) => p.id === r.id,
+                            )!;
+                            const change =
+                              r.previousRank === undefined
+                                ? 0
+                                : r.previousRank - r.rank;
+                            return (
+                              <Link
+                                href={link(`/players/${p.id}`)}
+                                key={p.id}
+                                className={`standing-row ${r.rank === 1 && r.points !== "0" ? "leader" : ""} ${state.me === p.id ? "is-me" : ""}`}
+                              >
+                                <span className="rank">
+                                  {r.rank === 1 && r.points !== "0" ? (
+                                    <Trophy size={21} />
+                                  ) : (
+                                    String(r.rank).padStart(2, "0")
+                                  )}
+                                </span>
+                                <span className="competitor">
+                                  <Avatar player={p} />
+                                  <span>
+                                    <b>
+                                      {p.team}
+                                      {state.me === p.id && <em>YOU</em>}
+                                    </b>
+                                    <small>
+                                      {p.name}
+                                      {p.nickname ? ` · ${p.nickname}` : ""}
+                                    </small>
+                                  </span>
+                                </span>
+                                <span
+                                  className={`movement ${change > 0 ? "up" : change < 0 ? "down" : ""}`}
+                                  title={
+                                    r.previousRank
+                                      ? `Previous position: ${r.previousRank}`
+                                      : "No previous finalized position"
+                                  }
+                                >
+                                  {change > 0 ? (
+                                    <ArrowUp size={13} />
+                                  ) : change < 0 ? (
+                                    <ArrowDown size={13} />
+                                  ) : (
+                                    <span className="dash">—</span>
+                                  )}
+                                  {change !== 0 && Math.abs(change)}
+                                </span>
+                                <span className="points">
+                                  {displayPoints(r.points)}
+                                  <small>PTS</small>
+                                </span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="empty-standings">
+                          <div className="empty-icon">
+                            <Trophy size={30} />
+                          </div>
+                          <h3>The field is wide open.</h3>
+                          <p>
+                            Seven competitors. Eight events. Claim your identity
+                            <br className="desktop" /> and get ready to earn
+                            your draft position.
+                          </p>
+                          <Link
+                            className="button primary"
+                            href={link("/register")}
+                          >
+                            Enter the lobby <ArrowUpRight size={16} />
+                          </Link>
+                          <div className="waiting-avatars">
+                            {NAMES.map((name) => (
+                              <Avatar key={name} player={{ name }} small />
+                            ))}
+                          </div>
+                          <small>Waiting for the first competitor</small>
+                        </div>
+                      )}
+                      <div className="table-footer">
+                        <span>
+                          <span className="dot" />{" "}
+                          {state.events.some(
+                            (e) =>
+                              e.kind === "fantasy" && e.status === "active",
+                          )
+                            ? "Includes provisional fantasy points"
+                            : "Official finalized event points"}
+                        </span>
+                        <Link href={link("/history")}>
+                          Standings history <ChevronRight size={13} />
+                        </Link>
+                      </div>
+                    </section>
+                    {state.phase === "Complete" && (
+                      <section className="panel final-order">
+                        <div className="eyebrow">THE PICKS ARE EARNED</div>
+                        <h2>Draft-position selection order</h2>
+                        <p>
+                          Choose your draft slots offline in this order. Shared
+                          ranks remain tied until the administrator records a
+                          resolution.
+                        </p>
+                        {[...state.standings]
+                          .sort(
+                            (a, b) =>
+                              a.rank - b.rank ||
+                              state.config.draftOrder.indexOf(a.id) -
+                                state.config.draftOrder.indexOf(b.id),
+                          )
+                          .map((r, i) => (
+                            <div className="order-row" key={r.id}>
+                              <b>
+                                {state.config.draftOrder.length
+                                  ? i + 1
+                                  : r.rank}
+                              </b>
+                              {
+                                state.participants.find((p) => p.id === r.id)
+                                  ?.team
+                              }
+                              <span>{displayPoints(r.points)} pts</span>
+                            </div>
+                          ))}
+                      </section>
+                    )}
+                    <div className="section-title">
+                      <h2>Event center</h2>
+                      <Link href={link("/events")}>
+                        All events <ArrowUpRight size={14} />
+                      </Link>
+                    </div>
+                    <div className="event-grid">
+                      {state.events
+                        .filter((e) => !e.deleted)
+                        .slice(0, 3)
+                        .map((e, i) => (
+                          <EventCard
+                            key={e.id}
+                            event={e}
+                            index={i}
+                            link={link}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                  <aside>
+                    {layout === "standings" && (
+                      <NextEvent state={state} link={link} />
+                    )}
+                    <FinaleCard state={state} link={link} />
+                    <section className="panel scoring-card">
+                      <div className="eyebrow">KNOW THE SCORE</div>
+                      <h3>Placement × weight.</h3>
+                      <p>
+                        Every finish counts. Bigger events raise the stakes.
+                      </p>
+                      <div className="points-scale">
+                        {[15, 10, 6, 3, 2, 1, 0].map((n, i) => (
+                          <span key={n}>
+                            <small>
+                              {i + 1}
+                              {ordinal(i + 1)}
+                            </small>
+                            <b>{n}</b>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="fine-print">
+                        Ties share the average of occupied places.
+                        <br />
+                        Mario Kart Wild Card losers: 1 base point each.
+                      </div>
+                    </section>
+                  </aside>
+                </div>
+              </>
+            )}
+            {page === "events" && !segments[1] && (
+              <>
+                <PageHeading
+                  label="THE COMPETITION"
+                  title="Eight events. Everything to play for."
+                  detail="From the first cup to Sunday Night Football. Follow every result here."
+                />
+                <div className="all-events">
+                  {state.events
+                    .filter((e) => !e.deleted)
+                    .map((e, i) => (
+                      <EventCard key={e.id} event={e} index={i} link={link} />
+                    ))}
+                </div>
+              </>
+            )}
+            {page === "events" && segments[1] && (
+              <EventDetail state={state} eventId={segments[1]} link={link} />
+            )}
+            {page === "players" && (
+              <PlayerDetail state={state} id={segments[1]} link={link} />
+            )}
+            {page === "history" && (
+              <>
+                <PageHeading
+                  label="THE BIG PICTURE"
+                  title="Every move matters."
+                  detail="Finalized event progression, with provisional fantasy updates clearly labeled."
+                />
+                <HistoryChart state={state} />
+              </>
+            )}
+            {page === "register" && (
+              <Registration state={state} refresh={refresh} />
+            )}
+            {page === "manage" && (
+              <Manage
+                token={segments[1] ?? ""}
+                refresh={refresh}
+                environment={env}
+              />
+            )}
+            {page === "admin" && (
+              <Admin state={state} refresh={refresh} env={env} />
+            )}
+            {![
+              "home",
+              "events",
+              "players",
+              "history",
+              "register",
+              "manage",
+              "admin",
+            ].includes(page) && (
+              <PageHeading
+                label="OUT OF BOUNDS"
+                title="Page not found"
+                detail="Use the navigation to return to the tournament."
+              />
+            )}
+          </>
+        )}
+      </main>
+      <footer className="site-footer">
+        <span className="footer-mark">
+          FE / <b>2026</b>
+        </span>
+        <p>Seven friends. Eight events. Bragging rights forever.</p>
+        <span>
+          {lastFetch ? `Updated ${lastFetch}` : "Connecting"} ·{" "}
+          <Link href={link("/admin")}>Commissioner access</Link>
+        </span>
+      </footer>
+    </>
+  );
+}
+export const displayPoints = (s: string) =>
+  Number(s).toLocaleString(undefined, { maximumFractionDigits: 3 });
+function ordinal(n: number) {
+  return n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
+}
+export function PageHeading({
+  label,
+  title,
+  detail,
+}: {
+  label: string;
+  title: string;
+  detail?: string;
+}) {
+  return (
+    <div className="page-heading">
+      <div className="eyebrow">{label}</div>
+      <h1>{title}</h1>
+      {detail && <p>{detail}</p>}
+    </div>
+  );
+}
+function NextEvent({
+  state,
+  link,
+}: {
+  state: PublicState;
+  link: (p: string) => string;
+}) {
+  const event =
+    state.events.find((e) => !e.deleted && e.status === "active") ??
+    state.events.find((e) => !e.deleted && e.status === "scheduled");
+  return (
+    <section className="panel next-card">
+      <div className="eyebrow">
+        <Flag size={13} />
+        {event?.status === "active" ? "ON THE FIELD" : "UP NEXT"}
+      </div>
+      {event ? (
+        <>
+          <div className="event-art event-art--illustrated">
+            <EventIllustration event={event} />
+          </div>
+          <div className="next-title">
+            <h2>{event.name}</h2>
+            <span className="weight">{event.weight}×</span>
+          </div>
+          <p>{event.description}</p>
+          <Link className="button secondary" href={link(`/events/${event.id}`)}>
+            Event details & rules <ArrowUpRight size={15} />
+          </Link>
+        </>
+      ) : (
+        <>
+          <h2>That’s the tournament.</h2>
+          <p>
+            The final standings determine the draft-position selection order.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+function FinaleCard({
+  state,
+  link,
+}: {
+  state: PublicState;
+  link: (p: string) => string;
+}) {
+  const e = state.events.find((e) => e.kind === "fantasy");
+  return (
+    <section className="panel finale-card">
+      <div className="eyebrow">
+        <Zap size={13} /> THE FINALE
+      </div>
+      <span className="finale-multiplier">
+        {e?.weight ?? 4}
+        <small>×</small>
+      </span>
+      <h3>Sunday decides it.</h3>
+      <p>Single Week Fantasy Score</p>
+      <div className="date-label">
+        NOV 08 <span>2026 · SUNDAY ONLY</span>
+      </div>
+      {e && (
+        <Link href={link(`/events/${e.id}`)}>
+          Explore the fantasy finale <ArrowUpRight size={14} />
+        </Link>
+      )}
+    </section>
+  );
+}
+function EventCard({
+  event,
+  index,
+  link,
+}: {
+  event: Event;
+  index: number;
+  link: (p: string) => string;
+}) {
+  return (
+    <Link
+      className={`event-card panel ${event.status}`}
+      href={link(`/events/${event.id}`)}
+    >
+      <div className="event-card-top">
+        <span className="event-number">
+          EVENT {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="weight">{event.weight}×</span>
+      </div>
+      <h3>{event.name}</h3>
+      <p>{eventPresentation(event).subtitle}</p>
+      <div className="event-card-illustration">
+        <EventIllustration event={event} />
+      </div>
+      <div className="event-card-bottom">
+        <Badge event={event} />
+        <ArrowUpRight size={17} />
+      </div>
+    </Link>
+  );
+}
+export function EventDetail({
+  state,
+  eventId,
+  link,
+}: {
+  state: PublicState;
+  eventId: string;
+  link: (p: string) => string;
+}) {
+  const e = state.events.find((e) => e.id === eventId && !e.deleted);
+  if (!e) return <PageHeading label="EVENT CENTER" title="Event not found" />;
+  const scores = placements(e);
+  const ids = e.order.length ? e.order : state.participants.map((p) => p.id);
+  const sorted = [...ids].sort(
+    (a, b) =>
+      (scores.find((r) => r.id === a)?.place ?? 99) -
+      (scores.find((r) => r.id === b)?.place ?? 99),
+  );
+  return (
+    <>
+      <Link className="back-link" href={link("/events")}>
+        ← All events
+      </Link>
+      <PageHeading
+        label={`EVENT ${state.events.filter((e) => !e.deleted).indexOf(e) + 1} / ${e.weight}× WEIGHT`}
+        title={e.name}
+        detail={e.description}
+      />
+      <Badge event={e} />
+      <div className="detail-grid">
+        <section className="panel">
+          <div className="section-heading">
+            <h2>Results</h2>
+            <span className="muted">
+              {e.status === "finalized" ? "Official" : "Provisional"}
+            </span>
+          </div>
+          {e.status !== "finalized" && (
+            <p className="inline-note">
+              {e.kind === "fantasy"
+                ? "Live fantasy points contribute to the overall standings."
+                : "Physical event points count only after finalization."}
+            </p>
+          )}
+          <div className="results-list">
+            {sorted.map((id) => {
+              const p = state.participants.find((p) => p.id === id);
+              if (!p) return null;
+              const r = e.results.find((r) => r.participantId === id),
+                score = scores.find((r) => r.id === id);
+              return (
+                <Link
+                  className="result-row"
+                  key={id}
+                  href={link(`/players/${id}`)}
+                >
+                  <span className="rank">
+                    {score?.place ?? "—"}
+                    {(score?.tie ?? 0) > 1 ? "=" : ""}
+                  </span>
+                  <Avatar player={p} small />
+                  <span className="result-person">
+                    <b>{p.team}</b>
+                    <small>{p.name}</small>
+                  </span>
+                  <span className="raw">
+                    {r?.absent
+                      ? "Absent"
+                      : r?.value
+                        ? `${r.value} ${e.unit}`
+                        : "Awaiting result"}
+                    <small>
+                      {score
+                        ? `${displayPoints(score.points)} tournament pts`
+                        : "Not scored"}
+                    </small>
+                  </span>
+                </Link>
+              );
+            })}
+            {!sorted.length && (
+              <div className="empty-small">
+                Results will appear when competitors register and the event
+                begins.
+              </div>
+            )}
+          </div>
+          {e.order.length > 0 && (
+            <div className="rules-block">
+              <h3>Frozen participation order</h3>
+              <p>
+                {e.order
+                  .map(
+                    (id) => state.participants.find((p) => p.id === id)?.name,
+                  )
+                  .join(" → ")}
+              </p>
+            </div>
+          )}
+        </section>
+        <section className="panel rules-block">
+          <div className="eyebrow">THE RULEBOOK</div>
+          <h2>How it works</h2>
+          {e.rules.map((r, i) => (
+            <p key={i}>{r}</p>
+          ))}
+        </section>
+      </div>
+      {e.kind === "kart" && <Bracket event={e} players={state.participants} />}
+      {e.kind === "fantasy" && <FantasyDetail state={state} />}
+    </>
+  );
+}
+export function Bracket({
+  event,
+  players,
+  onWinner,
+}: {
+  event: Event;
+  players: Player[];
+  onWinner?: (matchId: string, winner: string) => void;
+}) {
+  const rounds = [
+    ["Wild Card", "wc-1", "wc-2", "wc-3"],
+    ["Semifinals", "sf-1", "sf-2"],
+    ["Championship", "final", "third"],
+  ];
+  return (
+    <section className="panel bracket-panel">
+      <div className="section-heading">
+        <div>
+          <div className="eyebrow">MARIO KART · ROAD TO THE PODIUM</div>
+          <h2>Tournament bracket</h2>
+        </div>
+        <span className="muted">Reseeded semifinals</span>
+      </div>
+      <div className="bracket">
+        {rounds.map(([name, ...ids], round) => (
+          <div className={`bracket-round round-${round}`} key={name}>
+            <h3>{name}</h3>
+            {round === 0 && event.seeds[0] && (
+              <div className="bye">
+                <span className="gold">#1</span>{" "}
+                {players.find((p) => p.id === event.seeds[0])?.name}{" "}
+                <small>BYE TO SEMIFINAL</small>
+              </div>
+            )}
+            {ids.map((id) => {
+              const m = event.matches.find((m) => m.id === id);
+              return (
+                <div className="matchup" key={id}>
+                  <small>
+                    {id === "third"
+                      ? "THIRD-PLACE RACE"
+                      : id === "final"
+                        ? "CHAMPIONSHIP"
+                        : id.replace("-", " ").toUpperCase()}
+                  </small>
+                  {m ? (
+                    [m.a, m.b].map((p) => {
+                      const player = players.find((x) => x.id === p);
+                      return (
+                        <button
+                          key={p}
+                          disabled={
+                            !onWinner ||
+                            event.results.some(
+                              (r) => r.participantId === p && r.absent,
+                            )
+                          }
+                          className={`match-player ${m.winner === p ? "winner" : ""}`}
+                          onClick={() => onWinner?.(id, p)}
+                        >
+                          <span className="seed">
+                            {event.seeds.indexOf(p) + 1}
+                          </span>
+                          <span>
+                            {player?.team ?? "Competitor"}
+                            <small>
+                              {player?.name}
+                              {event.results.some(
+                                (r) => r.participantId === p && r.absent,
+                              )
+                                ? " · ABSENT / BYE"
+                                : ""}
+                            </small>
+                          </span>
+                          {m.winner === p && <Check size={16} />}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className="bracket-pending">
+                      Awaiting previous round
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <p className="inline-note">
+        Wild Card losers tie for 5th–7th: 1 base point × {event.weight} ={" "}
+        {event.weight} tournament points each.
+      </p>
+    </section>
+  );
+}
+function FantasyDetail({ state }: { state: PublicState }) {
+  const event = state.events.find((e) => !e.deleted && e.kind === "fantasy");
+  return (
+    <section className="panel fantasy-detail">
+      <div className="section-heading">
+        <h2>
+          <Radio size={20} />
+          ESPN fantasy score updates
+        </h2>
+        <span className="badge">
+          {event?.status === "finalized"
+            ? "Finalized"
+            : event?.status === "active"
+              ? "Provisional · admin updated"
+              : "Awaiting admin scores"}
+        </span>
+      </div>
+      <p className="inline-note">
+        Only Sunday, November 8 ESPN fantasy performances count, including
+        Sunday Night Football. The administrator verifies Sunday-only totals and
+        updates scores manually or from a reviewed screenshot. Standings update
+        after each saved update.
+      </p>
+      <p className="muted">
+        Last admin update:{" "}
+        {state.fantasy.entry?.updatedAt
+          ? new Date(state.fantasy.entry.updatedAt).toLocaleString()
+          : "No scores saved yet"}
+        {state.fantasy.entry?.source
+          ? ` · ${state.fantasy.entry.source === "screenshot" ? "Reviewed screenshot" : "Manual entry"}`
+          : ""}
+      </p>
+      {state.participants.map((p) => (
+        <div className="order-row fantasy-public-row" key={p.id}>
+          <span>
+            {p.team} · {p.name}
+          </span>
+          <b>
+            {event?.results.find((r) => r.participantId === p.id)?.value ?? "—"}{" "}
+            fantasy pts
+          </b>
+        </div>
+      ))}
+    </section>
+  );
+}
+function PlayerDetail({
+  state,
+  id,
+  link,
+}: {
+  state: PublicState;
+  id: string;
+  link: (p: string) => string;
+}) {
+  const p = state.participants.find((p) => p.id === id);
+  if (!p) return <PageHeading label="COMPETITOR" title="Profile not found" />;
+  const r = state.standings.find((r) => r.id === id);
+  return (
+    <>
+      <Link className="back-link" href={link("/")}>
+        ← Tournament standings
+      </Link>
+      <section className="player-hero">
+        <Avatar player={p} />
+        <div>
+          <div className="eyebrow">
+            {p.name}
+            {p.nickname ? ` / “${p.nickname}”` : ""}
+          </div>
+          <h1>{p.team}</h1>
+        </div>
+        <div className="player-stats">
+          <span>
+            <b>#{r?.rank}</b>OVERALL
+          </span>
+          <span>
+            <b>{displayPoints(r?.points ?? "0")}</b>POINTS
+          </span>
+        </div>
+      </section>
+      <section className="panel">
+        <div className="section-heading">
+          <h2>Event performance</h2>
+          <span className="muted">{r?.finishes[0] ?? 0} outright wins</span>
+        </div>
+        {state.events
+          .filter((e) => !e.deleted)
+          .map((e) => {
+            const raw = e.results.find((x) => x.participantId === id),
+              score = placements(e).find((x) => x.id === id);
+            return (
+              <Link
+                className="performance-row"
+                key={e.id}
+                href={link(`/events/${e.id}`)}
+              >
+                <span>
+                  <b>{e.name}</b>
+                  <small>
+                    {raw?.absent
+                      ? "Absent"
+                      : raw?.value
+                        ? `${raw.value} ${e.unit}`
+                        : "No result recorded"}
+                  </small>
+                </span>
+                <Badge event={e} />
+                <span>
+                  {score?.place
+                    ? `#${score.place}${score.tie > 1 ? " (tie)" : ""}`
+                    : "—"}
+                </span>
+                <b>{score ? `${displayPoints(score.points)} pts` : "—"}</b>
+              </Link>
+            );
+          })}
+      </section>
+      <HistoryChart state={state} initial={[id]} />
+    </>
+  );
+}
+export function HistoryChart({
+  state,
+  initial,
+}: {
+  state: PublicState;
+  initial?: string[];
+}) {
+  const [selected, setSelected] = useState<string[]>(
+    initial ?? state.participants.map((p) => p.id),
+  );
+  const [metric, setMetric] = useState<"rank" | "points">("rank");
+  const colors = [
+    "#e9bd5a",
+    "#5ab6dd",
+    "#ac95ed",
+    "#5ec6a1",
+    "#ec8e87",
+    "#e2a15c",
+    "#9aa9bd",
+  ];
+  const all = state.snapshots;
+  const snapshots = all.filter((x) => !x.id.startsWith("live-"));
+  const latestLive = all.filter((x) => x.id.startsWith("live-")).at(-1);
+  if (latestLive) snapshots.push(latestLive);
+  const max = Math.max(
+    15,
+    ...snapshots.flatMap((s) => s.standings.map((r) => Number(r.points))),
+  );
+  const width = 850,
+    height = 300;
+  const x = (i: number) => 55 + (i / Math.max(snapshots.length - 1, 1)) * 740;
+  const y = (v: number) =>
+    metric === "rank" ? 35 + ((v - 1) / 6) * 215 : 250 - (v / max) * 215;
+  return (
+    <section className="panel history-panel">
+      <div className="section-heading">
+        <h2>
+          <History size={20} /> Standings progression
+        </h2>
+        <div className="segmented">
+          <button
+            className={metric === "rank" ? "selected" : ""}
+            onClick={() => setMetric("rank")}
+          >
+            Rank
+          </button>
+          <button
+            className={metric === "points" ? "selected" : ""}
+            onClick={() => setMetric("points")}
+          >
+            Points
+          </button>
+        </div>
+      </div>
+      <div className="chart-filters">
+        {state.participants.map((p, i) => (
+          <button
+            aria-pressed={selected.includes(p.id)}
+            key={p.id}
+            onClick={() =>
+              setSelected(
+                selected.includes(p.id)
+                  ? selected.filter((id) => id !== p.id)
+                  : [...selected, p.id],
+              )
+            }
+          >
+            <span
+              style={{
+                background: selected.includes(p.id) ? colors[i % 7] : "#343d4e",
+              }}
+            />
+            {p.name}
+          </button>
+        ))}
+      </div>
+      {snapshots.length ? (
+        <>
+          <div className="chart-scroll">
+            <svg
+              viewBox={`0 0 ${width} ${height}`}
+              role="img"
+              aria-label={`${metric} progression across finalized events and latest live fantasy update`}
+            >
+              <title>{metric} progression</title>
+              {Array.from({ length: 7 }, (_, i) => (
+                <g key={i}>
+                  <line
+                    x1="48"
+                    x2="805"
+                    y1={35 + (i * 215) / 6}
+                    y2={35 + (i * 215) / 6}
+                    stroke="#273142"
+                  />
+                  <text
+                    x="25"
+                    y={40 + (i * 215) / 6}
+                    fill="#8290a6"
+                    fontSize="12"
+                  >
+                    {metric === "rank" ? i + 1 : Math.round(max * (1 - i / 6))}
+                  </text>
+                </g>
+              ))}
+              {snapshots.map((s, i) => (
+                <text
+                  key={s.id}
+                  x={x(i)}
+                  y="285"
+                  textAnchor="middle"
+                  fill="#8290a6"
+                  fontSize="11"
+                >
+                  {s.id.startsWith("live-") ? "Fantasy live" : `Event ${i + 1}`}
+                </text>
+              ))}
+              {state.participants.map((p, i) => {
+                if (!selected.includes(p.id)) return null;
+                const coords = snapshots.map((s, j) => {
+                  const r = s.standings.find((r) => r.id === p.id);
+                  return {
+                    x: x(j),
+                    y: y(
+                      metric === "rank"
+                        ? (r?.rank ?? 7)
+                        : Number(r?.points ?? 0),
+                    ),
+                    r,
+                    label: s.label,
+                  };
+                });
+                return (
+                  <g key={p.id}>
+                    <polyline
+                      points={coords.map((c) => `${c.x},${c.y}`).join(" ")}
+                      fill="none"
+                      stroke={colors[i % 7]}
+                      strokeWidth="3"
+                    />
+                    {coords.map((c, j) => (
+                      <circle
+                        key={j}
+                        cx={c.x}
+                        cy={c.y}
+                        r="5"
+                        fill={colors[i % 7]}
+                      >
+                        <title>
+                          {p.name}: {c.label} · #{c.r?.rank} · {c.r?.points}{" "}
+                          points
+                        </title>
+                      </circle>
+                    ))}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+          <details className="history-table">
+            <summary>View exact standings by event</summary>
+            {snapshots.map((s) => (
+              <div key={s.id}>
+                <h3>{s.label}</h3>
+                {s.standings
+                  .filter((r) => selected.includes(r.id))
+                  .map((r) => (
+                    <div className="order-row" key={r.id}>
+                      <span>
+                        #{r.rank}{" "}
+                        {state.participants.find((p) => p.id === r.id)?.name}
+                      </span>
+                      <b>{displayPoints(r.points)} pts</b>
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </details>
+        </>
+      ) : (
+        <div className="empty-small">
+          <History size={32} />
+          <h3>Your story starts at the first finish.</h3>
+          <p>Standings history appears after an event is finalized.</p>
+        </div>
+      )}
+    </section>
+  );
+}
+type ProfileFields = { team: string; nickname: string; sleeper: string };
+export function ProfileForm({
+  initial,
+  onSubmit,
+  button = "Save profile",
+  disabled = false,
+}: {
+  initial?: ProfileFields;
+  onSubmit: (value: ProfileFields) => Promise<void>;
+  button?: string;
+  disabled?: boolean;
+}) {
+  const [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
+  return (
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError("");
+        setBusy(true);
+        const f = new FormData(e.currentTarget);
+        try {
+          await onSubmit({
+            team: String(f.get("team")),
+            nickname: String(f.get("nickname")),
+            sleeper: initial?.sleeper ?? "",
+          });
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Save failed.");
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <label>
+        Team name{" "}
+        <input
+          name="team"
+          maxLength={40}
+          required
+          placeholder="Make a name for yourself"
+          defaultValue={initial?.team}
+        />
+      </label>
+      <div className="form-columns">
+        <label>
+          Nickname <span>optional</span>
+          <input
+            name="nickname"
+            maxLength={30}
+            defaultValue={initial?.nickname}
+            placeholder="What the league calls you"
+          />
+        </label>
+      </div>
+      <ErrorMessage message={error} />
+      <button className="button primary" disabled={disabled || busy}>
+        {busy ? "Saving…" : button}
+        <ArrowUpRight size={16} />
+      </button>
+    </form>
+  );
+}
+function Registration({
+  state,
+  refresh,
+}: {
+  state: PublicState;
+  refresh: () => Promise<void>;
+}) {
+  const [name, setName] = useState(""),
+    [privateLink, setPrivateLink] = useState("");
+  if (privateLink)
+    return (
+      <section className="registration panel">
+        <Check size={40} className="gold" />
+        <PageHeading
+          label="YOU’RE IN"
+          title="Welcome to the field."
+          detail="Save this private link. It is the key to editing your profile and uploading your photo."
+        />
+        <div className="private-link">
+          <input
+            readOnly
+            value={privateLink}
+            aria-label="Private profile management link"
+            onFocus={(e) => e.target.select()}
+          />
+          <button
+            className="button secondary"
+            onClick={() => void navigator.clipboard.writeText(privateLink)}
+          >
+            Copy link
+          </button>
+        </div>
+        <a href={privateLink} className="button primary">
+          Add your photo & manage profile <ArrowUpRight size={16} />
+        </a>
+        <p className="muted">
+          Keep this link private. Your device will highlight your leaderboard
+          row automatically.
+        </p>
+      </section>
+    );
+  return (
+    <>
+      <PageHeading
+        label="THE REGISTRATION LOBBY"
+        title={
+          state.participants.length === 7
+            ? "The field is set."
+            : "Claim your spot."
+        }
+        detail="Pick your real name. Rep your team. Seven competitors, one identity each."
+      />
+      <div className="registration-grid">
+        <section className="panel registration">
+          <div className="section-heading">
+            <h2>
+              <Users size={20} /> Who’s playing?
+            </h2>
+            <span className="muted">{state.participants.length}/7 claimed</span>
+          </div>
+          <div className="identity-grid">
+            {NAMES.map((n) => {
+              const p = state.participants.find((p) => p.name === n);
+              return (
+                <button
+                  key={n}
+                  aria-pressed={name === n}
+                  className={`identity ${name === n ? "chosen" : ""} ${p ? "claimed" : ""}`}
+                  disabled={!!p || !state.configured}
+                  onClick={() => setName(n)}
+                >
+                  <Avatar player={p ?? { name: n }} />
+                  <b>{n}</b>
+                  <small>
+                    {p ? (
+                      <>
+                        <Check size={11} /> Claimed
+                      </>
+                    ) : name === n ? (
+                      "Selected"
+                    ) : (
+                      "Available"
+                    )}
+                  </small>
+                </button>
+              );
+            })}
+          </div>
+          {state.participants.length < 7 && (
+            <>
+              <h3 className="form-title">
+                {name
+                  ? `${name}, make it official.`
+                  : "Choose your identity to continue."}
+              </h3>
+              <ProfileForm
+                disabled={!name || !state.configured}
+                button="Join the tournament"
+                onSubmit={async (profile) => {
+                  const value = await request("/api/action", {
+                    action: { type: "register", name, profile },
+                  });
+                  setPrivateLink(value.privateLink);
+                  await refresh();
+                }}
+              />
+            </>
+          )}
+          {state.participants.length === 7 && (
+            <p>
+              Registration is closed. Everyone can follow the standings without
+              an account.
+            </p>
+          )}
+        </section>
+        <aside className="panel rules-block">
+          <div className="eyebrow">YOUR ROAD TO FIRST PICK</div>
+          <h2>
+            A place in the league.
+            <br />A point to prove.
+          </h2>
+          <p>
+            Select your own real identity only. Registration is first come,
+            first served.
+          </p>
+          <p>
+            Your custom team name leads the leaderboard. Your private management
+            link lets you update your profile and photo.
+          </p>
+          <p>
+            Claimed incorrectly? Ask the commissioner to reopen your identity.
+          </p>
+          <div className="inline-note">
+            Spectating? You’re already in. No account needed.
+          </div>
+        </aside>
+      </div>
+    </>
+  );
+}
+function Manage({
+  token,
+  refresh,
+  environment,
+}: {
+  token: string;
+  refresh: () => Promise<void>;
+  environment: "production" | "practice";
+}) {
+  const [p, setP] = useState<Player | null>(null),
+    [error, setError] = useState(""),
+    [saved, setSaved] = useState("");
+  useEffect(() => {
+    request("/api/profile", { token, environment })
+      .then((r) => setP(r.participant))
+      .catch((e) => setError(e.message));
+  }, [token, environment]);
+  return (
+    <section className="panel registration">
+      <PageHeading
+        label="PRIVATE PROFILE MANAGEMENT"
+        title={p ? `${p.name}, this is your corner.` : "Your profile."}
+      />
+      <ErrorMessage message={error} />
+      {p && (
+        <>
+          <Avatar player={p} />
+          <ProfileForm
+            initial={p}
+            onSubmit={async (profile) => {
+              await request("/api/action", {
+                action: { type: "profile", participantId: p.id, profile },
+                profileToken: token,
+                environment,
+              });
+              setSaved("Profile saved.");
+              await refresh();
+            }}
+          />
+          <label className="photo-label">
+            Profile photo · JPG, PNG or WebP, up to 2 MB
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setError("");
+                const form = new FormData();
+                form.set("file", file);
+                form.set("participantId", p.id);
+                form.set("token", token);
+                form.set("environment", environment);
+                try {
+                  const res = await fetch("/api/upload", {
+                    method: "POST",
+                    body: form,
+                  });
+                  const v = await res.json();
+                  if (!res.ok) throw Error(v.error);
+                  const result = await request("/api/profile", {
+                    token,
+                    environment,
+                  });
+                  setP(result.participant);
+                  setSaved("Photo saved.");
+                  await refresh();
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "Upload failed.");
+                }
+              }}
+            />
+          </label>
+          <p role="status" className="success">
+            {saved}
+          </p>
+          <p className="muted">
+            Keep this URL private. The commissioner can revoke and regenerate
+            it.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}

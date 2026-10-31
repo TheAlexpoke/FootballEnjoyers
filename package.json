@@ -1,0 +1,47 @@
+{
+  "name": "football-enjoyers",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/prepare-ocr.mjs",
+    "predev": "node scripts/prepare-ocr.mjs",
+    "prebuild": "node scripts/prepare-ocr.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:integration": "node scripts/run-integration.mjs",
+    "admin:password": "node scripts/hash-password.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.80.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "decimal.js": "^10.6.0",
+    "lucide-react": "^0.468.0",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.34.0",
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.13",
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}
