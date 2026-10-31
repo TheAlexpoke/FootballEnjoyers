@@ -9,7 +9,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   await page.goto("http://localhost:3002/");
   await expect(
     page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-  ).toHaveText(["Standings", "Events"]);
+  ).toHaveText(["Standings", "Events", "History"]);
   await expect(page.locator(".standing-row")).toHaveCount(7);
   await expect(
     page.getByRole("link", { name: "Commissioner access" }),
@@ -22,17 +22,15 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   expect(JSON.stringify(publicData)).not.toMatch(
     /credentialHash|deviceHash|admin_sessions|profileToken/,
   );
-  for (const path of [
-    "admin",
-    "history",
-    "register",
-    "manage/private",
-    "players/test",
-  ]) {
+  for (const path of ["admin", "register", "manage/private", "players/test"]) {
     expect((await request.get(`http://localhost:3002/${path}`)).status()).toBe(
       404,
     );
   }
+  await page.goto("http://localhost:3002/history");
+  await expect(
+    page.getByRole("heading", { name: "Standings progression" }),
+  ).toBeVisible();
   expect(
     (await request.get("http://localhost:3002/api/state?env=practice")).ok(),
   ).toBe(false);

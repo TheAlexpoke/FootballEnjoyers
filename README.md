@@ -6,7 +6,7 @@
 
 Tournament data saves on this computer in `data/tournament.sqlite`; photos save in `data/avatars`. Practice and official data stay separate. Keep a separate copy of the entire `data` folder while the server is stopped, and use the Recovery tab for JSON/CSV exports and restore.
 
-GitHub stores the source. **Vercel shares a read-only published snapshot with only Standings and Events.** Run `npm run snapshot:prepare` while the local server is running to prepare the official scores, event schedule and public photo copies for publishing. Push those files to GitHub to update Vercel. Later local changes do not synchronize automatically. No Supabase or password variables are needed. Vercel rejects writes even if `LOCAL_MODE=true` is set. The full local control room and private database stay on this computer, with the local server bound to `127.0.0.1`.
+GitHub stores the source. **Vercel shares a read-only published snapshot with Standings, Events, and History.** Run `npm run snapshot:prepare` while the local server is running to prepare the official scores, event schedule, progression history and public photo copies for publishing. Push those files to GitHub to update Vercel. Later local changes do not synchronize automatically. No Supabase or password variables are needed. Vercel rejects writes even if `LOCAL_MODE=true` is set. The full local control room and private database stay on this computer, with the local server bound to `127.0.0.1`.
 
 See [the current local operating guide](docs/LOCAL-OPERATION.md) for setup, scoring, backups, publishing and tests. The hosted setup material below describes the retained legacy Supabase backend and is **not required for the current workflow**.
 

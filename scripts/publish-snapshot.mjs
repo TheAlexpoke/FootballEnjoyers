@@ -74,7 +74,18 @@ const snapshot = {
   environment: "production",
   participants,
   events,
-  snapshots: [],
+  snapshots: local.snapshots.map(({ id, eventId, at, label, standings }) => ({
+    id,
+    eventId,
+    at,
+    label,
+    standings: standings.map(({ id, rank, points, finishes }) => ({
+      id,
+      rank,
+      points,
+      finishes,
+    })),
+  })),
   config: { layout: "standings", draftOrder: local.config.draftOrder },
   fantasy: {
     entry: { teamNames: {} },

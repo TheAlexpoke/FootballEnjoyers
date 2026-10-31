@@ -41,9 +41,9 @@ The `data` directory, environment files, generated OCR assets, dependencies and 
 
 ### Current public sharing mode
 
-The shared Vercel site contains only Standings and Events, including read-only event detail pages. Admin, History, Players, registration, private management pages, practice access, and all editing APIs are unavailable there. The full local control room remains unchanged.
+The shared Vercel site contains Standings, Events, and History, including read-only event detail pages. Admin, Players, registration, private management pages, practice access, and all editing APIs are unavailable there. The full local control room remains unchanged.
 
-With the local server running, `npm run snapshot:prepare` prepares a public copy of the current **official** standings, roster, event schedule, rules, and profile photos. It does not change the local tournament. This creates `src/data/shared-tournament.json` and copies the displayed photos into `public/images/players/` with versioned filenames. These files are intentionally public when pushed to GitHub and deployed to Vercel. Private database files, audit records, backups, credentials and practice results are excluded.
+With the local server running, `npm run snapshot:prepare` prepares a public copy of the current **official** standings, roster, event schedule, rules, progression history, and profile photos. It does not change the local tournament. This creates `src/data/shared-tournament.json` and copies the displayed photos into `public/images/players/` with versioned filenames. These files are intentionally public when pushed to GitHub and deployed to Vercel. Private database files, audit records, backups, credentials and practice results are excluded.
 
 Push the updated source, snapshot and public photo copies to the connected GitHub repository to update Vercel. The public view is a published snapshot: later local score edits do not appear until a new snapshot is prepared and published. Originals and the main tournament database stay in `data` on this computer. No shared database or paid API is required.
 

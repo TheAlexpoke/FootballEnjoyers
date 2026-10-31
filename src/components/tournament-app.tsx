@@ -255,6 +255,7 @@ export default function TournamentApp({
               ? [
                   ["/", "Standings"],
                   ["/events", "Events"],
+                  ["/history", "History"],
                 ]
               : [
                   ["/", "Standings"],
@@ -559,11 +560,9 @@ export default function TournamentApp({
                             ? "Includes provisional fantasy points"
                             : "Official finalized event points"}
                         </span>
-                        {!sharedView && (
-                          <Link href={link("/history")}>
-                            Standings history <ChevronRight size={13} />
-                          </Link>
-                        )}
+                        <Link href={link("/history")}>
+                          Standings history <ChevronRight size={13} />
+                        </Link>
                       </div>
                     </section>
                     {state.phase === "Complete" && (
