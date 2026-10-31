@@ -1090,6 +1090,49 @@ function EventLastPlaceNote({
       aria-label={`${label}: ${losers.map((player) => player.name).join(", ")}`}
     >
       <div className="last-place-graphic">
+        <svg
+          className="last-place-atmosphere"
+          viewBox="0 0 48 36"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M7 12c-4-4 4-5 0-10M14 9c-3-3 3-4 0-8"
+            fill="none"
+            stroke="#879052"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            opacity=".65"
+          />
+          <g transform="translate(41 10) rotate(22)">
+            <ellipse
+              cx="-2.5"
+              cy="-2"
+              rx="2.6"
+              ry="1.5"
+              fill="#d4e3e6"
+              stroke="#6b7774"
+              strokeWidth=".6"
+            />
+            <ellipse
+              cx="2.5"
+              cy="-2"
+              rx="2.6"
+              ry="1.5"
+              fill="#d4e3e6"
+              stroke="#6b7774"
+              strokeWidth=".6"
+            />
+            <path
+              d="m-1 1-3 2m5-2 3 2"
+              stroke="#484338"
+              strokeWidth=".7"
+              strokeLinecap="round"
+            />
+            <ellipse cy=".5" rx="1.3" ry="2.2" fill="#484338" />
+            <circle cy="-2" r="1.3" fill="#484338" />
+          </g>
+        </svg>
         <span className="last-place-poop" aria-hidden="true">
           <svg viewBox="0 0 48 42" focusable="false">
             <path

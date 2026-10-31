@@ -543,6 +543,14 @@ textarea:focus {
   position: relative;
   margin: 0 auto;
 }
+.last-place-atmosphere {
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 48px;
+  height: 36px;
+  pointer-events: none;
+}
 .last-place-poop {
   display: flex;
   justify-content: center;
