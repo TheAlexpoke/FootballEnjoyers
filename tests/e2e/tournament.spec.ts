@@ -39,6 +39,45 @@ const fixture = () => {
     me: "p1",
   };
 };
+test("bonus note preference survives navigation and reloads and synchronizes browser tabs", async ({
+  page,
+  context,
+}) => {
+  await context.route("**/api/state*", (route) =>
+    route.fulfill({ json: fixture() }),
+  );
+  const other = await context.newPage();
+  await page.goto("/");
+  await other.goto("/events");
+  await expect(
+    page.getByRole("region", { name: "Bonus awards explained" }),
+  ).toBeVisible();
+  await expect(
+    other.getByRole("region", { name: "Bonus awards explained" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Minimize bonus note" }).click();
+  await expect(
+    other.getByRole("button", { name: "Show bonus note" }),
+  ).toBeVisible();
+  await page.goto("/history");
+  await page.goto("/events");
+  await expect(
+    page.getByRole("button", { name: "Show bonus note" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Show bonus note" }),
+  ).toBeVisible();
+  await other.getByRole("button", { name: "Show bonus note" }).click();
+  await expect(
+    page.getByRole("region", { name: "Bonus awards explained" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("region", { name: "Bonus awards explained" }),
+  ).toBeVisible();
+  await other.close();
+});
 test("public dashboard fits viewport and shows all competitors", async ({
   page,
 }) => {

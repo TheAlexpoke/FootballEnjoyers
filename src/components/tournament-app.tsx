@@ -1,5 +1,12 @@
 "use client";
-import { useCallback, useEffect, useState, useId, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useId,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -803,13 +810,48 @@ export function PageHeading({
     </div>
   );
 }
+const BONUS_NOTE_KEY = "football-enjoyers:bonus-note-minimized";
+const BONUS_NOTE_EVENT = "football-enjoyers:bonus-note-preference";
+let bonusNoteFallback = false;
+function readBonusNotePreference() {
+  try {
+    return window.localStorage.getItem(BONUS_NOTE_KEY) === "true";
+  } catch {
+    return bonusNoteFallback;
+  }
+}
+function subscribeBonusNotePreference(onChange: () => void) {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === BONUS_NOTE_KEY || event.key === null) onChange();
+  };
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(BONUS_NOTE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(BONUS_NOTE_EVENT, onChange);
+  };
+}
+function saveBonusNotePreference(collapsed: boolean) {
+  bonusNoteFallback = collapsed;
+  try {
+    window.localStorage.setItem(BONUS_NOTE_KEY, String(collapsed));
+  } catch {
+    /* Retain the preference in memory when storage is unavailable. */
+  }
+  window.dispatchEvent(new Event(BONUS_NOTE_EVENT));
+}
 function BonusNote() {
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = useSyncExternalStore<boolean | null>(
+    subscribeBonusNotePreference,
+    readBonusNotePreference,
+    () => null,
+  );
+  if (collapsed === null) return null;
   if (collapsed)
     return (
       <button
         className="bonus-note-toggle"
-        onClick={() => setCollapsed(false)}
+        onClick={() => saveBonusNotePreference(false)}
         aria-label="Show bonus note"
       >
         <Trophy size={16} /> Bonus notes
@@ -820,7 +862,7 @@ function BonusNote() {
       <button
         className="bonus-note-close"
         aria-label="Minimize bonus note"
-        onClick={() => setCollapsed(true)}
+        onClick={() => saveBonusNotePreference(true)}
       >
         <X size={15} />
       </button>
