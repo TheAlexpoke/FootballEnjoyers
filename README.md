@@ -100,7 +100,7 @@ Stop the old fantasy worker and remove `CRON_SECRET`, `FANTASY_FEED_URL` and `FA
 7. Finalize fantasy once verified. Shared tournament ranks remain tied after the defined tiebreakers; record only the offline ordering resolution. No draft-slot selection feature exists.
 8. Download final JSON/CSV and separately archive avatar objects and original score screenshots.
 
-Scoring is centralized in exact integer base-point ticks and decimal weights. Default base points are 15, 10, 6, 3, 2, 1, 0; total weight is 13 and maximum score is 195. Ties average occupied places. Absences score zero without occupying a finishing place. Overall tiebreakers use outright wins and subsequent finish counts, with shared ranks when unresolved.
+Scoring is centralized in exact integer base-point ticks and decimal weights. Default base points are 15, 10, 6, 3, 2, 1, 0; fantasy is 3×, total event weight is 12 and the event maximum is 180. The best unweighted average placement earns a moving 10-point Consistency Award (every tied leader gets 10), and the most last-place finishes earns a separate 10-point pool (tied leaders split it). Both use completed events only. The scoring breakdown shows 200 points available; the separate award qualifications mean a perfect sweep earns 190 rather than 200. Ties average occupied places. Legacy absences score zero without occupying a finishing place. Overall tiebreakers use outright wins and subsequent finish counts, with shared ranks when unresolved.
 
 ## Backups and recovery
 
