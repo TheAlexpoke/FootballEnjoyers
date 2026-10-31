@@ -72,6 +72,43 @@ body {
 .standing-row {
   border-color: #82704d33;
 }
+.rank-trophy {
+  display: block;
+  overflow: visible;
+}
+.rank-trophy--1 {
+  width: 44px;
+  height: 50px;
+  color: #edc66e;
+  filter: drop-shadow(0 2px 5px #edc66e33);
+}
+.rank-trophy--2 {
+  width: 37px;
+  height: 43px;
+  color: #c4cdd8;
+}
+.rank-trophy--3 {
+  width: 32px;
+  height: 38px;
+  color: #ce9467;
+}
+@media (max-width: 650px) {
+  .standing-row {
+    grid-template-columns: 36px 1fr 24px 58px;
+  }
+  .rank-trophy--1 {
+    width: 36px;
+    height: 43px;
+  }
+  .rank-trophy--2 {
+    width: 31px;
+    height: 37px;
+  }
+  .rank-trophy--3 {
+    width: 27px;
+    height: 32px;
+  }
+}
 .standing-row:hover {
   background: #c7a45309;
 }

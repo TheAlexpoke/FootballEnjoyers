@@ -463,10 +463,10 @@ export default function TournamentApp({
                                 <span className="rank">
                                   {completed === 0 ? (
                                     "-"
-                                  ) : r.rank === 1 && r.points !== "0" ? (
-                                    <Trophy size={21} />
+                                  ) : r.rank <= 3 ? (
+                                    <RankTrophy rank={r.rank} />
                                   ) : (
-                                    String(r.rank).padStart(2, "0")
+                                    r.rank
                                   )}
                                 </span>
                                 <span className="competitor">
@@ -500,7 +500,10 @@ export default function TournamentApp({
                                   {change !== 0 && Math.abs(change)}
                                 </span>
                                 <span className="points">
-                                  {displayPoints(r.points)}
+                                  {Number(r.points).toLocaleString(undefined, {
+                                    minimumFractionDigits: 1,
+                                    maximumFractionDigits: 1,
+                                  })}
                                   <small>PTS</small>
                                 </span>
                               </PlayerLink>
@@ -592,7 +595,13 @@ export default function TournamentApp({
                                 state.participants.find((p) => p.id === r.id)
                                   ?.team
                               }
-                              <span>{displayPoints(r.points)} pts</span>
+                              <span>
+                                {Number(r.points).toLocaleString(undefined, {
+                                  minimumFractionDigits: 1,
+                                  maximumFractionDigits: 1,
+                                })}{" "}
+                                pts
+                              </span>
                             </div>
                           ))}
                       </section>
@@ -745,6 +754,39 @@ export default function TournamentApp({
 }
 export const displayPoints = (s: string) =>
   Number(s).toLocaleString(undefined, { maximumFractionDigits: 3 });
+function RankTrophy({ rank }: { rank: number }) {
+  return (
+    <svg
+      className={`rank-trophy rank-trophy--${rank}`}
+      viewBox="0 0 48 54"
+      role="img"
+      aria-label={`Rank ${rank}`}
+    >
+      <path
+        d="M13 8H4v9c0 9 6 14 14 15M35 8h9v9c0 9-6 14-14 15"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        d="M11 3h26v17c0 10-5 16-11 18v7h10v6H12v-6h10v-7c-6-2-11-8-11-18Z"
+        fill="currentColor"
+      />
+      <path d="M14 6h20" stroke="#fff" strokeOpacity=".55" strokeWidth="2" />
+      <text
+        x="24"
+        y="26"
+        textAnchor="middle"
+        fill="#252018"
+        fontFamily="Impact, Arial Narrow, sans-serif"
+        fontSize="22"
+        fontWeight="900"
+      >
+        {rank}
+      </text>
+    </svg>
+  );
+}
 function ordinal(n: number) {
   return n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
 }
@@ -1321,17 +1363,41 @@ export function HistoryChart({
     "#9aa9bd",
   ];
   const all = state.snapshots;
-  const snapshots = all.filter((x) => !x.id.startsWith("live-"));
+  const snapshots = all
+    .filter((x) => !x.id.startsWith("live-"))
+    .sort((a, b) => a.at.localeCompare(b.at));
+  const latestCompletedId = snapshots.at(-1)?.id;
   const latestLive = all.filter((x) => x.id.startsWith("live-")).at(-1);
   if (latestLive) snapshots.push(latestLive);
   const max = Math.max(
     15,
     ...snapshots.flatMap((s) => s.standings.map((r) => Number(r.points))),
   );
-  const width = Math.max(850, snapshots.length * 190 + 130),
-    height = 460;
+  const width = 850;
+  const labelLength = Math.min(
+    18,
+    Math.max(8, Math.floor(630 / Math.max(snapshots.length - 1, 1) / 9)),
+  );
+  const eventLabels = snapshots.map((snapshot) =>
+    (
+      state.events.find((event) => event.id === snapshot.eventId)?.name ??
+      snapshot.label
+    )
+      .split(" ")
+      .reduce<string[]>((lines, word) => {
+        const last = lines.length - 1;
+        if (last >= 0 && lines[last].length + word.length < labelLength)
+          lines[last] += " " + word;
+        else lines.push(word);
+        return lines;
+      }, []),
+  );
+  const height = Math.max(
+    510,
+    465 + Math.max(0, ...eventLabels.map((lines) => lines.length)) * 20,
+  );
   const x = (i: number) =>
-    86 + (i / Math.max(snapshots.length - 1, 1)) * (width - 171);
+    110 + (i / Math.max(snapshots.length - 1, 1)) * (width - 220);
   const y = (v: number) =>
     metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
   const medals = [
@@ -1390,7 +1456,7 @@ export function HistoryChart({
           <div className="chart-scroll">
             <svg
               viewBox={`0 0 ${width} ${height}`}
-              style={{ minWidth: width }}
+              style={{ width: "100%", minWidth: 0, height: "auto" }}
               role="img"
               aria-label={`${metric} progression across finalized events and latest live fantasy update`}
             >
@@ -1470,16 +1536,26 @@ export function HistoryChart({
               {snapshots.map((s, i) => (
                 <text
                   key={s.id}
+                  data-history-event={s.eventId}
                   x={x(i)}
-                  y="445"
+                  y="435"
                   textAnchor="middle"
                   fill="#d6bd86"
-                  fontSize="19"
+                  fontSize="17"
                   fontWeight="800"
                   fontFamily="Impact, Arial Narrow, sans-serif"
                   letterSpacing="0.8"
                 >
-                  {s.id.startsWith("live-") ? "Fantasy live" : `Event ${i + 1}`}
+                  {eventLabels[i].map((line, lineIndex) => (
+                    <tspan key={lineIndex} x={x(i)} dy={lineIndex ? 20 : 0}>
+                      {line}
+                    </tspan>
+                  ))}
+                  {s.id.startsWith("live-") && (
+                    <tspan x={x(i)} dy="20">
+                      Live update
+                    </tspan>
+                  )}
                 </text>
               ))}
               {state.participants
@@ -1507,6 +1583,7 @@ export function HistoryChart({
                 })}
               {chartPoints.map((points, j) =>
                 points.map((point) => {
+                  const showPhoto = snapshots[j].id === latestCompletedId;
                   const tied =
                     points.filter((other) => Math.abs(other.y - point.y) < 0.01)
                       .length > 1;
@@ -1529,66 +1606,78 @@ export function HistoryChart({
                       data-history-marker={point.id}
                     >
                       <title>{label}</title>
-                      {(tied || Math.abs(point.markerY - point.y) > 0.1) && (
+                      {showPhoto ? (
                         <>
-                          <line
-                            data-history-connector={point.id}
-                            x1={point.x}
-                            y1={point.y}
-                            x2={markerX}
-                            y2={point.markerY}
-                            stroke={point.color}
-                            strokeWidth="1.5"
-                            opacity="0.8"
-                          />
+                          {(tied ||
+                            Math.abs(point.markerY - point.y) > 0.1) && (
+                            <>
+                              <line
+                                data-history-connector={point.id}
+                                x1={point.x}
+                                y1={point.y}
+                                x2={markerX}
+                                y2={point.markerY}
+                                stroke={point.color}
+                                strokeWidth="1.5"
+                                opacity="0.8"
+                              />
+                              <circle
+                                cx={point.x}
+                                cy={point.y}
+                                r="3"
+                                fill={point.color}
+                              />
+                            </>
+                          )}
+                          <defs>
+                            <clipPath id={clip}>
+                              <circle cx={markerX} cy={point.markerY} r="16" />
+                            </clipPath>
+                          </defs>
                           <circle
-                            cx={point.x}
-                            cy={point.y}
-                            r="3"
+                            cx={markerX}
+                            cy={point.markerY}
+                            r="17"
+                            fill="#172332"
+                          />
+                          <text
+                            x={markerX}
+                            y={point.markerY + 4}
+                            textAnchor="middle"
+                            fontSize="11"
                             fill={point.color}
+                            fontWeight="700"
+                          >
+                            {point.player.name.slice(0, 2).toUpperCase()}
+                          </text>
+                          {point.player.avatar && (
+                            <image
+                              href={point.player.avatar}
+                              x={markerX - 16}
+                              y={point.markerY - 16}
+                              width="32"
+                              height="32"
+                              preserveAspectRatio="xMidYMid slice"
+                              clipPath={"url(#" + clip + ")"}
+                            />
+                          )}
+                          <circle
+                            cx={markerX}
+                            cy={point.markerY}
+                            r="17"
+                            fill="none"
+                            stroke={point.color}
+                            strokeWidth="2.5"
                           />
                         </>
-                      )}
-                      <defs>
-                        <clipPath id={clip}>
-                          <circle cx={markerX} cy={point.markerY} r="16" />
-                        </clipPath>
-                      </defs>
-                      <circle
-                        cx={markerX}
-                        cy={point.markerY}
-                        r="17"
-                        fill="#172332"
-                      />
-                      <text
-                        x={markerX}
-                        y={point.markerY + 4}
-                        textAnchor="middle"
-                        fontSize="11"
-                        fill={point.color}
-                        fontWeight="700"
-                      >
-                        {point.player.name.slice(0, 2).toUpperCase()}
-                      </text>
-                      {point.player.avatar && (
-                        <image
-                          href={point.player.avatar}
-                          x={markerX - 16}
-                          y={point.markerY - 16}
-                          width="32"
-                          height="32"
-                          preserveAspectRatio="xMidYMid slice"
-                          clipPath={"url(#" + clip + ")"}
+                      ) : (
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r="4"
+                          fill={point.color}
                         />
                       )}
-                      <circle
-                        cx={markerX}
-                        cy={point.markerY}
-                        r="17"
-                        fill="none"
-                        stroke={point.color}
-                        strokeWidth="2.5"
-                      />
                     </g>
                   );
                 }),

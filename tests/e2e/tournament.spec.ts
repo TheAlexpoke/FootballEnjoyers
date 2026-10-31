@@ -48,6 +48,11 @@ test("public dashboard fits viewport and shows all competitors", async ({
     page.getByRole("heading", { name: "Tournament standings" }),
   ).toBeVisible();
   await expect(page.locator(".standing-row")).toHaveCount(7);
+  await expect(page.locator(".rank-trophy")).toHaveCount(3);
+  await expect(page.locator(".standing-row .rank").nth(3)).toHaveText("4");
+  await expect(page.locator(".standing-row .points").first()).toHaveText(
+    "15.0PTS",
+  );
   await expect(page.locator(".is-me")).toContainText("YOU");
   expect(
     await page.evaluate(
@@ -272,6 +277,20 @@ test("history selects everyone after loading and gives tied players separate pho
       })),
     },
   ];
+  s.snapshots.unshift({
+    ...s.snapshots[0],
+    id: "event-3",
+    eventId: "event-3",
+    at: "2026-10-31T13:00:00.000Z",
+    label: "40M Dash",
+  });
+  s.snapshots.push({
+    ...s.snapshots[0],
+    id: "live-fantasy",
+    eventId: "event-8",
+    at: "2026-10-31T14:00:00.000Z",
+    label: "Fantasy live",
+  });
   await page.route("**/api/state*", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 150));
     await route.fulfill({ json: s });
@@ -281,6 +300,27 @@ test("history selects everyone after loading and gives tied players separate pho
   await expect(page.locator(".history-rank-label")).toHaveCount(7);
   await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
   await expect(page.locator("[data-history-connector]")).toHaveCount(7);
+  expect(
+    await page
+      .locator(".chart-scroll")
+      .evaluate((element) => element.scrollWidth <= element.clientWidth),
+  ).toBe(true);
+  expect(
+    await page
+      .locator("[data-history-event]")
+      .evaluateAll((labels) =>
+        labels.map((label) => label.getAttribute("data-history-event")),
+      ),
+  ).toEqual(["event-1", "event-3", "event-8"]);
+  await expect(page.locator('[data-history-event="event-1"]')).toContainText(
+    "Beer Pong",
+  );
+  await expect(page.locator('[data-history-event="event-3"]')).toContainText(
+    "40M Dash",
+  );
+  await expect(
+    page.locator("[data-history-marker] image").first().locator(".."),
+  ).toContainText("40M Dash");
   const photos = await page
     .locator("[data-history-marker] image")
     .evaluateAll((images) =>
