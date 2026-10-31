@@ -156,10 +156,10 @@ export function initialState(
       "Pigskin Accuracy Toss",
       "1",
       "distance",
-      "cm",
+      "inches",
       [
         "Three throws at a target marker. Only the closest throw counts.",
-        "Use the same measurement unit for everyone. Smallest distance wins.",
+        "Measure every throw's distance in inches. Smallest distance wins.",
       ],
     ],
     [

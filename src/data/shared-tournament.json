@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 33,
+  "revision": 34,
   "environment": "production",
   "participants": [
     {
@@ -66,12 +66,12 @@
       "name": "Pigskin Accuracy Toss",
       "weight": "1",
       "kind": "distance",
-      "unit": "Feet and Inches",
+      "unit": "inches",
       "direction": "asc",
       "description": "Three throws at a target marker. Only the closest throw counts.",
       "rules": [
         "Three attempts to throw a football as close to a target marker. Only the closest throw counts.",
-        "Use the same measurement unit for everyone. Shortest distance wins."
+        "Measure every throw's distance in inches. Shortest distance wins."
       ],
       "status": "scheduled",
       "order": [],
@@ -400,5 +400,5 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-10-31T22:00:06.559Z"
+  "sharedSnapshotAt": "2026-10-31T22:21:32.358Z"
 }
