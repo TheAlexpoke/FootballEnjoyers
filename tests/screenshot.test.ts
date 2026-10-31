@@ -292,7 +292,7 @@ describe("admin fantasy score updates", () => {
       "2026-11-08T20:00:00.000Z",
     );
     expect(s.events[7].status).toBe("active");
-    expect(Number(standings(s)[0].points)).toBe(Number(before) + 60);
+    expect(Number(standings(s)[0].points)).toBe(Number(before) + 45);
     expect(s.audit.at(-1)?.action).toBe("fantasyScreenshot");
     expect(s.snapshots.at(-1)?.fantasyResults).toHaveLength(7);
     expect(() =>

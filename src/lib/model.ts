@@ -55,6 +55,8 @@ export type Standing = {
   previousRank?: number;
   averagePlacement?: string | null;
   consistencyBonus?: string;
+  lastPlaceBonus?: string;
+  lastPlaceFinishes?: number;
 };
 export type Snapshot = {
   id: string;
@@ -221,7 +223,7 @@ export function initialState(
     ],
     [
       "Single Week Fantasy Score",
-      "4",
+      "3",
       "fantasy",
       "pts",
       [

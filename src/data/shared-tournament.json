@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 29,
+  "revision": 30,
   "environment": "production",
   "participants": [
     {
@@ -206,7 +206,7 @@
     {
       "id": "event-8",
       "name": "Single Week Fantasy Score",
-      "weight": "4",
+      "weight": "3",
       "kind": "fantasy",
       "unit": "pts",
       "direction": "desc",
@@ -262,7 +262,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
@@ -278,7 +280,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
@@ -294,7 +298,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "73976db5-106f-44fa-8f8a-580db27553d2",
@@ -310,7 +316,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
@@ -326,7 +334,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
@@ -342,7 +352,9 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     },
     {
       "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
@@ -358,12 +370,14 @@
         0
       ],
       "averagePlacement": null,
-      "consistencyBonus": "0"
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
     }
   ],
   "phase": "Ready",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-10-31T18:40:18.421Z"
+  "sharedSnapshotAt": "2026-10-31T19:00:56.046Z"
 }

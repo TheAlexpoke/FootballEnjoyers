@@ -51,12 +51,14 @@ test("public dashboard fits viewport and shows all competitors", async ({
   await expect(page.locator(".standing-row .rank-trophy")).toHaveCount(3);
   await expect(page.locator(".standing-row .rank").nth(3)).toHaveText("4");
   await expect(page.locator(".standing-row .points").first()).toHaveText(
-    "20.0PTS",
+    "25.0PTS",
   );
-  await expect(page.locator(".consistency-badge")).toHaveCount(1);
-  await expect(page.locator(".consistency-badge")).toContainText(
-    "+5 Consistency",
-  );
+  await expect(
+    page.locator(".consistency-badge").filter({ hasText: "Consistency" }),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(".consistency-badge").filter({ hasText: "Consistency" }),
+  ).toContainText("+10 Consistency");
   await expect(page.locator(".is-me")).toContainText("YOU");
   expect(
     await page.evaluate(
@@ -84,8 +86,8 @@ test("event rules and player details navigate correctly", async ({ page }) => {
   await expect(page.locator(".performance-place .rank-trophy--1")).toHaveCount(
     1,
   );
-  await expect(page.locator(".consistency-summary")).toContainText(
-    "+5 pts included in total",
+  await expect(page.locator(".consistency-summary").first()).toContainText(
+    "+10 pts included in total",
   );
   await page.goto("/players/p1");
   await expect(page.locator(".performance-place .rank-trophy--2")).toHaveCount(

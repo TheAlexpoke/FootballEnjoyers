@@ -405,13 +405,14 @@ export default function TournamentApp({
                     <b>
                       {state.events
                         .filter((e) => !e.deleted)
-                        .reduce((n, e) => n + Number(e.weight) * 15, 0)}
+                        .reduce((n, e) => n + Number(e.weight) * 15, 20)}
                     </b>
-                    <small>POINTS POSSIBLE</small>
+                    <small>POINTS AVAILABLE</small>
                   </div>
                 </section>
                 <div className="dashboard">
                   <div className="main-column">
+                    <BonusNote />
                     {layout === "events" && (
                       <NextEvent state={state} link={link} />
                     )}
@@ -481,13 +482,22 @@ export default function TournamentApp({
                                       p.name.toLowerCase() && (
                                       <small>{p.name}</small>
                                     )}
-                                    {r.consistencyBonus === "5" && (
+                                    {r.consistencyBonus === "10" && (
                                       <span
                                         className="consistency-badge"
                                         title={`Included in total · average placement ${Number(r.averagePlacement).toFixed(2)}`}
                                       >
-                                        +5 Consistency · avg{" "}
+                                        +10 Consistency · avg{" "}
                                         {Number(r.averagePlacement).toFixed(2)}
+                                      </span>
+                                    )}
+                                    {Number(r.lastPlaceBonus ?? 0) > 0 && (
+                                      <span
+                                        className="consistency-badge"
+                                        title="Included in total · 10-point pool split equally among tied leaders"
+                                      >
+                                        +{Number(r.lastPlaceBonus).toFixed(1)}{" "}
+                                        Most last places · {r.lastPlaceFinishes}
                                       </span>
                                     )}
                                   </span>
@@ -656,17 +666,20 @@ export default function TournamentApp({
             {page === "events" && !segments[1] && (
               <>
                 <div className="events-page-header">
-                  <PageHeading
-                    label="THE COMPETITION"
-                    title={
-                      <>
-                        EARN YOUR
-                        <br />
-                        <span className="poster-gold">FIRST PICK.</span>
-                      </>
-                    }
-                    detail="From the first throw to Sunday Night Football. Follow every result here."
-                  />
+                  <div className="events-intro">
+                    <PageHeading
+                      label="THE COMPETITION"
+                      title={
+                        <>
+                          EARN YOUR
+                          <br />
+                          <span className="poster-gold">FIRST PICK.</span>
+                        </>
+                      }
+                      detail="From the first throw to Sunday Night Football. Follow every result here."
+                    />
+                    <BonusNote />
+                  </div>
                   <ScoringCard events={state.events} />
                 </div>
                 <div className="all-events">
@@ -790,6 +803,24 @@ export function PageHeading({
     </div>
   );
 }
+function BonusNote() {
+  return (
+    <section className="bonus-note" aria-label="Bonus awards explained">
+      <h3>The bonus points</h3>
+      <p>
+        <strong>+10 Consistency:</strong> best average finish. Tied leaders each
+        get 10.
+      </p>
+      <p>
+        <strong>10-point Last Place pool:</strong> most last-place finishes.
+        Tied leaders split the 10 points; shared last places count.
+      </p>
+      <small>
+        Moves after each completed event · Already included in totals
+      </small>
+    </section>
+  );
+}
 function ScoringCard({ events }: { events: Event[] }) {
   const eventMaximum = events
     .filter((event) => !event.deleted)
@@ -820,19 +851,15 @@ function ScoringCard({ events }: { events: Event[] }) {
         Ties share the average of occupied places.
         <br />
         Mario Kart Wild Card losers: 1 base point each.
-        <br />
-        Consistency Award: +5 points for the best unweighted average placement
-        across completed events. Every tied leader gets +5. Recalculated after
-        each event; included in standings totals. Tied event finishes use their
-        shared placement.
       </div>
       <div className="scoring-maximum">
         <strong>
-          {displayPoints(String(eventMaximum + 5))} points possible
+          {displayPoints(String(eventMaximum + 20))} points available
         </strong>
         <span>
-          {displayPoints(String(eventMaximum))} event points + 5 consistency
-          points
+          {displayPoints(String(eventMaximum))} event maximum + 10 consistency +
+          10 most last places. Awards have separate eligibility; a perfect sweep
+          earns {displayPoints(String(eventMaximum + 10))} points.
         </span>
       </div>
     </section>
@@ -923,7 +950,7 @@ function FinaleCard({
         <Zap size={13} /> THE FINALE
       </div>
       <span className="finale-multiplier">
-        {e?.weight ?? 4}
+        {e?.weight ?? 3}
         <small>×</small>
       </span>
       <h3>Sunday decides it.</h3>
@@ -1330,8 +1357,24 @@ function PlayerDetail({
               </small>
             </span>
             <b>
-              {r.consistencyBonus === "5"
-                ? "+5 pts included in total"
+              {r.consistencyBonus === "10"
+                ? "+10 pts included in total"
+                : "No current bonus"}
+            </b>
+          </div>
+        )}
+        {r?.averagePlacement && (
+          <div className="performance-row consistency-summary">
+            <span>
+              <b>Most Last Places Award</b>
+              <small>
+                {r.lastPlaceFinishes ?? 0} last-place finishes · tied leaders
+                split 10 points
+              </small>
+            </span>
+            <b>
+              {Number(r.lastPlaceBonus ?? 0) > 0
+                ? `+${Number(r.lastPlaceBonus).toFixed(1)} pts included in total`
                 : "No current bonus"}
             </b>
           </div>

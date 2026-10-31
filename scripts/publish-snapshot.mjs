@@ -82,13 +82,24 @@ const snapshot = {
     at,
     label,
     standings: standings.map(
-      ({ id, rank, points, finishes, averagePlacement, consistencyBonus }) => ({
+      ({
         id,
         rank,
         points,
         finishes,
         averagePlacement,
         consistencyBonus,
+        lastPlaceBonus,
+        lastPlaceFinishes,
+      }) => ({
+        id,
+        rank,
+        points,
+        finishes,
+        averagePlacement,
+        consistencyBonus,
+        lastPlaceBonus,
+        lastPlaceFinishes,
       }),
     ),
   })),
@@ -110,13 +121,24 @@ const snapshot = {
     warning: "",
   },
   standings: local.standings.map(
-    ({ id, rank, points, finishes, averagePlacement, consistencyBonus }) => ({
+    ({
       id,
       rank,
       points,
       finishes,
       averagePlacement,
       consistencyBonus,
+      lastPlaceBonus,
+      lastPlaceFinishes,
+    }) => ({
+      id,
+      rank,
+      points,
+      finishes,
+      averagePlacement,
+      consistencyBonus,
+      lastPlaceBonus,
+      lastPlaceFinishes,
     }),
   ),
   phase: local.phase,

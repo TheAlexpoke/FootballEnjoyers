@@ -88,6 +88,55 @@ body {
   gap: 16px;
   flex-wrap: wrap;
 }
+.bonus-note {
+  position: relative;
+  margin: 14px 5px 25px;
+  padding: 22px 24px 18px;
+  background: #f3dc91;
+  color: #332812;
+  transform: rotate(-0.7deg);
+  box-shadow: 3px 6px 0 #0003;
+}
+.bonus-note::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: calc(50% - 38px);
+  width: 76px;
+  height: 23px;
+  transform: rotate(4deg);
+  background: #fff2bf99;
+  border: 1px solid #fff4d044;
+}
+.bonus-note h3 {
+  margin: 0 0 10px;
+  font:
+    22px Impact,
+    "Arial Narrow",
+    sans-serif;
+  text-transform: uppercase;
+}
+.bonus-note p {
+  margin: 7px 0;
+  color: #332812;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.bonus-note small {
+  display: block;
+  margin-top: 11px;
+  color: #65532b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.events-intro {
+  min-width: 0;
+}
+.events-intro .bonus-note {
+  max-width: 520px;
+  margin-top: 27px;
+  margin-bottom: 5px;
+}
 .performance-place {
   display: flex;
   align-items: center;

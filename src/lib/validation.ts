@@ -74,14 +74,19 @@ export const backupSchema = z.object({
               z.object({
                 id,
                 rank: z.number().int().min(1).max(7),
-                points: number,
+                points: z.string().regex(/^\d{1,8}(\.\d{1,8})?$/),
                 finishes: z.array(z.number().int().nonnegative()).length(7),
                 averagePlacement: z
                   .string()
                   .regex(/^\d+(\.\d+)?$/)
                   .nullable()
                   .optional(),
-                consistencyBonus: z.enum(["0", "5"]).optional(),
+                consistencyBonus: z.enum(["0", "5", "10"]).optional(),
+                lastPlaceBonus: z
+                  .string()
+                  .regex(/^\d+(\.\d+)?$/)
+                  .optional(),
+                lastPlaceFinishes: z.number().int().nonnegative().optional(),
               }),
             )
             .max(7),

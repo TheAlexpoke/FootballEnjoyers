@@ -64,7 +64,8 @@ export function counts(event: Event) {
       (event.kind === "fantasy" && event.status === "active"))
   );
 }
-export const CONSISTENCY_POINTS = 5;
+export const CONSISTENCY_POINTS = 10;
+export const LAST_PLACE_POINTS = 10;
 // Placements are unweighted. Tied event results use their official shared place,
 // including Mario Kart's shared 5th. Missing/absent legacy results count as 7th.
 export function consistencyAward(
@@ -98,9 +99,14 @@ export function standings(state: State): Standing[] {
   const awards = new Map(
     consistencyAward(state).map((award) => [award.id, award]),
   );
+  const lastAwards = new Map(
+    lastPlaceAward(state).map((award) => [award.id, award]),
+  );
   const rows = state.participants.map((p) => ({
     id: p.id,
-    ticks: new Decimal(awards.get(p.id)!.consistencyBonus).mul(SCALE),
+    ticks: new Decimal(awards.get(p.id)!.consistencyBonus)
+      .mul(SCALE)
+      .plus(lastAwards.get(p.id)!.bonusTicks),
     finishes: Array<number>(7).fill(0),
   }));
   for (const event of state.events.filter(counts))
@@ -131,6 +137,41 @@ export function standings(state: State): Standing[] {
       finishes: r.finishes,
       averagePlacement: awards.get(r.id)!.averagePlacement,
       consistencyBonus: awards.get(r.id)!.consistencyBonus,
+      lastPlaceBonus: lastAwards.get(r.id)!.lastPlaceBonus,
+      lastPlaceFinishes: lastAwards.get(r.id)!.lastPlaceFinishes,
+    };
+  });
+}
+export function lastPlaceAward(state: Pick<State, "participants" | "events">) {
+  const totals = new Map(state.participants.map((player) => [player.id, 0]));
+  for (const event of state.events.filter(
+    (event) => !event.deleted && event.status === "finalized",
+  )) {
+    const recorded = placements(event);
+    if (recorded.length !== state.participants.length) continue;
+    const results = recorded.filter((row) => !row.absent && row.place !== null);
+    const last = Math.max(...results.map((row) => row.place!));
+    for (const row of results.filter((row) => row.place === last))
+      if (totals.has(row.id)) totals.set(row.id, totals.get(row.id)! + 1);
+  }
+  const most = Math.max(0, ...totals.values());
+  const winners = [...totals.values()].filter(
+    (count) => most > 0 && count === most,
+  ).length;
+  return state.participants.map((player) => {
+    const bonusTicks =
+      winners && totals.get(player.id) === most
+        ? (LAST_PLACE_POINTS * SCALE) / winners
+        : 0;
+    return {
+      id: player.id,
+      lastPlaceFinishes: totals.get(player.id)!,
+      bonusTicks,
+      lastPlaceBonus:
+        new Decimal(bonusTicks)
+          .div(SCALE)
+          .toFixed(8)
+          .replace(/\.?0+$/, "") || "0",
     };
   });
 }

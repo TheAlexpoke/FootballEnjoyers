@@ -29,9 +29,15 @@ The History page shows all competitors automatically, without a separate player 
 
 ## Moving Consistency Award
 
-The best unweighted average placement across finalized, non-deleted events earns **5 extra points**, already included in standings totals. Every player tied for the best average receives the full 5 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.
+The best unweighted average placement across finalized, non-deleted events earns **10 extra points**, already included in standings totals. Every player tied for the best average receives the full 10 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.
 
-Official shared places are used for event ties, including Mario Kart's shared 5th. Legacy absent or missing results count as 7th for the average. Corrections, reopened events, deleted events and resets recalculate the award and history automatically. The standings badge identifies recipients and shows their average; player profiles show their current award status. With the default eight event weights, a perfect tournament earns 195 event points plus 5 consistency points, for a **200-point maximum per player**. Ties can award more than 5 bonus points across the entire field.
+Official shared places are used for event ties, including Mario Kart's shared 5th. Legacy absent or missing results count as 7th for the average. Corrections, reopened events, deleted events and resets recalculate the award and history automatically. The standings badge identifies recipients and shows their average; player profiles show their current award status.
+
+## Most Last Places Award and scoring breakdown
+
+The most last-place finishes across completed events earns a **10-point pool**. Tied leaders split the pool equally, using exact scoring internally and one-decimal display. Every competitor tied for last in an event receives one last-place count, including Mario Kart's three wild-card losers. Absences and incomplete legacy results do not earn last-place counts. Provisional fantasy is excluded until finalized. This award also moves automatically and is not cumulative; recipients and their shares are marked in standings and profiles.
+
+Fantasy is **3×** in both official and practice tournaments. The default breakdown is **200 points available: 180 event maximum + 10 consistency + 10 most last places**. These award qualifications differ, so 200 is not an attainable individual maximum: a perfect sweep earns 190 and does not qualify for most last places. Tied consistency leaders each receive 10, so total bonus points across the field can exceed 20. The last-place pool itself always totals 10 when awarded.
 
 ## Storage and recovery
 

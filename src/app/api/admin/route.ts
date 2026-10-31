@@ -111,6 +111,8 @@ export async function GET(req: NextRequest) {
           r.points,
           JSON.stringify({
             consistencyBonus: r.consistencyBonus,
+            lastPlaceBonus: r.lastPlaceBonus,
+            lastPlaceFinishes: r.lastPlaceFinishes,
             averagePlacement: r.averagePlacement,
           }),
         ]);

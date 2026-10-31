@@ -19,6 +19,14 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     await request.get("http://localhost:3002/api/state")
   ).json();
   expect(publicData.readOnly).toBe(true);
+  expect(
+    publicData.events.find(
+      (event: { kind: string }) => event.kind === "fantasy",
+    ).weight,
+  ).toBe("3");
+  await expect(page.locator(".scoring-maximum strong")).toHaveText(
+    "200 points available",
+  );
   expect(JSON.stringify(publicData)).not.toMatch(
     /credentialHash|deviceHash|admin_sessions|profileToken/,
   );
@@ -143,8 +151,12 @@ test("local organizer manages competitors, scores, photos, and recovery without 
     await page.locator(".standing-row .rank").allTextContents(),
   ).not.toContain("-");
   s = await state();
-  expect(s.standings[0].points).toBe("20");
-  await act({ type: "start", eventId: "event-4", order });
+  expect(s.standings[0].points).toBe("25");
+  await act({
+    type: "start",
+    eventId: "event-4",
+    order: s.standings.map((r: { id: string }) => r.id),
+  });
   await page.goto(`${origin}/admin`);
   await page.getByRole("button", { name: /Mario Kart/ }).click();
   await expect(page.getByRole("checkbox", { name: /absent/i })).toHaveCount(0);

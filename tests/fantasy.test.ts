@@ -95,7 +95,7 @@ describe("Sunday-only scoring", () => {
     expect(out.fantasy.lineups["0"][1].eligible).toBe(false);
     expect(
       standings(out).every(
-        (r) => r.points === "26.14285714" && r.consistencyBonus === "5",
+        (r) => r.points === "25.85714286" && r.consistencyBonus === "10",
       ),
     ).toBe(true);
   });
