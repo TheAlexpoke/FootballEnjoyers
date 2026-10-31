@@ -131,6 +131,18 @@ test("local editing rejects cross-origin and non-loopback requests", async ({
 test("compact hero keeps both headlines readable across screen sizes", async ({
   page,
 }) => {
+  const empty = initialState();
+  await page.route("**/api/state*", (r) =>
+    r.fulfill({
+      json: {
+        ...empty,
+        configured: true,
+        localMode: true,
+        standings: [],
+        phase: phase(empty),
+      },
+    }),
+  );
   for (const width of [375, 768, 1024, 1440, 1600]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
@@ -212,4 +224,51 @@ test("all event cards retain navigation and show distinct local illustrations", 
   await expect(
     page.getByRole("heading", { name: "Relay Race", exact: true }),
   ).toBeVisible();
+});
+
+test("history selects everyone after loading and gives tied players separate photo markers", async ({
+  page,
+}) => {
+  const s = fixture();
+  s.participants = s.participants.map((p) => ({
+    ...p,
+    avatar: "/images/events/beer-pong.svg",
+  }));
+  s.snapshots = [
+    {
+      id: "event-1",
+      eventId: "event-1",
+      at: "2026-10-31T12:00:00.000Z",
+      label: "Beer Pong",
+      standings: s.participants.map((p) => ({
+        id: p.id,
+        rank: 1,
+        points: "6",
+        finishes: [],
+      })),
+    },
+  ];
+  await page.route("**/api/state*", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    await route.fulfill({ json: s });
+  });
+  await page.goto("/history");
+  await expect(
+    page.locator('.chart-filters button[aria-pressed="true"]'),
+  ).toHaveCount(7);
+  await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
+  await expect(page.locator("[data-history-connector]")).toHaveCount(7);
+  const photos = await page
+    .locator("[data-history-marker] image")
+    .evaluateAll((images) =>
+      images.map((image) => Number(image.getAttribute("y"))),
+    );
+  expect(new Set(photos).size).toBe(7);
+  await page
+    .locator(".chart-filters")
+    .getByRole("button", { name: "Mark", exact: true })
+    .click();
+  await expect(page.locator('[data-history-marker="p0"]')).toHaveCount(0);
+  await page.getByRole("button", { name: "Points", exact: true }).click();
+  await expect(page.locator("[data-history-marker] image")).toHaveCount(6);
 });

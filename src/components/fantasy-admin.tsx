@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Worker } from "tesseract.js";
 import { Camera, Check, Upload, X } from "lucide-react";
 import type { PublicState } from "@/lib/model";
-import { validateScreenshotLabels } from "@/lib/fantasy-entry";
+import { screenshotTeamNames } from "@/lib/fantasy-entry";
 import { matchScreenshot, type MatchedScore, type Ocr } from "@/lib/screenshot";
 import { ErrorMessage } from "./tournament-app";
 
@@ -39,13 +39,11 @@ export function FantasyAdmin({
   const workerRef = useRef<Worker | null>(null),
     job = useRef(0),
     operation = useRef(0);
-  const mappingDetails = useRef<HTMLDetailsElement | null>(null);
   const event = state.events.find((e) => !e.deleted && e.kind === "fantasy");
-  const names = state.fantasy.entry?.teamNames ?? {};
-  const labels = state.fantasy.entry?.labels ?? {};
+  let names: Record<string, string> = {};
   let mapped = true;
   try {
-    validateScreenshotLabels(state, names, labels);
+    names = screenshotTeamNames(state);
   } catch {
     mapped = false;
   }
@@ -187,7 +185,7 @@ export function FantasyAdmin({
           },
         }));
       const ocr: Ocr = { width, height, words };
-      matchScreenshot(ocr, names, labels);
+      matchScreenshot(ocr, names);
       const form = new FormData();
       form.set("file", file);
       form.set("environment", env);
@@ -222,10 +220,9 @@ export function FantasyAdmin({
       </p>
       <div className="inline-note">
         Include the TEAM and TOTAL PTS column headers and all seven team rows.
-        The reader uses Total Pts and ignores Rank, Score and Budget. For a
-        truncated name, save its exact visible screenshot label below. The
-        administrator must still verify that Thursday and Monday points are
-        excluded.
+        The reader uses Total Pts and ignores Rank, Score and Budget. Use each
+        competitor’s full name as the ESPN team name. The administrator must
+        still verify that Thursday and Monday points are excluded.
       </div>
       <ErrorMessage message={error} />
       {message && (
@@ -234,80 +231,11 @@ export function FantasyAdmin({
           {message}
         </p>
       )}
-      <details ref={mappingDetails} open={!mapped}>
-        <summary>1. Match ESPN team names to competitors</summary>
-        <p className="muted">
-          Save all seven full ESPN names. If ESPN truncates a name, enter its
-          exact visible label, including the ellipsis, in the optional field.
-          Shortened names must be mapped explicitly and uniquely; the site never
-          guesses.
-        </p>
-        <form
-          key={JSON.stringify([names, labels])}
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = new FormData(e.currentTarget);
-            const configured = Object.fromEntries(
-              state.participants.map((p) => [
-                p.id,
-                String(form.get(p.id) ?? "").trim(),
-              ]),
-            );
-            void run(async () => {
-              const screenshotLabels = Object.fromEntries(
-                state.participants
-                  .map((p) => [
-                    p.id,
-                    String(form.get(`${p.id}:label`) ?? "").trim(),
-                  ])
-                  .filter(([, label]) => label),
-              );
-              await act({
-                type: "fantasyTeamNames",
-                names: configured,
-                labels: screenshotLabels,
-              });
-              mappingDetails.current?.removeAttribute("open");
-              setReview(null);
-              setMessage(
-                "All seven team names saved. Screenshot uploads are enabled.",
-              );
-            });
-          }}
-        >
-          <div className="fantasy-name-grid">
-            {state.participants.map((p) => (
-              <label key={p.id}>
-                {p.name} · {p.team}
-                <input
-                  name={p.id}
-                  aria-label={`${p.name} ESPN team name`}
-                  defaultValue={names[p.id] ?? ""}
-                  required
-                  minLength={2}
-                  maxLength={60}
-                  placeholder="Exact team name shown in screenshots"
-                />
-                <span>Optional visible screenshot label, if truncated</span>
-                <input
-                  name={`${p.id}:label`}
-                  aria-label={`${p.name} shortened ESPN screenshot label`}
-                  defaultValue={labels[p.id] ?? ""}
-                  maxLength={60}
-                  minLength={2}
-                  placeholder="Example: Mark's Magnificent ..."
-                />
-              </label>
-            ))}
-          </div>
-          <button
-            className="button secondary"
-            disabled={busy || state.participants.length !== 7}
-          >
-            Save all seven team names
-          </button>
-        </form>
-      </details>
+      <div className="inline-note">
+        ESPN teams must be named exactly Mark, Hong, Li, Arun, Erfan, Dabin, and
+        Alex. Each name matches its competitor automatically; no team-name setup
+        is needed.
+      </div>
       {event?.status === "finalized" ? (
         <div className="inline-note">
           ESPN fantasy scores are finalized. Reopen the event to make a
@@ -316,16 +244,16 @@ export function FantasyAdmin({
       ) : (
         !canScore && (
           <p className="inline-note">
-            Register all seven competitors and finalize every physical event
-            before saving fantasy scores. Team mappings and screenshot reading
-            can be prepared beforehand.
+            Add all seven competitors and finalize every physical event before
+            saving fantasy scores. Screenshot reading can be prepared
+            beforehand.
           </p>
         )
       )}
       <div className="fantasy-input-columns">
         <div>
           <h3>
-            <Camera size={18} /> 2. Read an ESPN screenshot
+            <Camera size={18} /> 1. Read an ESPN screenshot
           </h3>
           <p className="muted">
             PNG, JPG or WebP, up to 3 MB. All seven team names and scores are
@@ -396,7 +324,7 @@ export function FantasyAdmin({
           )}
           {review && (
             <section className="screenshot-review">
-              <h3>3. Review all seven scores</h3>
+              <h3>2. Review all seven scores</h3>
               <p className="muted">
                 Detected score column: <b>Total Pts</b>. Rank, Score and Budget
                 are ignored.

@@ -823,7 +823,7 @@ function EventEditor({
         (r) => r.participantId === p.id && (r.absent || r.value !== null),
       ),
     );
-  const saveResult = (id: string, value: string, absent: boolean) => {
+  const saveResult = (id: string, value: string) => {
     setSaving((prev) => [...prev, id]);
     run(async () => {
       try {
@@ -832,7 +832,7 @@ function EventEditor({
           eventId: e.id,
           participantId: id,
           value: value === "" ? null : value,
-          absent,
+          absent: false,
         });
       } finally {
         setSaving((prev) => prev.filter((x) => x !== id));
@@ -909,10 +909,7 @@ function EventEditor({
                 const r = e.results.find((r) => r.participantId === id),
                   place = score.find((r) => r.id === id);
                 return (
-                  <div
-                    className={`score-entry ${r?.absent ? "absent" : ""}`}
-                    key={id}
-                  >
+                  <div className="score-entry" key={id}>
                     <span className="entry-order">
                       {e.order.indexOf(id) + 1}
                     </span>
@@ -929,10 +926,10 @@ function EventEditor({
                         inputMode={e.kind === "count" ? "numeric" : "decimal"}
                         placeholder="—"
                         defaultValue={r?.value ?? ""}
-                        disabled={r?.absent || saving.includes(id)}
+                        disabled={saving.includes(id)}
                         onBlur={(ev) => {
                           if (ev.target.value !== (r?.value ?? ""))
-                            saveResult(id, ev.target.value, false);
+                            saveResult(id, ev.target.value);
                         }}
                       />
                       <small>
@@ -942,15 +939,6 @@ function EventEditor({
                             ? `#${place.place ?? "—"} · ${place.points} pts`
                             : e.unit}
                       </small>
-                    </label>
-                    <label className="absence-input">
-                      <input
-                        type="checkbox"
-                        checked={r?.absent ?? false}
-                        disabled={saving.includes(id)}
-                        onChange={(ev) => saveResult(id, "", ev.target.checked)}
-                      />
-                      Absent
                     </label>
                   </div>
                 );
@@ -986,34 +974,6 @@ function EventEditor({
                       );
                   }}
                 />
-              </label>
-            ))}
-          </div>
-          <div className="button-row">
-            {e.order.map((id) => (
-              <label className="absence-input" key={id}>
-                <input
-                  type="checkbox"
-                  checked={e.results.some(
-                    (r) => r.participantId === id && r.absent,
-                  )}
-                  onChange={(ev) => {
-                    if (
-                      window.confirm(
-                        "Update this absence? Existing seeds and races will be cleared.",
-                      )
-                    )
-                      run(() =>
-                        act({
-                          type: "kartAbsent",
-                          eventId: e.id,
-                          participantId: id,
-                          absent: ev.target.checked,
-                        }),
-                      );
-                  }}
-                />
-                {state.participants.find((p) => p.id === id)?.name} absent
               </label>
             ))}
           </div>

@@ -6,8 +6,7 @@ import { assertOrigin, requireAdmin, hash, limit } from "@/lib/server/auth";
 import { load, mutate } from "@/lib/server/store";
 import { matchScreenshot, ocrSchema } from "@/lib/screenshot";
 import {
-  validateTeamNames,
-  validateScreenshotLabels,
+  screenshotTeamNames,
   saveFantasyScores,
   normalizeTeam,
 } from "@/lib/fantasy-entry";
@@ -62,9 +61,8 @@ export async function POST(req: NextRequest) {
           "Screenshot dimensions do not match its recognized text. Read the image again.",
         );
       const s = await load(environment);
-      const names = validateTeamNames(s, s.fantasy.entry?.teamNames ?? {});
-      validateScreenshotLabels(s, names, s.fantasy.entry?.labels ?? {});
-      const teams = matchScreenshot(ocr, names, s.fantasy.entry?.labels ?? {});
+      const names = screenshotTeamNames(s);
+      const teams = matchScreenshot(ocr, names);
       const receipt: Receipt = {
         version: 1,
         importId: crypto.randomUUID(),
@@ -96,19 +94,14 @@ export async function POST(req: NextRequest) {
         throw Error(
           "Scores or team mappings changed after this review. Read the screenshot again before applying.",
         );
-      const names = validateTeamNames(s, s.fantasy.entry?.teamNames ?? {});
-      const labels = validateScreenshotLabels(
-        s,
-        names,
-        s.fantasy.entry?.labels ?? {},
-      );
+      const names = screenshotTeamNames(s);
       if (
         receipt.teams.some(
           (t) =>
             normalizeTeam(t.teamName) !==
               normalizeTeam(names[t.participantId] ?? "") ||
             normalizeTeam(t.matchedLabel ?? t.teamName) !==
-              normalizeTeam(labels[t.participantId] ?? ""),
+              normalizeTeam(names[t.participantId] ?? ""),
         )
       )
         throw Error("Team mappings changed. Read the screenshot again.");

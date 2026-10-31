@@ -13,6 +13,48 @@ import { localMode } from "../src/lib/server/local-mode";
 import { applyAction } from "../src/lib/actions";
 
 describe("local persistence and hosted isolation", () => {
+  it("lets a time trial replace an older absence without an absence checkbox", () => {
+    let s = applyAction(
+      initialState("practice"),
+      { type: "populate", confirm: "PRACTICE ONLY" },
+      { admin: true },
+    );
+    s = applyAction(
+      s,
+      {
+        type: "start",
+        eventId: "event-4",
+        order: s.participants.map((p) => p.id),
+      },
+      { admin: true },
+    );
+    s = applyAction(
+      s,
+      {
+        type: "kartAbsent",
+        eventId: "event-4",
+        participantId: s.participants[0].id,
+        absent: true,
+      },
+      { admin: true },
+    );
+    s = applyAction(
+      s,
+      {
+        type: "trial",
+        eventId: "event-4",
+        participantId: s.participants[0].id,
+        value: "45.25",
+      },
+      { admin: true },
+    );
+    expect(
+      s.events[3].results.some(
+        (r) => r.participantId === s.participants[0].id && r.absent,
+      ),
+    ).toBe(false);
+    expect(s.events[3].trials[s.participants[0].id]).toBe("45.25");
+  });
   let directory: string;
   beforeEach(() => {
     directory = mkdtempSync(join(tmpdir(), "football-local-"));

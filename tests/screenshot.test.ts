@@ -5,6 +5,7 @@ import {
   saveFantasyScores,
   validateTeamNames,
   validateScreenshotLabels,
+  screenshotTeamNames,
 } from "../src/lib/fantasy-entry";
 import { matchScreenshot, type Ocr } from "../src/lib/screenshot";
 import {
@@ -223,6 +224,43 @@ describe("all-seven screenshot acceptance", () => {
     expect(() => matchScreenshot(data, names)).toThrow("coordinates");
   });
 });
+describe("automatic ESPN competitor names", () => {
+  it("uses the seven real names regardless of old team mappings or website team names", () => {
+    const s = ready();
+    const names = screenshotTeamNames(s);
+    expect(Object.values(names)).toEqual([
+      "Mark",
+      "Hong",
+      "Li",
+      "Arun",
+      "Erfan",
+      "Dabin",
+      "Alex",
+    ]);
+    const data = ocr();
+    data.words = data.words.filter((w) => w.bbox.y0 === 40 || w.bbox.x0 >= 800);
+    s.participants.forEach((p, i) =>
+      data.words.push({
+        text: p.name,
+        confidence: 96,
+        bbox: { x0: 40, x1: 130, y0: 100 + i * 100, y1: 135 + i * 100 },
+      }),
+    );
+    expect(matchScreenshot(data, names).map((row) => row.teamName)).toEqual(
+      Object.values(names),
+    );
+    data.words = data.words.filter((w) => w.text !== "Alex");
+    expect(() => matchScreenshot(data, names)).toThrow(
+      "Missing or unmatched: Alex",
+    );
+  });
+  it("requires all seven competitors before enabling screenshots", () => {
+    const s = ready();
+    s.participants.pop();
+    expect(() => screenshotTeamNames(s)).toThrow("Add all seven");
+  });
+});
+
 describe("screenshot review receipts", () => {
   beforeEach(() => {
     process.env.ADMIN_PASSWORD_HASH = "private-unit-test-signing-key";

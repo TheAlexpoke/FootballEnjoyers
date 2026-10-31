@@ -1,15 +1,15 @@
 # ESPN screenshot and manual fantasy scoring
 
-The final event now uses administrator updates from ESPN. There is no direct ESPN/Sleeper connection, fantasy provider, AI API key or scheduled scoring worker. Supabase and Vercel are still required for persistent, shared hosted standings.
+The final event uses organizer updates from ESPN on the local site. No password, Supabase project, ESPN integration, AI API key or scheduled scoring worker is required. Vercel is a read-only preview; local scores do not synchronize there.
 
 ## Setup and operating steps
 
-1. Register all seven competitors. Open Admin → Fantasy.
-2. Expand **Match ESPN team names to competitors**. Enter the exact ESPN team name for each real-world competitor and save all seven. These mappings are independent of public website team names and can only be changed by an administrator. Duplicate names, after normalizing case/spacing, are rejected. If ESPN truncates a name, also enter its exact visible screenshot label, including the ellipsis. These labels must be unique and are only accepted when explicitly configured.
+1. Add all seven competitors in Control room → Players. Open Fantasy.
+2. Name each ESPN team exactly **Mark, Hong, Li, Arun, Erfan, Dabin, Alex**. Names match competitors automatically, independently of website team names. No mapping form or saved configuration is needed. Old custom mappings and shortened labels are ignored by the current importer. Keep all seven complete names visible.
 3. Complete and finalize all physical events before saving fantasy scores. Practice allows rehearsal before tournament day; official fantasy scores open November 8, 2026.
 4. Obtain an ESPN League table screenshot showing **all seven teams** and the **TEAM** and **TOTAL PTS** headers. Keep those headers visible. Rank, Score and Budget may remain visible: the reader explicitly selects only the Total Pts column. Owner-name sublines and advertisements are ignored. Arbitrary matchup-card layouts are not guessed.
 5. Choose a PNG, JPG or WebP image under 3 MB, at least 200 × 200 pixels, and under 18 megapixels. Press **Read ESPN screenshot**. The OCR worker and English model load from this website and run on your device; the first read may take longer.
-6. If any configured team is missing, a match is duplicated, a visible label is ambiguous, or the Total Pts heading/cell is unclear, **the entire screenshot is rejected**. No partial scores are saved. Case, ordinary extra spaces and typographic apostrophes are normalized; OCR spelling/number mistakes are never automatically repaired.
+6. If any of the seven names is missing, a match is duplicated, a name contains extra text, or the Total Pts heading/cell is unclear, **the entire screenshot is rejected**. No partial scores are saved. Case and ordinary extra spaces are normalized; OCR spelling/number mistakes are never automatically repaired.
 7. Review all seven proposed scores beside the original image and current saved values. Scores have not changed yet. Confirm every value and the Sunday-only attestation, then press **Apply seven scores to provisional standings**.
 8. Scores are saved atomically; fantasy placements, weighted points, overall standings, movement and history recalculate. A later screenshot replaces the seven raw fantasy totals rather than adding them. Exact ties use the existing tie formula.
 9. Alternatively, type all seven raw ESPN fantasy totals into **Enter scores manually**, confirm Sunday-only eligibility, and save. Negative and tied values are supported. Unknown scores are never silently filled with zero.
@@ -23,9 +23,9 @@ The labeled Total Pts cells may contain integer or decimal values, including `0.
 
 ## Security, history and recovery
 
-Only authenticated administrators may prepare or apply screenshot reviews. The server validates seven-team mappings, file format/dimensions, recognized text geometry and score ambiguity. It returns a signed, ten-minute review bound to the tournament environment and revision. Editing a review, changing mappings/results before applying it, or replaying a previously applied image is rejected. The OCR itself runs in the administrator's browser; an administrator already has authority to enter manual scores.
+The local control room can prepare and apply reviews without a password; hosted Vercel previews reject these writes. The server validates all seven fixed names, file format/dimensions, recognized text geometry and score ambiguity. It returns a signed, ten-minute review bound to the tournament environment and revision. Editing a review, changing tournament data before applying it, or replaying a previously applied image is rejected. OCR runs in the organizer's browser. The signing key is generated locally and persists with the SQLite database.
 
-For server validation the selected image is uploaded to the site's backend. The image is not retained in Storage or sent to a third-party OCR/AI service. The audit log retains its SHA-256 hash, filename, matched teams, confidence, old values and accepted scores. Keep your original screenshots if you need full visual evidence later. Mappings and score/audit history are included in JSON backups. Restoring an older backup without mappings requires entering the seven ESPN names again.
+For server validation the selected image is sent to the local backend. It is not retained as an image or sent to a third-party OCR/AI service. The audit log retains its SHA-256 hash, filename, matched names, confidence, old values and accepted scores. Keep original screenshots if you need full visual evidence later. Score/audit history is included in JSON backups. Names match automatically after restoring a backup with all seven competitors; historical custom name mappings are not used by the current importer.
 
 Public pages show **admin updated** and the last saved timestamp. They do not claim automatic live ESPN synchronization. New scores appear after an administrator saves an update; spectators receive the application's normal realtime notification/polling updates.
 

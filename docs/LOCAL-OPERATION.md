@@ -17,11 +17,15 @@ Local mode is the default. Copying `.env.example` is optional. `LOCAL_DATA_DIR` 
 
 ## Competitors and events
 
-1. Open Control room → Players. Add each of the seven names, a team name and optional nickname. Edit their profiles and upload their photos here. Nobody needs to sign up or save a private link.
+1. Open Control room → Players. Add each of the seven names and a team name. Edit their profiles and upload their photos here. Nobody needs to sign up or save a private link. Score-entry forms have no absent checkboxes.
 2. For a rehearsal, choose Open practice sandbox and Populate seven sample competitors. Return to OFFICIAL TOURNAMENT for real scores. Practice and official records remain separate.
 3. Start each physical event individually, confirm competitor order, enter results and finalize it. The existing scoring, multipliers, ties, Mario Kart brackets and ranking history remain in use. There is no global tournament-start button.
-4. In Fantasy, save all seven exact ESPN names. Enter all seven scores manually or upload an ESPN League screenshot showing TEAM, TOTAL PTS and all seven matching teams. Review before applying. See [the screenshot guide](SCREENSHOT-SCORING.md).
+4. Name the ESPN teams Mark, Hong, Li, Arun, Erfan, Dabin, and Alex. In Fantasy, enter all seven scores manually or upload an ESPN League screenshot showing TEAM, TOTAL PTS and all seven matching names. No name-mapping setup is needed. Review before applying. See [the screenshot guide](SCREENSHOT-SCORING.md).
 5. Only Sunday, November 8, 2026 performances count in the fantasy finale. Verify eligible Sunday-only totals yourself; ESPN weekly totals may include Thursday or Monday points. Finalize after every eligible game has ended.
+
+## History progression
+
+The History page selects all competitors by default, including when data loads after the page opens. Name buttons toggle individual competitors. Both Rank and Points views use profile photos as markers; initials appear until a photo is added. Tied or crowded markers are separated with leader lines to their exact chart positions, preserving the recorded standings. The chart scrolls horizontally on smaller screens. Add each photo in Control room → Players to use it throughout the site and in history.
 
 ## Storage and recovery
 

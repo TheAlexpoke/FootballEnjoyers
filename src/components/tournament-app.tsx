@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useId } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -27,6 +27,7 @@ import { placements, phase, standings } from "@/lib/scoring";
 import { Admin } from "./admin";
 import { EventIllustration } from "./event-illustration";
 import { eventPresentation } from "@/lib/event-presentation";
+import { spreadHistoryMarkers } from "@/lib/history-markers";
 type Player = PublicState["participants"][number];
 let realtimeClient: ReturnType<typeof createClient> | undefined;
 export async function request(url: string, body?: unknown, method = "POST") {
@@ -1162,9 +1163,11 @@ export function HistoryChart({
   state: PublicState;
   initial?: string[];
 }) {
-  const [selected, setSelected] = useState<string[]>(
-    initial ?? state.participants.map((p) => p.id),
-  );
+  const [selection, setSelection] = useState<Record<string, boolean>>({});
+  const selected = state.participants
+    .filter((p) => selection[p.id] ?? (initial ? initial.includes(p.id) : true))
+    .map((p) => p.id);
+  const chartId = useId().replace(/:/g, "");
   const [metric, setMetric] = useState<"rank" | "points">("rank");
   const colors = [
     "#e9bd5a",
@@ -1183,11 +1186,37 @@ export function HistoryChart({
     15,
     ...snapshots.flatMap((s) => s.standings.map((r) => Number(r.points))),
   );
-  const width = 850,
-    height = 300;
-  const x = (i: number) => 55 + (i / Math.max(snapshots.length - 1, 1)) * 740;
+  const width = Math.max(850, snapshots.length * 190 + 130),
+    height = 460;
+  const x = (i: number) =>
+    65 + (i / Math.max(snapshots.length - 1, 1)) * (width - 150);
   const y = (v: number) =>
-    metric === "rank" ? 35 + ((v - 1) / 6) * 215 : 250 - (v / max) * 215;
+    metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
+  const chartPoints = snapshots.map((snapshot, j) =>
+    spreadHistoryMarkers(
+      state.participants
+        .filter((p) => selected.includes(p.id))
+        .flatMap((p) => {
+          const standing = snapshot.standings.find((r) => r.id === p.id);
+          if (!standing) return [];
+          return [
+            {
+              id: p.id,
+              player: p,
+              standing,
+              x: x(j),
+              y: y(metric === "rank" ? standing.rank : Number(standing.points)),
+              color:
+                colors[
+                  state.participants.findIndex((player) => player.id === p.id) %
+                    7
+                ],
+              label: snapshot.label,
+            },
+          ];
+        }),
+    ),
+  );
   return (
     <section className="panel history-panel">
       <div className="section-heading">
@@ -1215,11 +1244,10 @@ export function HistoryChart({
             aria-pressed={selected.includes(p.id)}
             key={p.id}
             onClick={() =>
-              setSelected(
-                selected.includes(p.id)
-                  ? selected.filter((id) => id !== p.id)
-                  : [...selected, p.id],
-              )
+              setSelection((previous) => ({
+                ...previous,
+                [p.id]: !selected.includes(p.id),
+              }))
             }
           >
             <span
@@ -1236,6 +1264,7 @@ export function HistoryChart({
           <div className="chart-scroll">
             <svg
               viewBox={`0 0 ${width} ${height}`}
+              style={{ minWidth: width }}
               role="img"
               aria-label={`${metric} progression across finalized events and latest live fantasy update`}
             >
@@ -1244,14 +1273,14 @@ export function HistoryChart({
                 <g key={i}>
                   <line
                     x1="48"
-                    x2="805"
-                    y1={35 + (i * 215) / 6}
-                    y2={35 + (i * 215) / 6}
+                    x2={width - 35}
+                    y1={80 + (i * 280) / 6}
+                    y2={80 + (i * 280) / 6}
                     stroke="#273142"
                   />
                   <text
                     x="25"
-                    y={40 + (i * 215) / 6}
+                    y={85 + (i * 280) / 6}
                     fill="#8290a6"
                     fontSize="12"
                   >
@@ -1263,7 +1292,7 @@ export function HistoryChart({
                 <text
                   key={s.id}
                   x={x(i)}
-                  y="285"
+                  y="445"
                   textAnchor="middle"
                   fill="#8290a6"
                   fontSize="11"
@@ -1271,46 +1300,117 @@ export function HistoryChart({
                   {s.id.startsWith("live-") ? "Fantasy live" : `Event ${i + 1}`}
                 </text>
               ))}
-              {state.participants.map((p, i) => {
-                if (!selected.includes(p.id)) return null;
-                const coords = snapshots.map((s, j) => {
-                  const r = s.standings.find((r) => r.id === p.id);
-                  return {
-                    x: x(j),
-                    y: y(
-                      metric === "rank"
-                        ? (r?.rank ?? 7)
-                        : Number(r?.points ?? 0),
-                    ),
-                    r,
-                    label: s.label,
-                  };
-                });
-                return (
-                  <g key={p.id}>
+              {state.participants
+                .filter((p) => selected.includes(p.id))
+                .map((p) => {
+                  const coords = chartPoints.flatMap((points) =>
+                    points.filter((point) => point.id === p.id),
+                  );
+                  return (
                     <polyline
-                      points={coords.map((c) => `${c.x},${c.y}`).join(" ")}
+                      key={p.id}
+                      points={coords.map((c) => [c.x, c.y].join(",")).join(" ")}
                       fill="none"
-                      stroke={colors[i % 7]}
-                      strokeWidth="3"
+                      stroke={
+                        colors[
+                          state.participants.findIndex(
+                            (player) => player.id === p.id,
+                          ) % 7
+                        ]
+                      }
+                      strokeWidth="2"
+                      opacity="0.8"
                     />
-                    {coords.map((c, j) => (
+                  );
+                })}
+              {chartPoints.map((points, j) =>
+                points.map((point) => {
+                  const tied =
+                    points.filter((other) => Math.abs(other.y - point.y) < 0.01)
+                      .length > 1;
+                  const markerX = point.x + (tied ? 38 : 0);
+                  const label =
+                    point.player.name +
+                    ": " +
+                    point.label +
+                    " · #" +
+                    point.standing.rank +
+                    " · " +
+                    point.standing.points +
+                    " points";
+                  const clip = chartId + "-" + point.id + "-" + j;
+                  return (
+                    <g
+                      key={point.id + "-" + j}
+                      role="img"
+                      aria-label={label}
+                      data-history-marker={point.id}
+                    >
+                      <title>{label}</title>
+                      {(tied || Math.abs(point.markerY - point.y) > 0.1) && (
+                        <>
+                          <line
+                            data-history-connector={point.id}
+                            x1={point.x}
+                            y1={point.y}
+                            x2={markerX}
+                            y2={point.markerY}
+                            stroke={point.color}
+                            strokeWidth="1.5"
+                            opacity="0.8"
+                          />
+                          <circle
+                            cx={point.x}
+                            cy={point.y}
+                            r="3"
+                            fill={point.color}
+                          />
+                        </>
+                      )}
+                      <defs>
+                        <clipPath id={clip}>
+                          <circle cx={markerX} cy={point.markerY} r="16" />
+                        </clipPath>
+                      </defs>
                       <circle
-                        key={j}
-                        cx={c.x}
-                        cy={c.y}
-                        r="5"
-                        fill={colors[i % 7]}
+                        cx={markerX}
+                        cy={point.markerY}
+                        r="17"
+                        fill="#172332"
+                      />
+                      <text
+                        x={markerX}
+                        y={point.markerY + 4}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fill={point.color}
+                        fontWeight="700"
                       >
-                        <title>
-                          {p.name}: {c.label} · #{c.r?.rank} · {c.r?.points}{" "}
-                          points
-                        </title>
-                      </circle>
-                    ))}
-                  </g>
-                );
-              })}
+                        {point.player.name.slice(0, 2).toUpperCase()}
+                      </text>
+                      {point.player.avatar && (
+                        <image
+                          href={point.player.avatar}
+                          x={markerX - 16}
+                          y={point.markerY - 16}
+                          width="32"
+                          height="32"
+                          preserveAspectRatio="xMidYMid slice"
+                          clipPath={"url(#" + clip + ")"}
+                        />
+                      )}
+                      <circle
+                        cx={markerX}
+                        cy={point.markerY}
+                        r="17"
+                        fill="none"
+                        stroke={point.color}
+                        strokeWidth="2.5"
+                      />
+                    </g>
+                  );
+                }),
+              )}
             </svg>
           </div>
           <details className="history-table">
@@ -1367,7 +1467,7 @@ export function ProfileForm({
         try {
           await onSubmit({
             team: String(f.get("team")),
-            nickname: String(f.get("nickname")),
+            nickname: initial?.nickname ?? "",
             sleeper: initial?.sleeper ?? "",
           });
         } catch (e) {
@@ -1387,17 +1487,6 @@ export function ProfileForm({
           defaultValue={initial?.team}
         />
       </label>
-      <div className="form-columns">
-        <label>
-          Nickname <span>optional</span>
-          <input
-            name="nickname"
-            maxLength={30}
-            defaultValue={initial?.nickname}
-            placeholder="What the league calls you"
-          />
-        </label>
-      </div>
       <ErrorMessage message={error} />
       <button className="button primary" disabled={disabled || busy}>
         {busy ? "Saving…" : button}

@@ -57,6 +57,7 @@ test("local organizer manages competitors, scores, photos, and recovery without 
     (await request.get(`${origin}/api/state?env=${env}`)).json();
   await page.goto(`${origin}/admin`);
   await page.getByRole("button", { name: "players", exact: true }).click();
+  await expect(page.getByLabel(/Nickname/)).toHaveCount(0);
   await page
     .getByLabel("Competitor name", { exact: true })
     .selectOption("Mark");
@@ -78,6 +79,10 @@ test("local organizer manages competitors, scores, photos, and recovery without 
   expect((await state("practice")).participants).toHaveLength(0);
   const order = s.participants.map((p: { id: string }) => p.id);
   await act({ type: "start", eventId: "event-1", order });
+  await page.goto(`${origin}/admin`);
+  await page.getByRole("button", { name: /Beer Pong/ }).click();
+  await expect(page.getByRole("checkbox", { name: /absent/i })).toHaveCount(0);
+  await expect(page.getByLabel("Mark result", { exact: true })).toBeEnabled();
   for (let i = 0; i < 7; i++)
     await act({
       type: "result",
@@ -91,6 +96,85 @@ test("local organizer manages competitors, scores, photos, and recovery without 
   await expect(page.locator(".standing-row")).toHaveCount(7);
   s = await state();
   expect(s.standings[0].points).toBe("15");
+  await act({ type: "start", eventId: "event-4", order });
+  await page.goto(`${origin}/admin`);
+  await page.getByRole("button", { name: /Mario Kart/ }).click();
+  await expect(page.getByRole("checkbox", { name: /absent/i })).toHaveCount(0);
+  await expect(
+    page.getByLabel("Mark time trial", { exact: true }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: "fantasy", exact: true }).click();
+  await expect(
+    page.getByText("Each name matches its competitor automatically", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("Choose ESPN scoreboard screenshot"),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Save all seven team names" }),
+  ).toHaveCount(0);
+  const ocr = {
+    width: 1000,
+    height: 1000,
+    words: [
+      {
+        text: "TEAM",
+        confidence: 96,
+        bbox: { x0: 40, x1: 130, y0: 40, y1: 60 },
+      },
+      {
+        text: "TOTAL",
+        confidence: 96,
+        bbox: { x0: 800, x1: 870, y0: 40, y1: 60 },
+      },
+      {
+        text: "PTS",
+        confidence: 96,
+        bbox: { x0: 880, x1: 930, y0: 40, y1: 60 },
+      },
+      ...NAMES.flatMap((name, i) => [
+        {
+          text: name,
+          confidence: 96,
+          bbox: { x0: 40, x1: 130, y0: 100 + i * 100, y1: 135 + i * 100 },
+        },
+        {
+          text: String(80 - i * 10),
+          confidence: 96,
+          bbox: { x0: 800, x1: 930, y0: 100 + i * 100, y1: 135 + i * 100 },
+        },
+      ]),
+    ],
+  };
+  const screenshot = await sharp({
+    create: { width: 1000, height: 1000, channels: 3, background: "white" },
+  })
+    .png()
+    .toBuffer();
+  const prepare = () =>
+    request.post(`${origin}/api/fantasy/screenshot`, {
+      headers: { origin },
+      multipart: {
+        file: {
+          name: "scoreboard.png",
+          mimeType: "image/png",
+          buffer: screenshot,
+        },
+        environment: "production",
+        ocr: JSON.stringify(ocr),
+      },
+    });
+  const review = await prepare();
+  expect(review.ok(), await review.text()).toBe(true);
+  expect(
+    (await review.json()).teams.map((t: { teamName: string }) => t.teamName),
+  ).toEqual([...NAMES]);
+  ocr.words = ocr.words.filter((w) => w.text !== "Alex");
+  const incomplete = await prepare();
+  expect(incomplete.ok()).toBe(false);
+  expect((await incomplete.json()).error).toContain("Alex");
   const bytes = await sharp({
     create: { width: 40, height: 40, channels: 3, background: "#eac16a" },
   })

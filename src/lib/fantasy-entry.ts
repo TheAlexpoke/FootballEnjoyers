@@ -1,6 +1,6 @@
 import { z } from "zod";
 import Decimal from "decimal.js";
-import type { State } from "./model";
+import { NAMES, type State } from "./model";
 import { rebuildHistory, standings } from "./scoring";
 
 export const fantasyScore = z
@@ -25,6 +25,19 @@ export const normalizeTeam = (name: string) =>
     .replace(/\s+/g, " ")
     .trim()
     .replace(/\s*\.{2,}$/, "...");
+export function screenshotTeamNames(s: {
+  participants: { id: string; name: string }[];
+}) {
+  if (
+    s.participants.length !== 7 ||
+    NAMES.some((name) => !s.participants.some((p) => p.name === name))
+  )
+    throw Error("Add all seven competitors before reading a screenshot.");
+  return validateTeamNames(
+    s,
+    Object.fromEntries(s.participants.map((p) => [p.id, p.name])),
+  );
+}
 export function validateTeamNames(
   s: { participants: { id: string }[] },
   names: Record<string, string>,

@@ -464,7 +464,9 @@ export function applyAction(
       e!.trials[a.participantId] = a.value;
       e!.seeds = [];
       e!.matches = [];
-      e!.results = e!.results.filter((r) => r.absent);
+      e!.results = e!.results.filter(
+        (r) => r.absent && r.participantId !== a.participantId,
+      );
       if (e!.status === "finalized") {
         e!.status = "active";
         delete e!.finalizedAt;
