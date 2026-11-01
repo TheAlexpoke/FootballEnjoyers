@@ -33,7 +33,12 @@ import {
   Zap,
 } from "lucide-react";
 import { initialState, NAMES, type PublicState, type Event } from "@/lib/model";
-import { placements, phase, standings } from "@/lib/scoring";
+import {
+  placements,
+  phase,
+  standings,
+  remainingEventPoints,
+} from "@/lib/scoring";
 import { Admin } from "./admin";
 import { EventIllustration } from "./event-illustration";
 import { eventPresentation } from "@/lib/event-presentation";
@@ -422,12 +427,8 @@ export default function TournamentApp({
                       ))}
                   </div>
                   <div className="strip-stat">
-                    <b>
-                      {state.events
-                        .filter((e) => !e.deleted)
-                        .reduce((n, e) => n + Number(e.weight) * 15, 20)}
-                    </b>
-                    <small>POINTS AVAILABLE</small>
+                    <b>{displayPoints(remainingEventPoints(state.events))}</b>
+                    <small>POINTS REMAINING</small>
                   </div>
                 </section>
                 <div className="dashboard">
@@ -914,9 +915,7 @@ function BonusNote() {
   );
 }
 function ScoringCard({ events }: { events: Event[] }) {
-  const eventMaximum = events
-    .filter((event) => !event.deleted)
-    .reduce((sum, event) => sum + 15 * Number(event.weight), 0);
+  const remaining = remainingEventPoints(events);
   return (
     <section className="panel scoring-card" aria-label="Scoring breakdown">
       <div className="eyebrow">KNOW THE SCORE</div>
@@ -945,13 +944,10 @@ function ScoringCard({ events }: { events: Event[] }) {
         Mario Kart Wild Card losers: 1 base point each.
       </div>
       <div className="scoring-maximum">
-        <strong>
-          {displayPoints(String(eventMaximum + 20))} points available
-        </strong>
+        <strong>{displayPoints(remaining)} points remaining</strong>
         <span>
-          {displayPoints(String(eventMaximum))} event maximum + 10 consistency +
-          10 most last places. Awards have separate eligibility; a perfect sweep
-          earns {displayPoints(String(eventMaximum + 10))} points.
+          Maximum from winning every unfinished event. Bonuses are excluded;
+          current bonus awards are already included in standings totals.
         </span>
       </div>
     </section>

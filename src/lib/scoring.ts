@@ -1,6 +1,16 @@
 import Decimal from "decimal.js";
 import type { Event, State, Standing } from "./model";
 export const BASE = [15, 10, 6, 3, 2, 1, 0];
+// A winning finish in every unfinished event; moving bonuses are already in totals.
+export function remainingEventPoints(events: Event[]): string {
+  return events
+    .filter((event) => !event.deleted && event.status !== "finalized")
+    .reduce(
+      (sum, event) => sum.plus(new Decimal(event.weight).mul(BASE[0])),
+      new Decimal(0),
+    )
+    .toString();
+}
 // All possible seven-person tie denominators divide 420. Integer ticks are exact.
 const SCALE = 420;
 export type Placement = {

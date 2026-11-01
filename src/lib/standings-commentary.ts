@@ -18,7 +18,6 @@ const LINES: Record<number, string[]> = {
   ],
   2: [
     "First place in losing.",
-    "Currently breathing down the king's neck.",
     "Would be first if first didn't exist.",
     "The best loser in the building.",
     "One choke away from greatness.",

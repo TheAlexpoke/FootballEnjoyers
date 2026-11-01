@@ -36,6 +36,20 @@ function fixture(eventOrders: number[][]): PublicState {
 }
 
 describe("standings commentary", () => {
+  it("reserves breathing-down-the-neck banter for second place within five points", () => {
+    const state = fixture([[1, 2, 3, 4, 5, 6, 7]]);
+    const rows = state.snapshots[0].standings;
+    const first = rows.find((row) => row.rank === 1)!;
+    const second = rows.find((row) => row.rank === 2)!;
+    second.points = String(Number(first.points) - 5);
+    expect(standingsCommentary(state)[second.id].at(-1)!.text).toBe(
+      "Currently breathing down the king's neck.",
+    );
+    second.points = String(Number(first.points) - 5.1);
+    expect(standingsCommentary(state)[second.id].at(-1)!.text).not.toBe(
+      "Currently breathing down the king's neck.",
+    );
+  });
   it("stays empty before results and leaves scores untouched", () => {
     const state = fixture([]);
     const before = JSON.stringify(state);

@@ -87,6 +87,12 @@ test("public dashboard fits viewport and shows all competitors", async ({
     page.getByRole("heading", { name: "Tournament standings" }),
   ).toBeVisible();
   await expect(page.locator(".standing-row")).toHaveCount(7);
+  await expect(page.locator(".scoring-maximum strong")).toHaveText(
+    "165 points remaining",
+  );
+  await expect(page.locator(".tournament-strip .strip-stat")).toHaveText(
+    "165POINTS REMAINING",
+  );
   await expect(page.locator(".standing-form")).toHaveCount(7);
   await expect(page.locator(".standing-form").first()).toHaveText(
     "Sources confirm he's HIM.",

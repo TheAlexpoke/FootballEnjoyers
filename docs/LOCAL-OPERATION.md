@@ -37,6 +37,8 @@ Placement banter uses only the supplied one-liners, without rank nicknames or de
 
 Both Standings Progression and Points Progression exact tables show rank movement and regular-point gains together. A positive rank change means moving up; a negative value means moving down. The first rank checkpoint has no previous placement and displays a dash. Bonuses remain separate from the regular-point delta.
 
+Second place only receives the breathing-down-the-king's-neck line when the completed-event standings put them within five points of first place; it is excluded from the general second-place comment pool.
+
 ## Moving Consistency Award
 
 The best unweighted average placement across finalized, non-deleted events earns **10 extra points**, already included in standings totals. Every player tied for the best average receives the full 10 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.
@@ -80,6 +82,8 @@ Local scores and photos are not uploaded or synchronized to Vercel. Push source 
 The retained Supabase migration, password helper and legacy backend are for older installations. They are not required for this workflow. No external OCR, image-generation, AI or ESPN integration API is called.
 
 ## Validation
+
+The standings strip and every Scoring breakdown card show **points remaining**: 15 times the multiplier of each unfinished, non-deleted event. Moving bonuses are excluded because current awards are already in standings totals. In the nine-event schedule this starts at 195, drops to 180 after the first 1× event, becomes 75 after event 7, then 45 with only the 3× Fantasy Finale left, and reaches zero after finalization. Active events remain in the count until finalized; reopening an event adds its potential points back. This changes the display only, not scoring.
 
 ```sh
 npm run lint
