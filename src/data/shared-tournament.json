@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 619,
+  "revision": 627,
   "environment": "production",
   "participants": [
     {
@@ -138,9 +138,54 @@
         "Run the same marked sprint course; it need not be exactly 40 meters.",
         "Use an external stopwatch. Fastest completion wins."
       ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
+      "status": "active",
+      "startedAt": "2026-11-01T21:57:26.534Z",
+      "order": [
+        "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
+        "75fd721d-3dde-4127-9483-4816a24af5f0",
+        "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
+        "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
+        "0e07588b-ba57-4373-a427-9e086ad1f9a8",
+        "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
+        "c8546f52-785f-45c5-b4b2-20e3ee6a3583"
+      ],
+      "results": [
+        {
+          "participantId": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
+          "value": "4.5",
+          "absent": false
+        },
+        {
+          "participantId": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
+          "value": "2.3",
+          "absent": false
+        },
+        {
+          "participantId": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
+          "value": "9.4",
+          "absent": false
+        },
+        {
+          "participantId": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
+          "value": "3.5",
+          "absent": false
+        },
+        {
+          "participantId": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
+          "value": "0.2",
+          "absent": false
+        },
+        {
+          "participantId": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
+          "value": "9.3",
+          "absent": false
+        },
+        {
+          "participantId": "75fd721d-3dde-4127-9483-4816a24af5f0",
+          "value": "199",
+          "absent": false
+        }
+      ],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -581,6 +626,6 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-01T21:52:08.077Z",
+  "sharedSnapshotAt": "2026-11-01T21:57:27.614Z",
   "sharedDemo": true
 }
