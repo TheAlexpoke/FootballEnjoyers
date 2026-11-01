@@ -1172,6 +1172,18 @@ textarea:focus {
 .competitor-identity {
   min-width: 0;
 }
+.competitor-name-line {
+  display: block;
+}
+.competitor-name-line b {
+  display: inline;
+}
+.standing-banter {
+  font-weight: 400;
+}
+.standing-form:empty {
+  display: none;
+}
 .standing-form {
   display: grid;
   gap: 5px;

@@ -94,8 +94,11 @@ test("public dashboard fits viewport and shows all competitors", async ({
     "MAX 165POINTS REMAINING",
   );
   await expect(page.locator(".standing-form")).toHaveCount(7);
-  await expect(page.locator(".standing-form").first()).toHaveText(
-    "Sources confirm he's HIM.",
+  await expect(
+    page.locator(".competitor-name-line .standing-banter"),
+  ).toHaveCount(7);
+  await expect(page.locator(".standing-banter").first()).toHaveText(
+    "- Sources confirm he's HIM.",
   );
   await expect(page.locator(".standing-comment").first()).toHaveAttribute(
     "title",

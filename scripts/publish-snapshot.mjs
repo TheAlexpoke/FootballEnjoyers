@@ -132,6 +132,7 @@ const snapshot = {
     ({
       id,
       rank,
+      previousRank,
       points,
       finishes,
       averagePlacement,
@@ -141,6 +142,7 @@ const snapshot = {
     }) => ({
       id,
       rank,
+      previousRank,
       points,
       finishes,
       averagePlacement,

@@ -19,6 +19,22 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     await request.get("http://localhost:3002/api/state")
   ).json();
   expect(publicData.readOnly).toBe(true);
+  const previous = publicData.snapshots
+    .filter((snapshot: { id: string }) => !snapshot.id.startsWith("live-"))
+    .at(-2);
+  if (previous) {
+    const expected = publicData.standings.map(
+      (row: { id: string; rank: number; previousRank?: number }) => {
+        const prior = previous.standings.find(
+          (other: { id: string }) => other.id === row.id,
+        );
+        expect(row.previousRank).toBe(prior.rank);
+        const delta = prior.rank - row.rank;
+        return delta === 0 ? "—" : String(Math.abs(delta));
+      },
+    );
+    await expect(page.locator(".standing-row .movement")).toHaveText(expected);
+  }
   if (publicData.sharedDemo) {
     await expect(page.getByRole("note")).toContainText(
       "EXAMPLE TOURNAMENT · Simulated results through event 7. Not official standings.",

@@ -474,6 +474,9 @@ export default function TournamentApp({
                             const p = state.participants.find(
                               (p) => p.id === r.id,
                             )!;
+                            const banter = standingNotes[p.id]?.find(
+                              (note) => note.kind === "banter",
+                            );
                             const change =
                               completed === 0 || r.previousRank === undefined
                                 ? 0
@@ -498,10 +501,21 @@ export default function TournamentApp({
                                   <Avatar player={p} />
                                   <span className="competitor-details">
                                     <span className="competitor-identity">
-                                      <b>
-                                        {p.team}
-                                        {state.me === p.id && <em>YOU</em>}
-                                      </b>
+                                      <span className="competitor-name-line">
+                                        <b>
+                                          {p.team}
+                                          {state.me === p.id && <em>YOU</em>}
+                                        </b>
+                                        {banter && (
+                                          <span
+                                            className="standing-comment standing-banter"
+                                            title={banter.detail}
+                                          >
+                                            {" "}
+                                            - {banter.text}
+                                          </span>
+                                        )}
+                                      </span>
                                       {p.team.trim().toLowerCase() !==
                                         p.name.toLowerCase() && (
                                         <small>{p.name}</small>
@@ -532,8 +546,11 @@ export default function TournamentApp({
                                       className="standing-form"
                                       aria-label={`${p.name} stats and commentary`}
                                     >
-                                      {(standingNotes[p.id] ?? []).map(
-                                        (note) => (
+                                      {(standingNotes[p.id] ?? [])
+                                        .filter(
+                                          (note) => note.kind !== "banter",
+                                        )
+                                        .map((note) => (
                                           <span
                                             key={note.text}
                                             title={note.detail}
@@ -541,8 +558,7 @@ export default function TournamentApp({
                                           >
                                             {note.text}
                                           </span>
-                                        ),
-                                      )}
+                                        ))}
                                     </span>
                                   </span>
                                 </span>

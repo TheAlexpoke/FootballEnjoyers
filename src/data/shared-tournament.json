@@ -1592,6 +1592,7 @@
     {
       "id": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
       "rank": 1,
+      "previousRank": 7,
       "points": "56",
       "finishes": [
         1,
@@ -1610,6 +1611,7 @@
     {
       "id": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
       "rank": 2,
+      "previousRank": 1,
       "points": "54",
       "finishes": [
         1,
@@ -1628,6 +1630,7 @@
     {
       "id": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
       "rank": 3,
+      "previousRank": 6,
       "points": "49",
       "finishes": [
         1,
@@ -1646,6 +1649,7 @@
     {
       "id": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
       "rank": 4,
+      "previousRank": 5,
       "points": "42",
       "finishes": [
         1,
@@ -1664,6 +1668,7 @@
     {
       "id": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
       "rank": 5,
+      "previousRank": 2,
       "points": "40",
       "finishes": [
         1,
@@ -1682,6 +1687,7 @@
     {
       "id": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
       "rank": 6,
+      "previousRank": 4,
       "points": "38",
       "finishes": [
         1,
@@ -1700,6 +1706,7 @@
     {
       "id": "75fd721d-3dde-4127-9483-4816a24af5f0",
       "rank": 7,
+      "previousRank": 3,
       "points": "37",
       "finishes": [
         1,
@@ -1720,6 +1727,6 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-01T02:43:03.662Z",
+  "sharedSnapshotAt": "2026-11-01T02:47:43.411Z",
   "sharedDemo": true
 }
