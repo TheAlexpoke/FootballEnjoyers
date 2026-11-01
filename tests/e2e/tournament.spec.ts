@@ -89,11 +89,11 @@ test("public dashboard fits viewport and shows all competitors", async ({
   await expect(page.locator(".standing-row")).toHaveCount(7);
   await expect(page.locator(".standing-form")).toHaveCount(7);
   await expect(page.locator(".standing-form").first()).toHaveText(
-    "Front-runner. Keep that energy.",
+    "Sources confirm he's HIM.",
   );
   await expect(page.locator(".standing-comment").first()).toHaveAttribute(
     "title",
-    "Currently tied for or holding first overall.",
+    /1st overall/,
   );
   await expect(
     page.locator(".tournament-strip").getByText("COMPETITORS", { exact: true }),

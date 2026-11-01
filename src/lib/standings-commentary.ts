@@ -6,10 +6,90 @@ export type StandingComment = {
   detail: string;
   kind: "movement" | "form" | "banter";
 };
+const LINES: Record<number, string[]> = {
+  1: [
+    "Everyone else must be playing for second.",
+    "A generational talent.",
+    "Built different. Actually.",
+    "Making grown men question their existence.",
+    "The tournament runs through him.",
+    "Sources confirm he's HIM.",
+    "A dynasty in the making.",
+  ],
+  2: [
+    "First place in losing.",
+    "Currently breathing down the king's neck.",
+    "Would be first if first didn't exist.",
+    "The best loser in the building.",
+    "One choke away from greatness.",
+  ],
+  3: [
+    "Just happy to be on the podium.",
+    "A contender in theory.",
+    "Elite at being pretty good.",
+    "Nobody remembers who finished third.",
+    "A dark horse with no horsepower.",
+    "Not a threat. Not a joke. Just there.",
+    "Too good to roast. Too mid to praise.",
+    "Currently enjoying the view from irrelevance.",
+  ],
+  4: [
+    "mid.",
+    "Aggressively average.",
+    "Too good to be last. Too bad to matter.",
+    "Nobody's worried about this guy.",
+    "Contender in his own head.",
+    "Somehow still mathematically alive.",
+    "The human equivalent of room-temperature water.",
+    "A perfectly balanced disappointment.",
+    "The NPC of the tournament.",
+  ],
+  5: [
+    "A generational underachievement.",
+    "Peaked on Thursday.",
+    "Sources say he's lost the locker room.",
+    "His mom still believes in him.",
+    "Currently exploring other hobbies.",
+    "The analytics suggest retirement.",
+    "All talk, no hardware.",
+    "Draft stock in absolute free fall.",
+    "Currently blaming the format.",
+    "A cautionary tale about self-confidence.",
+  ],
+  6: [
+    "Saved by someone else's incompetence.",
+    "Making 7th place look competitive.",
+    "Would be last in most other tournaments.",
+    "Currently seeking a rule change.",
+    "Not even the refs can save him.",
+    "His highlight reel is 4 seconds long.",
+    "The only thing worse than his performance is his confidence.",
+    "A masterclass in doing absolutely nothing.",
+    "One spot above rock bottom. Hang the banner.",
+  ],
+  7: [
+    "Are you even trying?",
+    "Pitiful...",
+    "A historic display of incompetence.",
+    "The reason participation trophies exist.",
+    "Generational loser.",
+    "Making a strong case for an eighth participant.",
+    "His biggest contribution was paying for the Airbnb.",
+    "The league is considering relegation.",
+    "A statistical anomaly. In the worst way.",
+    "A Make-A-Wish performance.",
+    "The first overall pick of being terrible.",
+  ],
+};
 const ordinal = (place: number) =>
   `${place}${place === 1 ? "st" : place === 2 ? "nd" : place === 3 ? "rd" : "th"}`;
+const hash = (value: string) =>
+  [...value].reduce(
+    (seed, char) => (Math.imul(seed, 31) + char.charCodeAt(0)) >>> 0,
+    0,
+  );
 
-// All commentary is derived from recorded results; no AI service or score changes.
+// Comments depend only on completed-event results, never on a clock or an AI call.
 export function standingsCommentary(
   state: PublicState,
 ): Record<string, StandingComment[]> {
@@ -17,35 +97,57 @@ export function standingsCommentary(
     .filter((event) => !event.deleted && event.status === "finalized")
     .sort((a, b) => (a.finalizedAt ?? "").localeCompare(b.finalizedAt ?? ""));
   const finishes = completed.map((event) => placements(event));
+  const completedIds = new Set(completed.map((event) => event.id));
   const checkpoints = state.snapshots
-    .filter((snapshot) => !snapshot.id.startsWith("live-"))
+    .filter(
+      (snapshot) =>
+        !snapshot.id.startsWith("live-") && completedIds.has(snapshot.eventId),
+    )
     .sort((a, b) => a.at.localeCompare(b.at));
   const latest = checkpoints.at(-1),
     previous = checkpoints.at(-2);
   const gains = new Map(
-    state.participants.map((player) => [
-      player.id,
-      previous && latest
-        ? (previous.standings.find((row) => row.id === player.id)?.rank ?? 0) -
-          (latest.standings.find((row) => row.id === player.id)?.rank ?? 0)
-        : 0,
-    ]),
+    state.participants.map((player) => {
+      const before = previous?.standings.find((row) => row.id === player.id);
+      const after = latest?.standings.find((row) => row.id === player.id);
+      return [player.id, before && after ? before.rank - after.rank : 0];
+    }),
   );
   const biggest = Math.max(0, ...gains.values());
-  const leader = Math.max(
-    0,
-    ...state.standings.map((row) => Number(row.points)),
+  const sorted = [...(latest?.standings ?? state.standings)].sort(
+    (a, b) => a.rank - b.rank,
   );
-  const lastRank = Math.max(0, ...state.standings.map((row) => row.rank));
+  const leaderPoints = Math.max(0, ...sorted.map((row) => Number(row.points)));
+  const recentLeads = checkpoints.slice(-3).map((snapshot) => {
+    const first = snapshot.standings.filter((row) => row.rank === 1);
+    if (first.length !== 1) return null;
+    const others = snapshot.standings.filter((row) => row.id !== first[0].id);
+    return {
+      id: first[0].id,
+      gap:
+        Number(first[0].points) -
+        Math.max(...others.map((row) => Number(row.points))),
+    };
+  });
+  const pullingAway =
+    completed.length >= 3 &&
+    recentLeads.length === 3 &&
+    recentLeads.every(
+      (lead) => lead && lead.id === recentLeads[0]?.id && lead.gap > 0,
+    ) &&
+    recentLeads[1]!.gap > recentLeads[0]!.gap &&
+    recentLeads[2]!.gap > recentLeads[1]!.gap;
+  const kartComplete = completed.some((event) => event.kind === "kart");
+  const round = Math.max(0, completed.length - 1);
   return Object.fromEntries(
     state.participants.map((player) => {
-      const notes: StandingComment[] = [];
-      const row = state.standings.find((row) => row.id === player.id);
-      if (!completed.length || !row) return [player.id, notes];
+      const stats: StandingComment[] = [];
+      const row = sorted.find((row) => row.id === player.id);
+      if (!completed.length || !row) return [player.id, stats];
       const gain = gains.get(player.id) ?? 0;
       if (biggest > 0 && gain === biggest)
-        notes.push({
-          text: `Biggest mover: +${gain}`,
+        stats.push({
+          text: "Biggest mover",
           detail: `Gained ${gain} ${gain === 1 ? "place" : "places"} after the latest completed event.`,
           kind: "movement",
         });
@@ -61,22 +163,15 @@ export function standingsCommentary(
           streak++;
         }
       if (streak >= 2)
-        notes.push({
-          text: `${ordinal(recent!.place!)} place streak ×${streak}!`,
+        stats.push({
+          text:
+            recent!.place === 2
+              ? `A silver medal enthusiast. ×${streak}`
+              : recent!.place === 3
+                ? `The bronze medal bandit. ×${streak}`
+                : `${ordinal(recent!.place!)} place streak ×${streak}!`,
           detail: `Finished in the same official place in ${streak} consecutive completed events; shared places count.`,
           kind: "form",
-        });
-      const deficit = leader - Number(row.points);
-      if (
-        completed.length >= 3 &&
-        row.rank === lastRank &&
-        row.rank > 1 &&
-        deficit >= 30
-      )
-        notes.push({
-          text: "You need a handicap, bro?",
-          detail: `${deficit.toFixed(1)} points behind the leader. Plenty of comeback material.`,
-          kind: "banter",
         });
       const wins = finishes.filter((event) =>
         event.some(
@@ -84,47 +179,55 @@ export function standingsCommentary(
             finish.id === player.id && finish.place === 1 && finish.tie === 1,
         ),
       ).length;
-      const podiums = finishes.filter((event) =>
-        event.some(
-          (finish) =>
-            finish.id === player.id &&
-            finish.place !== null &&
-            finish.place <= 3,
-        ),
-      ).length;
-      if (notes.length < 2 && wins >= 2)
-        notes.push({
+      if (!stats.length && wins >= 2)
+        stats.push({
           text: `${wins} event wins. Save some for us.`,
           detail: `${wins} outright wins across completed events.`,
           kind: "form",
         });
-      if (!notes.length && podiums >= 2)
-        notes.push({
-          text: `Podium regular: ${podiums} top-3 finishes`,
-          detail:
-            "Based on event placements, including shared top-three places.",
-          kind: "form",
-        });
-      if (!notes.length && row.rank === 1)
-        notes.push({
-          text: "Front-runner. Keep that energy.",
-          detail: "Currently tied for or holding first overall.",
-          kind: "form",
-        });
-      if (!notes.length && completed.length >= 3 && wins === 0)
-        notes.push({
-          text: "Still hunting that first win",
-          detail: "No outright first-place event finishes yet.",
-          kind: "banter",
-        });
-      if (!notes.length)
-        notes.push({
-          text:
-            deficit <= 15 ? "Right in the mix" : "The comeback arc is loading…",
-          detail: `${deficit.toFixed(1)} points behind the leader.`,
-          kind: "banter",
-        });
-      return [player.id, notes.slice(0, 2)];
+      const pool = [...(LINES[row.rank] ?? LINES[7])];
+      const deficit = leaderPoints - Number(row.points);
+      const above = sorted.filter((other) => other.rank < row.rank).at(-1);
+      if (row.rank === 7 && above) {
+        const name = state.participants.find(
+          (other) => other.id === above.id,
+        )?.name;
+        if (name) pool.push(`You're really letting ${name} beat you??`);
+        if (completed.length >= 3 && deficit >= 30)
+          pool.push("You need a handicap, bro?");
+      }
+      if (row.rank === 5 && kartComplete)
+        pool.push("Somebody check his controller.");
+      if (row.rank === 1 && pullingAway && recentLeads[0]?.id === player.id)
+        pool.push("The gap is getting disrespectful.");
+      let text = pool[(hash(`${player.id}:${row.rank}`) + round) % pool.length];
+      // Prefer lines supported by a specific result over general rank banter.
+      if (row.rank === 1 && pullingAway && recentLeads[0]?.id === player.id)
+        text = "The gap is getting disrespectful.";
+      else if (row.rank === 1 && recent?.place === 1 && streak >= 2)
+        text = "A dynasty in the making.";
+      else if (row.rank === 1 && recent?.place === 1)
+        text = "Sources confirm he's HIM.";
+      else if (row.rank === 2 && deficit <= 5)
+        text = "Currently breathing down the king's neck.";
+      else if (
+        row.rank === 5 &&
+        completed.at(-1)?.kind === "kart" &&
+        (recent?.place ?? 0) >= 5
+      )
+        text = "Somebody check his controller.";
+      else if (row.rank === 7 && above && round % 2 === 0) {
+        const name = state.participants.find(
+          (other) => other.id === above.id,
+        )?.name;
+        if (name) text = `You're really letting ${name} beat you??`;
+      }
+      const banter: StandingComment = {
+        text,
+        detail: `${ordinal(row.rank)} overall · ${deficit.toFixed(1)} points behind the leader. Tournament banter; finish streaks refer to individual events.`,
+        kind: "banter",
+      };
+      return [player.id, stats.length ? [stats[0], banter] : [banter]];
     }),
   );
 }

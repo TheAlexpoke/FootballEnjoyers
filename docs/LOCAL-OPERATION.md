@@ -33,6 +33,8 @@ History defaults to Event Finishes: every completed event displays all selected 
 
 The main standings table adds deterministic commentary from recorded results: largest latest rank gains, consecutive official placement streaks, wins, podium counts and light comeback banter. Hover descriptions explain the underlying stats. Comments remain empty before an event is completed and do not alter scoring or call any AI service.
 
+Placement banter uses only the supplied one-liners, without rank nicknames or descriptive paragraphs. Each row keeps its chosen line until completed-event results change; there is no timer, random refresh, or reaction to provisional fantasy updates. Rank and recent finishes choose eligible lines. The growing-gap line requires the same sole leader with a strictly increasing positive points lead across the latest three completed events. Controller banter is unavailable until Mario Kart is finalized. Last-place neighbor jokes name an actually better-ranked competitor. Biggest mover omits its numeric change, and repeated second/third event finishes use silver/bronze nicknames with the streak count.
+
 Both Standings Progression and Points Progression exact tables show rank movement and regular-point gains together. A positive rank change means moving up; a negative value means moving down. The first rank checkpoint has no previous placement and displays a dash. Bonuses remain separate from the regular-point delta.
 
 ## Moving Consistency Award
