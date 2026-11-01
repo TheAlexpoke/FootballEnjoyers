@@ -37,7 +37,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   }
   await page.goto("http://localhost:3002/history");
   await expect(
-    page.getByRole("heading", { name: "Standings progression" }),
+    page.getByRole("heading", { name: "Event Finishes" }),
   ).toBeVisible();
   expect(
     (await request.get("http://localhost:3002/api/state?env=practice")).ok(),

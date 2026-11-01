@@ -37,6 +37,7 @@ import { EventIllustration } from "./event-illustration";
 import { eventPresentation } from "@/lib/event-presentation";
 import { RankTrophy, PlacementRank } from "./placement-rank";
 import { spreadHistoryMarkers } from "@/lib/history-markers";
+import { standingsCommentary } from "@/lib/standings-commentary";
 type Player = PublicState["participants"][number];
 let realtimeClient: ReturnType<typeof createClient> | undefined;
 export async function request(url: string, body?: unknown, method = "POST") {
@@ -224,6 +225,7 @@ export default function TournamentApp({
   const link = (path: string) =>
     env === "practice" ? `${path}?env=practice` : path;
   const state = data ?? fallback;
+  const standingNotes = standingsCommentary(state);
   const sharedView = publicOnly || state.readOnly;
   const completed = state.events.filter(
     (e) => !e.deleted && e.status === "finalized",
@@ -473,33 +475,54 @@ export default function TournamentApp({
                                 </span>
                                 <span className="competitor">
                                   <Avatar player={p} />
-                                  <span>
-                                    <b>
-                                      {p.team}
-                                      {state.me === p.id && <em>YOU</em>}
-                                    </b>
-                                    {p.team.trim().toLowerCase() !==
-                                      p.name.toLowerCase() && (
-                                      <small>{p.name}</small>
-                                    )}
-                                    {r.consistencyBonus === "10" && (
-                                      <span
-                                        className="consistency-badge"
-                                        title={`Included in total · average placement ${Number(r.averagePlacement).toFixed(2)}`}
-                                      >
-                                        +10 Consistency · avg{" "}
-                                        {Number(r.averagePlacement).toFixed(2)}
-                                      </span>
-                                    )}
-                                    {Number(r.lastPlaceBonus ?? 0) > 0 && (
-                                      <span
-                                        className="consistency-badge"
-                                        title="Included in total · 10-point pool split equally among tied leaders"
-                                      >
-                                        +{Number(r.lastPlaceBonus).toFixed(1)}{" "}
-                                        Most last places · {r.lastPlaceFinishes}
-                                      </span>
-                                    )}
+                                  <span className="competitor-details">
+                                    <span className="competitor-identity">
+                                      <b>
+                                        {p.team}
+                                        {state.me === p.id && <em>YOU</em>}
+                                      </b>
+                                      {p.team.trim().toLowerCase() !==
+                                        p.name.toLowerCase() && (
+                                        <small>{p.name}</small>
+                                      )}
+                                      {r.consistencyBonus === "10" && (
+                                        <span
+                                          className="consistency-badge"
+                                          title={`Included in total · average placement ${Number(r.averagePlacement).toFixed(2)}`}
+                                        >
+                                          +10 Consistency · avg{" "}
+                                          {Number(r.averagePlacement).toFixed(
+                                            2,
+                                          )}
+                                        </span>
+                                      )}
+                                      {Number(r.lastPlaceBonus ?? 0) > 0 && (
+                                        <span
+                                          className="consistency-badge"
+                                          title="Included in total · 10-point pool split equally among tied leaders"
+                                        >
+                                          +{Number(r.lastPlaceBonus).toFixed(1)}{" "}
+                                          Most last places ·{" "}
+                                          {r.lastPlaceFinishes}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <span
+                                      className="standing-form"
+                                      aria-label={`${p.name} stats and commentary`}
+                                    >
+                                      {(standingNotes[p.id] ?? []).map(
+                                        (note) => (
+                                          <span
+                                            key={note.text}
+                                            title={note.detail}
+                                            className={`standing-comment standing-comment--${note.kind}`}
+                                          >
+                                            {note.text}
+                                          </span>
+                                        ),
+                                      )}
+                                    </span>
                                   </span>
                                 </span>
                                 <span
@@ -1598,51 +1621,146 @@ function EventComparisonTable({
     </section>
   );
 }
+type HistoryMetric = "finishes" | "rank" | "points";
+const HISTORY_VIEWS: Record<HistoryMetric, string> = {
+  finishes: "Event Finishes",
+  rank: "Standings Progression",
+  points: "Points Progression",
+};
 function HistoryStandingsTable({
   state,
   snapshot,
   previousSnapshot,
   highlightId,
+  metric,
 }: {
   state: PublicState;
   snapshot: PublicState["snapshots"][number];
   previousSnapshot?: PublicState["snapshots"][number];
   highlightId?: string;
+  metric: HistoryMetric;
 }) {
-  const players = snapshot.standings.flatMap((row) => {
-    const player = state.participants.find((player) => player.id === row.id);
-    return player ? [player] : [];
-  });
+  const event = state.events.find((event) => event.id === snapshot.eventId);
+  const scores = event ? placements(event) : [];
+  const finish = (player: Player) => scores.find((row) => row.id === player.id);
   const standing = (player: Player) =>
     snapshot.standings.find((row) => row.id === player.id);
-  return (
-    <section className="history-checkpoint">
-      <div className="comparison-heading">
-        <h3>{snapshot.label}</h3>
-        <span>
-          Cumulative{snapshot.id.startsWith("live-") ? " · provisional" : ""}
-        </span>
-      </div>
-      <PlayerComparisonTable
-        players={players}
-        highlightId={highlightId}
-        label={`Cumulative standings after ${snapshot.label}`}
-        rows={[
+  const players =
+    metric === "finishes"
+      ? [...state.participants].sort(
+          (a, b) => (finish(a)?.place ?? 99) - (finish(b)?.place ?? 99),
+        )
+      : snapshot.standings.flatMap((row) => {
+          const player = state.participants.find(
+            (player) => player.id === row.id,
+          );
+          return player ? [player] : [];
+        });
+  const bonusRow: ComparisonRow = {
+    label: "Bonus points",
+    render: (player) => {
+      const row = standing(player);
+      return (
+        <>
+          <b>{comparisonPoints(bonusPoints(row))}</b>
+          {Number(row?.consistencyBonus) > 0 && (
+            <small title="Consistency Award">
+              Cons. +{comparisonPoints(row!.consistencyBonus!)}
+            </small>
+          )}
+          {Number(row?.lastPlaceBonus) > 0 && (
+            <small>Last place +{comparisonPoints(row!.lastPlaceBonus!)}</small>
+          )}
+        </>
+      );
+    },
+  };
+  const rows: ComparisonRow[] =
+    metric === "finishes"
+      ? [
           {
-            label: "Rank",
-            render: (player) => <PlacementRank rank={standing(player)?.rank} />,
+            label: "Place",
+            render: (player) => (
+              <span className="performance-place">
+                <PlacementRank rank={finish(player)?.place} />
+                {(finish(player)?.tie ?? 0) > 1 && <small>Tie</small>}
+              </span>
+            ),
+          },
+          {
+            label: `Result (${event?.unit ?? "score"})`,
+            render: (player) => {
+              const raw = event?.results.find(
+                (row) => row.participantId === player.id,
+              );
+              return raw?.absent ? "Absent" : (raw?.value ?? "—");
+            },
+          },
+          {
+            label: "Event points",
+            render: (player) => comparisonPoints(finish(player)?.points ?? 0),
+          },
+          bonusRow,
+          {
+            label: "Event + bonus",
+            render: (player) =>
+              comparisonPoints(
+                Number(finish(player)?.points ?? 0) +
+                  bonusPoints(standing(player)),
+              ),
+            total: true,
+          },
+        ]
+      : [
+          {
+            label: "Rank / change",
+            render: (player) => {
+              const row = standing(player),
+                previous = previousSnapshot?.standings.find(
+                  (row) => row.id === player.id,
+                );
+              const change =
+                previous && row ? previous.rank - row.rank : undefined;
+              return (
+                <>
+                  <PlacementRank rank={row?.rank} />
+                  <span
+                    className={`rank-delta ${change !== undefined && change < 0 ? "rank-delta--down" : ""}`}
+                    title={
+                      change === undefined
+                        ? "First checkpoint: no previous rank"
+                        : change > 0
+                          ? `Up ${change} places`
+                          : change < 0
+                            ? `Down ${-change} places`
+                            : "Rank unchanged"
+                    }
+                  >
+                    (
+                    {change === undefined
+                      ? "—"
+                      : change > 0
+                        ? `+${change}`
+                        : change < 0
+                          ? `−${-change}`
+                          : "0"}
+                    )
+                  </span>
+                </>
+              );
+            },
           },
           {
             label: "Event points",
             render: (player) => {
-              const cumulative = regularPoints(standing(player));
-              const delta =
-                cumulative -
-                regularPoints(
-                  previousSnapshot?.standings.find(
-                    (row) => row.id === player.id,
-                  ),
-                );
+              const cumulative = regularPoints(standing(player)),
+                delta =
+                  cumulative -
+                  regularPoints(
+                    previousSnapshot?.standings.find(
+                      (row) => row.id === player.id,
+                    ),
+                  );
               return (
                 <>
                   {comparisonPoints(cumulative)}
@@ -1654,37 +1772,37 @@ function HistoryStandingsTable({
               );
             },
           },
-          {
-            label: "Bonus points",
-            render: (player) => {
-              const row = standing(player);
-              return (
-                <>
-                  <b>{comparisonPoints(bonusPoints(row))}</b>
-                  {Number(row?.consistencyBonus) > 0 && (
-                    <small title="Consistency Award">
-                      Cons. +{comparisonPoints(row!.consistencyBonus!)}
-                    </small>
-                  )}
-                  {Number(row?.lastPlaceBonus) > 0 && (
-                    <small>
-                      Last place +{comparisonPoints(row!.lastPlaceBonus!)}
-                    </small>
-                  )}
-                </>
-              );
-            },
-          },
+          bonusRow,
           {
             label: "Total points",
             render: (player) => comparisonPoints(standing(player)?.points ?? 0),
             total: true,
           },
-        ]}
+        ];
+  return (
+    <section className="history-checkpoint">
+      <div className="comparison-heading">
+        <h3>{snapshot.label}</h3>
+        <span>
+          {metric === "finishes"
+            ? "Event only"
+            : `Cumulative${snapshot.id.startsWith("live-") ? " · provisional" : ""}`}
+        </span>
+      </div>
+      <PlayerComparisonTable
+        players={players}
+        rows={rows}
+        highlightId={highlightId}
+        label={
+          metric === "finishes"
+            ? `Event finishes for ${snapshot.label}`
+            : `Cumulative standings after ${snapshot.label}`
+        }
       />
     </section>
   );
 }
+
 function PlayerDetail({
   state,
   id,
@@ -1831,7 +1949,7 @@ export function HistoryChart({
 }) {
   const selected = initial ?? state.participants.map((p) => p.id);
   const chartId = useId().replace(/:/g, "");
-  const [metric, setMetric] = useState<"rank" | "points">("rank");
+  const [metric, setMetric] = useState<HistoryMetric>("finishes");
   const colors = [
     "#e9bd5a",
     "#5ab6dd",
@@ -1847,13 +1965,14 @@ export function HistoryChart({
     .sort((a, b) => a.at.localeCompare(b.at));
   const latestCompletedId = snapshots.at(-1)?.id;
   const latestLive = all.filter((x) => x.id.startsWith("live-")).at(-1);
-  if (latestLive) snapshots.push(latestLive);
+  if (latestLive && metric !== "finishes") snapshots.push(latestLive);
   const max = Math.max(
     15,
     ...snapshots.flatMap((s) => s.standings.map((r) => Number(r.points))),
   );
   const width = 850;
-  const plotSpan = width - (selected.length > 1 ? 300 : 220);
+  const plotSpan =
+    width - (metric !== "finishes" && selected.length > 1 ? 300 : 220);
   const labelLength = Math.min(
     18,
     Math.max(8, Math.floor(plotSpan / Math.max(snapshots.length - 1, 1) / 9)),
@@ -1879,32 +1998,59 @@ export function HistoryChart({
   const x = (i: number) =>
     110 + (i / Math.max(snapshots.length - 1, 1)) * plotSpan;
   const y = (v: number) =>
-    metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
-  const chartPoints = snapshots.map((snapshot, j) =>
-    spreadHistoryMarkers(
-      state.participants
-        .filter((p) => selected.includes(p.id))
-        .flatMap((p) => {
-          const standing = snapshot.standings.find((r) => r.id === p.id);
-          if (!standing) return [];
-          return [
-            {
-              id: p.id,
-              player: p,
-              standing,
-              x: x(j),
-              y: y(metric === "rank" ? standing.rank : Number(standing.points)),
-              color:
-                colors[
-                  state.participants.findIndex((player) => player.id === p.id) %
-                    7
-                ],
-              label: snapshot.label,
-            },
-          ];
-        }),
-    ),
-  );
+    metric !== "points" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
+  const chartPoints = snapshots.map((snapshot, j) => {
+    const event = state.events.find((event) => event.id === snapshot.eventId);
+    const scores = event ? placements(event) : [];
+    const players =
+      metric === "finishes"
+        ? [...state.participants].sort(
+            (a, b) =>
+              (scores.find((row) => row.id === a.id)?.place ?? 99) -
+              (scores.find((row) => row.id === b.id)?.place ?? 99),
+          )
+        : state.participants;
+    return spreadHistoryMarkers(
+      players.flatMap((player, slot) => {
+        if (!selected.includes(player.id)) return [];
+        const cumulative = snapshot.standings.find(
+          (row) => row.id === player.id,
+        );
+        if (!cumulative) return [];
+        const finish = scores.find((row) => row.id === player.id);
+        const standing =
+          metric === "finishes"
+            ? {
+                ...cumulative,
+                rank: finish?.place ?? 7,
+                points: finish?.points ?? "0",
+              }
+            : cumulative;
+        return [
+          {
+            id: player.id,
+            player,
+            standing,
+            x: x(j),
+            y: y(
+              metric === "finishes"
+                ? slot + 1
+                : metric === "rank"
+                  ? standing.rank
+                  : Number(standing.points),
+            ),
+            color:
+              colors[
+                state.participants.findIndex((p) => p.id === player.id) % 7
+              ],
+            label: snapshot.label,
+            tie: finish?.tie ?? 1,
+            absent: finish?.absent ?? false,
+          },
+        ];
+      }),
+    );
+  });
   const latestPhotoIndex = snapshots.findIndex(
     (snapshot) => snapshot.id === latestCompletedId,
   );
@@ -1919,23 +2065,28 @@ export function HistoryChart({
     <section className="panel history-panel">
       <div className="section-heading">
         <h2>
-          <History size={20} /> Standings progression
+          <History size={20} /> {HISTORY_VIEWS[metric]}
         </h2>
-        <div className="segmented">
-          <button
-            className={metric === "rank" ? "selected" : ""}
-            onClick={() => setMetric("rank")}
-          >
-            Rank
-          </button>
-          <button
-            className={metric === "points" ? "selected" : ""}
-            onClick={() => setMetric("points")}
-          >
-            Points
-          </button>
+        <div className="segmented history-modes" aria-label="History view">
+          {(Object.keys(HISTORY_VIEWS) as HistoryMetric[]).map((view) => (
+            <button
+              key={view}
+              className={metric === view ? "selected" : ""}
+              aria-pressed={metric === view}
+              onClick={() => setMetric(view)}
+            >
+              {HISTORY_VIEWS[view]}
+            </button>
+          ))}
         </div>
       </div>
+      {metric === "finishes" && (
+        <p className="history-view-help">
+          Each column shows one event’s finish order. Tied finishers occupy
+          adjacent slots marked with their shared place. Bonuses do not change
+          event finishes.
+        </p>
+      )}
       {snapshots.length ? (
         <>
           <div className="chart-scroll">
@@ -1943,7 +2094,11 @@ export function HistoryChart({
               viewBox={`0 0 ${width} ${height}`}
               style={{ width: "100%", minWidth: 0, height: "auto" }}
               role="img"
-              aria-label={`${metric} progression across finalized events and latest live fantasy update`}
+              aria-label={
+                metric === "finishes"
+                  ? "Event finishes across completed events"
+                  : `${metric} progression across finalized events and latest live fantasy update`
+              }
             >
               <title>{metric} progression</title>
               {Array.from({ length: 7 }, (_, i) => (
@@ -1955,7 +2110,7 @@ export function HistoryChart({
                     y2={80 + (i * 280) / 6}
                     stroke="#273142"
                   />
-                  {metric === "rank" ? (
+                  {metric !== "points" ? (
                     <g
                       className="history-rank-label"
                       data-rank={i + 1}
@@ -2032,63 +2187,77 @@ export function HistoryChart({
                   )}
                 </text>
               ))}
-              {state.participants
-                .filter((p) => selected.includes(p.id))
-                .map((p) => {
-                  const coords = chartPoints.flatMap((points) =>
-                    points.filter((point) => point.id === p.id),
-                  );
-                  return (
-                    <polyline
-                      key={p.id}
-                      points={coords.map((c) => [c.x, c.y].join(",")).join(" ")}
-                      fill="none"
-                      stroke={
-                        colors[
-                          state.participants.findIndex(
-                            (player) => player.id === p.id,
-                          ) % 7
-                        ]
-                      }
-                      strokeWidth="2"
-                      opacity="0.8"
-                    />
-                  );
-                })}
-              <g className="history-photo-connectors" aria-hidden="true">
-                {photoMarkers
-                  .filter(
-                    (point) =>
-                      Math.abs(point.markerX - point.x) > 0.1 ||
-                      Math.abs(point.markerY - point.y) > 0.1,
-                  )
-                  .map((point) => (
-                    <g key={point.id}>
-                      <path
-                        data-history-connector={point.id}
-                        d={`M${point.x},${point.y} C${point.x + 40},${point.y} ${point.markerX - 40},${point.markerY} ${point.markerX},${point.markerY}`}
-                        fill="none"
-                        stroke={point.color}
-                        strokeWidth="1.4"
-                        opacity="0.7"
-                      />
-                      <circle
-                        cx={point.x}
-                        cy={point.y}
-                        r="3.5"
-                        fill={point.color}
-                      />
-                    </g>
-                  ))}
-              </g>
+              {metric !== "finishes" && (
+                <>
+                  {state.participants
+                    .filter((p) => selected.includes(p.id))
+                    .map((p) => {
+                      const coords = chartPoints.flatMap((points) =>
+                        points.filter((point) => point.id === p.id),
+                      );
+                      return (
+                        <polyline
+                          key={p.id}
+                          points={coords
+                            .map((c) => [c.x, c.y].join(","))
+                            .join(" ")}
+                          fill="none"
+                          stroke={
+                            colors[
+                              state.participants.findIndex(
+                                (player) => player.id === p.id,
+                              ) % 7
+                            ]
+                          }
+                          strokeWidth="2"
+                          opacity="0.8"
+                        />
+                      );
+                    })}
+                  <g className="history-photo-connectors" aria-hidden="true">
+                    {photoMarkers
+                      .filter(
+                        (point) =>
+                          Math.abs(point.markerX - point.x) > 0.1 ||
+                          Math.abs(point.markerY - point.y) > 0.1,
+                      )
+                      .map((point) => (
+                        <g key={point.id}>
+                          <path
+                            data-history-connector={point.id}
+                            d={`M${point.x},${point.y} C${point.x + 40},${point.y} ${point.markerX - 40},${point.markerY} ${point.markerX},${point.markerY}`}
+                            fill="none"
+                            stroke={point.color}
+                            strokeWidth="1.4"
+                            opacity="0.7"
+                          />
+                          <circle
+                            cx={point.x}
+                            cy={point.y}
+                            r="3.5"
+                            fill={point.color}
+                          />
+                        </g>
+                      ))}
+                  </g>
+                </>
+              )}
               {chartPoints.map((points, j) =>
                 points.map((point) => {
-                  const showPhoto = snapshots[j].id === latestCompletedId;
+                  const showPhoto =
+                    metric === "finishes" ||
+                    snapshots[j].id === latestCompletedId;
                   const parked = photoMarkers.find(
                     (marker) => marker.id === point.id,
                   );
-                  const markerX = parked?.markerX ?? point.x;
-                  const markerY = parked?.markerY ?? point.markerY;
+                  const markerX =
+                    metric === "finishes"
+                      ? point.x
+                      : (parked?.markerX ?? point.x);
+                  const markerY =
+                    metric === "finishes"
+                      ? point.y
+                      : (parked?.markerY ?? point.markerY);
                   const label =
                     point.player.name +
                     ": " +
@@ -2149,6 +2318,17 @@ export function HistoryChart({
                             stroke={point.color}
                             strokeWidth="2.5"
                           />
+                          {metric === "finishes" && point.tie > 1 && (
+                            <text
+                              x={markerX + 20}
+                              y={markerY + 4}
+                              fontSize="9"
+                              fill={point.color}
+                              fontWeight="700"
+                            >
+                              T{point.standing.rank}
+                            </text>
+                          )}
                         </>
                       ) : (
                         <circle
@@ -2168,16 +2348,16 @@ export function HistoryChart({
             <details className="history-table">
               <summary>View exact standings by event</summary>
               <p className="comparison-help">
-                Event points are cumulative. Bonus points show the awards held
-                at that checkpoint, rather than adding earlier bonuses again.
-                Parentheses show event points gained since the previous
-                checkpoint.
+                {metric === "finishes"
+                  ? "Event-only results, sorted by finish. Bonuses shown are those held after the event and do not affect this order; Event + bonus is not a cumulative total."
+                  : "Both progression views show rank changes (+ up / − down) and regular points gained since the previous checkpoint in parentheses. Current bonuses are shown separately and are not accumulated again."}
               </p>
               {snapshots.map((snapshot, index) => (
                 <HistoryStandingsTable
                   key={snapshot.id}
                   state={state}
                   snapshot={snapshot}
+                  metric={metric}
                   previousSnapshot={snapshots[index - 1]}
                   highlightId={initial?.length === 1 ? initial[0] : undefined}
                 />
