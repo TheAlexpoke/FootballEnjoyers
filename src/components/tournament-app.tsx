@@ -427,7 +427,9 @@ export default function TournamentApp({
                       ))}
                   </div>
                   <div className="strip-stat">
-                    <b>{displayPoints(remainingEventPoints(state.events))}</b>
+                    <b>
+                      MAX {displayPoints(remainingEventPoints(state.events))}
+                    </b>
                     <small>POINTS REMAINING</small>
                   </div>
                 </section>
@@ -944,7 +946,7 @@ function ScoringCard({ events }: { events: Event[] }) {
         Mario Kart Wild Card losers: 1 base point each.
       </div>
       <div className="scoring-maximum">
-        <strong>{displayPoints(remaining)} points remaining</strong>
+        <strong>MAX {displayPoints(remaining)} Points Remaining</strong>
         <span>
           Maximum from winning every unfinished event. Bonuses are excluded;
           current bonus awards are already included in standings totals.

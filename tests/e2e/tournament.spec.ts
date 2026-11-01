@@ -88,10 +88,10 @@ test("public dashboard fits viewport and shows all competitors", async ({
   ).toBeVisible();
   await expect(page.locator(".standing-row")).toHaveCount(7);
   await expect(page.locator(".scoring-maximum strong")).toHaveText(
-    "165 points remaining",
+    "MAX 165 Points Remaining",
   );
   await expect(page.locator(".tournament-strip .strip-stat")).toHaveText(
-    "165POINTS REMAINING",
+    "MAX 165POINTS REMAINING",
   );
   await expect(page.locator(".standing-form")).toHaveCount(7);
   await expect(page.locator(".standing-form").first()).toHaveText(

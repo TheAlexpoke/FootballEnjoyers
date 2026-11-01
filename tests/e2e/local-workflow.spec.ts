@@ -41,7 +41,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     ).weight,
   ).toBe("3");
   await expect(page.locator(".scoring-maximum strong")).toHaveText(
-    `${publicData.events.filter((event: { deleted?: boolean; status: string }) => !event.deleted && event.status !== "finalized").reduce((sum: number, event: { weight: string }) => sum + 15 * Number(event.weight), 0)} points remaining`,
+    `MAX ${publicData.events.filter((event: { deleted?: boolean; status: string }) => !event.deleted && event.status !== "finalized").reduce((sum: number, event: { weight: string }) => sum + 15 * Number(event.weight), 0)} Points Remaining`,
   );
   expect(JSON.stringify(publicData)).not.toMatch(
     /credentialHash|deviceHash|admin_sessions|profileToken/,
