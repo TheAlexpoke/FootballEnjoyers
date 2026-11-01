@@ -296,6 +296,198 @@ body {
   align-items: center;
   gap: 7px;
 }
+.comparison-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.player-comparison-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #eee6d7;
+}
+.player-comparison-table th,
+.player-comparison-table td {
+  padding: 10px 5px;
+  text-align: center;
+  border: 1px solid #82704d44;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+.player-comparison-table thead th {
+  background: #242119;
+  font-weight: 800;
+}
+.player-comparison-table tr > :first-child {
+  width: 105px;
+  text-align: left;
+  padding-left: 12px;
+  color: #c9b88e;
+  font-size: 10px;
+}
+.player-comparison-table thead .avatar {
+  display: flex;
+  margin: 0 auto 6px;
+}
+.player-comparison-table thead th > span:last-child {
+  display: block;
+}
+.player-comparison-table td small {
+  display: block;
+  font-size: 9px;
+  line-height: 1.4;
+  color: #cdb878;
+  margin-top: 3px;
+}
+.player-comparison-table .rank-trophy {
+  margin: auto;
+}
+.player-comparison-table .comparison-self {
+  background: #edc66e22;
+  color: #ffe4a2;
+  font-weight: 900;
+  border-left: 2px solid #cba957;
+  border-right: 2px solid #cba957;
+}
+.player-comparison-table thead .comparison-self {
+  background: #edc66e38;
+  border-top: 2px solid #cba957;
+}
+.comparison-total td {
+  font-weight: 900;
+  background: #bca0650c;
+}
+.comparison-total .comparison-self {
+  border-bottom: 2px solid #cba957;
+}
+.comparison-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0 10px;
+}
+.comparison-heading h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.comparison-heading > a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 800;
+  color: #edc66e;
+  font-size: 14px;
+}
+.comparison-heading > span {
+  font-size: 10px;
+  color: #b0a795;
+}
+.event-comparison {
+  padding: 0 22px 18px;
+  border-top: 1px solid #82704d44;
+}
+.history-checkpoint {
+  margin: 14px 0 22px;
+}
+.comparison-help {
+  padding: 0 22px;
+  color: #b0a795;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.history-table .comparison-help {
+  padding: 12px 0 0;
+}
+.profile-points-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: -8px 0 24px;
+}
+.profile-points-summary > span {
+  padding: 13px 16px;
+  background: #201e19;
+  border: 1px solid #82704d55;
+  color: #b0a795;
+  font-size: 10px;
+}
+.profile-points-summary b {
+  display: block;
+  color: #edc66e;
+  font-size: 21px;
+  margin-top: 5px;
+}
+@media (max-width: 760px) {
+  .player-hero {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .player-hero > .avatar {
+    width: 56px;
+    height: 56px;
+  }
+  .player-hero h1 {
+    font-size: 32px;
+  }
+  .player-hero .player-stats {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 28px;
+    padding-top: 6px;
+  }
+  .event-comparison {
+    padding: 0 8px 14px;
+  }
+  .history-table {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+  .player-comparison-table {
+    font-size: 9px;
+  }
+  .player-comparison-table th,
+  .player-comparison-table td {
+    padding: 8px 2px;
+  }
+  .player-comparison-table tr > :first-child {
+    width: 61px;
+    padding-left: 5px;
+    font-size: 8px;
+  }
+  .player-comparison-table thead .avatar {
+    width: 20px;
+    height: 20px;
+  }
+  .player-comparison-table td small {
+    font-size: 7px;
+  }
+  .player-comparison-table .rank-trophy--inline {
+    width: 15px;
+    height: 18px;
+  }
+  .comparison-heading > a,
+  .comparison-heading h3 {
+    font-size: 12px;
+  }
+  .comparison-heading > span {
+    font-size: 8px;
+  }
+  .comparison-help {
+    padding: 0 12px;
+    font-size: 10px;
+  }
+  .profile-points-summary {
+    gap: 6px;
+  }
+  .profile-points-summary > span {
+    padding: 10px 8px;
+    font-size: 8px;
+  }
+}
 .points-scale small {
   min-height: 20px;
   display: flex;

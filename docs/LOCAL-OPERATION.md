@@ -27,6 +27,8 @@ Local mode is the default. Copying `.env.example` is optional. `LOCAL_DATA_DIR` 
 
 The History page shows all competitors automatically, without a separate player key. Profile photos appear only on the latest completed event; earlier points use dots. Tied photos have leader lines to their exact positions. Event names follow completion order, and the graph compresses to fit the screen without horizontal scrolling. Standings and individual event finishes use numbered gold, silver and bronze trophies for the top three places.
 
+“View exact standings by event” shows one comparison table per checkpoint, with seven player columns and rows for rank, cumulative event points, current bonus points and total. Bonus details distinguish Consistency from Most Last Places; earlier moving bonuses are not added again. Player profiles use the same table style to compare all competitors' event places, raw results (in the event's unit) and event points. The profile player's full column is highlighted, and a separate summary retains cumulative event, bonus and total points. Unplayed events display dashes.
+
 ## Moving Consistency Award
 
 The best unweighted average placement across finalized, non-deleted events earns **10 extra points**, already included in standings totals. Every player tied for the best average receives the full 10 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.

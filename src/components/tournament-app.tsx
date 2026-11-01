@@ -1463,6 +1463,217 @@ function FantasyDetail({ state }: { state: PublicState }) {
     </section>
   );
 }
+type ComparisonRow = {
+  label: string;
+  render: (player: Player) => ReactNode;
+  total?: boolean;
+};
+const comparisonPoints = (value: number | string) =>
+  Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+const bonusPoints = (row?: PublicState["standings"][number]) =>
+  Number(row?.consistencyBonus ?? 0) + Number(row?.lastPlaceBonus ?? 0);
+function PlayerComparisonTable({
+  players,
+  rows,
+  highlightId,
+  label,
+}: {
+  players: Player[];
+  rows: ComparisonRow[];
+  highlightId?: string;
+  label: string;
+}) {
+  return (
+    <div className="comparison-table-wrap">
+      <table className="player-comparison-table" aria-label={label}>
+        <thead>
+          <tr>
+            <th scope="col">Player</th>
+            {players.map((player) => (
+              <th
+                scope="col"
+                key={player.id}
+                data-player-id={player.id}
+                className={
+                  player.id === highlightId ? "comparison-self" : undefined
+                }
+              >
+                <Avatar player={player} small />
+                <span>{player.name}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              key={row.label}
+              className={row.total ? "comparison-total" : undefined}
+            >
+              <th scope="row">{row.label}</th>
+              {players.map((player) => (
+                <td
+                  key={player.id}
+                  data-player-id={player.id}
+                  className={
+                    player.id === highlightId ? "comparison-self" : undefined
+                  }
+                >
+                  {row.render(player)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+function EventComparisonTable({
+  state,
+  event,
+  playerId,
+  link,
+}: {
+  state: PublicState;
+  event: Event;
+  playerId: string;
+  link: (path: string) => string;
+}) {
+  const scores = placements(event);
+  const players = [...state.participants].sort(
+    (a, b) =>
+      (scores.find((row) => row.id === a.id)?.place ?? 99) -
+      (scores.find((row) => row.id === b.id)?.place ?? 99),
+  );
+  return (
+    <section
+      className="event-comparison"
+      aria-label={`${event.name} player comparison`}
+    >
+      <div className="comparison-heading">
+        <Link href={link(`/events/${event.id}`)}>
+          {event.name}
+          <ArrowUpRight size={13} />
+        </Link>
+        <Badge event={event} />
+      </div>
+      <PlayerComparisonTable
+        players={players}
+        highlightId={playerId}
+        label={`${event.name}: all player results`}
+        rows={[
+          {
+            label: "Place",
+            render: (player) => {
+              const row = scores.find((row) => row.id === player.id);
+              return (
+                <span className="performance-place">
+                  <PlacementRank rank={row?.place} />
+                  {row && row.tie > 1 && <small>Tie</small>}
+                </span>
+              );
+            },
+          },
+          {
+            label: `Result (${event.unit})`,
+            render: (player) => {
+              const raw = event.results.find(
+                (row) => row.participantId === player.id,
+              );
+              return raw?.absent ? "Absent" : (raw?.value ?? "—");
+            },
+          },
+          {
+            label:
+              event.status === "active"
+                ? "Event pts (provisional)"
+                : "Event points",
+            render: (player) => {
+              const row = scores.find((row) => row.id === player.id);
+              return row ? comparisonPoints(row.points) : "—";
+            },
+            total: true,
+          },
+        ]}
+      />
+    </section>
+  );
+}
+function HistoryStandingsTable({
+  state,
+  snapshot,
+  highlightId,
+}: {
+  state: PublicState;
+  snapshot: PublicState["snapshots"][number];
+  highlightId?: string;
+}) {
+  const players = snapshot.standings.flatMap((row) => {
+    const player = state.participants.find((player) => player.id === row.id);
+    return player ? [player] : [];
+  });
+  const standing = (player: Player) =>
+    snapshot.standings.find((row) => row.id === player.id);
+  return (
+    <section className="history-checkpoint">
+      <div className="comparison-heading">
+        <h3>{snapshot.label}</h3>
+        <span>
+          Cumulative{snapshot.id.startsWith("live-") ? " · provisional" : ""}
+        </span>
+      </div>
+      <PlayerComparisonTable
+        players={players}
+        highlightId={highlightId}
+        label={`Cumulative standings after ${snapshot.label}`}
+        rows={[
+          {
+            label: "Rank",
+            render: (player) => <PlacementRank rank={standing(player)?.rank} />,
+          },
+          {
+            label: "Event points",
+            render: (player) =>
+              comparisonPoints(
+                Number(standing(player)?.points ?? 0) -
+                  bonusPoints(standing(player)),
+              ),
+          },
+          {
+            label: "Bonus points",
+            render: (player) => {
+              const row = standing(player);
+              return (
+                <>
+                  <b>{comparisonPoints(bonusPoints(row))}</b>
+                  {Number(row?.consistencyBonus) > 0 && (
+                    <small title="Consistency Award">
+                      Cons. +{comparisonPoints(row!.consistencyBonus!)}
+                    </small>
+                  )}
+                  {Number(row?.lastPlaceBonus) > 0 && (
+                    <small>
+                      Last place +{comparisonPoints(row!.lastPlaceBonus!)}
+                    </small>
+                  )}
+                </>
+              );
+            },
+          },
+          {
+            label: "Total points",
+            render: (player) => comparisonPoints(standing(player)?.points ?? 0),
+            total: true,
+          },
+        ]}
+      />
+    </section>
+  );
+}
 function PlayerDetail({
   state,
   id,
@@ -1503,10 +1714,24 @@ function PlayerDetail({
             OVERALL
           </span>
           <span>
-            <b>{displayPoints(r?.points ?? "0")}</b>POINTS
+            <b>{comparisonPoints(r?.points ?? "0")}</b>CUMULATIVE PTS
           </span>
         </div>
       </section>
+      {r && (
+        <div className="profile-points-summary">
+          <span>
+            Event points{" "}
+            <b>{comparisonPoints(Number(r.points) - bonusPoints(r))}</b>
+          </span>
+          <span>
+            Bonus points <b>{comparisonPoints(bonusPoints(r))}</b>
+          </span>
+          <span>
+            Cumulative total <b>{comparisonPoints(r.points)}</b>
+          </span>
+        </div>
+      )}
       <section className="panel">
         <div className="section-heading">
           <h2>Event performance</h2>
@@ -1544,46 +1769,21 @@ function PlayerDetail({
             </b>
           </div>
         )}
+        <p className="comparison-help">
+          All competitors, ordered by event finish. The highlighted column is{" "}
+          {p.name}. Event points exclude bonuses.
+        </p>
         {state.events
-          .filter((e) => !e.deleted)
-          .map((e) => {
-            const raw = e.results.find((x) => x.participantId === id),
-              score = placements(e).find((x) => x.id === id);
-            return (
-              <Link
-                className="performance-row"
-                key={e.id}
-                href={link(`/events/${e.id}`)}
-              >
-                <span>
-                  <b>{e.name}</b>
-                  <small>
-                    {raw?.absent
-                      ? "Absent"
-                      : raw?.value
-                        ? `${raw.value} ${e.unit}`
-                        : "No result recorded"}
-                  </small>
-                </span>
-                <Badge event={e} />
-                <span className="performance-place">
-                  {score?.place ? (
-                    <>
-                      {score.place <= 3 ? (
-                        <RankTrophy rank={score.place} />
-                      ) : (
-                        `#${score.place}`
-                      )}
-                      {score.tie > 1 && <small>(tie)</small>}
-                    </>
-                  ) : (
-                    "—"
-                  )}
-                </span>
-                <b>{score ? `${displayPoints(score.points)} pts` : "—"}</b>
-              </Link>
-            );
-          })}
+          .filter((event) => !event.deleted)
+          .map((event) => (
+            <EventComparisonTable
+              key={event.id}
+              state={state}
+              event={event}
+              playerId={id}
+              link={link}
+            />
+          ))}
       </section>
       <HistoryChart state={state} initial={[id]} />
     </>
@@ -1916,21 +2116,17 @@ export function HistoryChart({
           </div>
           <details className="history-table">
             <summary>View exact standings by event</summary>
-            {snapshots.map((s) => (
-              <div key={s.id}>
-                <h3>{s.label}</h3>
-                {s.standings
-                  .filter((r) => selected.includes(r.id))
-                  .map((r) => (
-                    <div className="order-row" key={r.id}>
-                      <span>
-                        <PlacementRank rank={r.rank} />{" "}
-                        {state.participants.find((p) => p.id === r.id)?.name}
-                      </span>
-                      <b>{displayPoints(r.points)} pts</b>
-                    </div>
-                  ))}
-              </div>
+            <p className="comparison-help">
+              Event points are cumulative. Bonus points show the awards held at
+              that checkpoint, rather than adding earlier bonuses again.
+            </p>
+            {snapshots.map((snapshot) => (
+              <HistoryStandingsTable
+                key={snapshot.id}
+                state={state}
+                snapshot={snapshot}
+                highlightId={initial?.length === 1 ? initial[0] : undefined}
+              />
             ))}
           </details>
         </>

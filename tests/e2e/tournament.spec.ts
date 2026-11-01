@@ -122,25 +122,80 @@ test("event rules and player details navigate correctly", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Event performance" }),
   ).toBeVisible();
-  await expect(page.locator(".performance-place .rank-trophy--1")).toHaveCount(
-    1,
-  );
+  const comparison = page.getByRole("table", {
+    name: "Beer Pong: all player results",
+  });
+  await expect(comparison.locator("thead th[data-player-id]")).toHaveCount(7);
+  await expect(comparison.locator("tbody td.comparison-self")).toHaveCount(3);
+  await expect(
+    comparison.locator("tbody tr").nth(1).locator('[data-player-id="p0"]'),
+  ).toHaveText("30");
+  await expect(
+    comparison.locator("tbody tr").nth(2).locator('[data-player-id="p0"]'),
+  ).toHaveText("15.0");
+  await expect(
+    page.locator(".event-comparison .comparison-self .rank-trophy--1"),
+  ).toHaveCount(1);
   await expect(page.locator(".consistency-summary").first()).toContainText(
     "+10 pts included in total",
   );
   await page.goto("/players/p1");
-  await expect(page.locator(".performance-place .rank-trophy--2")).toHaveCount(
-    1,
-  );
+  await expect(
+    page.locator(".event-comparison .comparison-self .rank-trophy--2"),
+  ).toHaveCount(1);
   await page.goto("/players/p2");
-  await expect(page.locator(".performance-place .rank-trophy--3")).toHaveCount(
-    1,
-  );
+  await expect(
+    page.locator(".event-comparison .comparison-self .rank-trophy--3"),
+  ).toHaveCount(1);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+test("exact history tables separate cumulative event points and current awards", async ({
+  page,
+}) => {
+  const s = fixture();
+  s.snapshots = [
+    {
+      id: "final-event-1",
+      eventId: "event-1",
+      at: "2026-10-31T12:00:00.000Z",
+      label: "Beer Pong",
+      standings: s.standings,
+    },
+  ];
+  await page.route("**/api/state*", (route) => route.fulfill({ json: s }));
+  await page.goto("/history");
+  await page
+    .getByText("View exact standings by event", { exact: true })
+    .click();
+  const table = page.getByRole("table", {
+    name: "Cumulative standings after Beer Pong",
+  });
+  await expect(table.locator("thead th[data-player-id]")).toHaveCount(7);
+  await expect(table.locator("tbody tr > th")).toHaveText([
+    "Rank",
+    "Event points",
+    "Bonus points",
+    "Total points",
+  ]);
+  await expect(
+    table.locator("tbody tr").nth(1).locator('[data-player-id="p0"]'),
+  ).toHaveText("15.0");
+  await expect(
+    table.locator("tbody tr").nth(2).locator('[data-player-id="p0"]'),
+  ).toContainText("10.0");
+  await expect(
+    table.locator("tbody tr").nth(3).locator('[data-player-id="p0"]'),
+  ).toHaveText("25.0");
+  await expect(
+    table.locator("tbody tr").nth(1).locator('[data-player-id="p6"]'),
+  ).toHaveText("0.0");
+  await expect(
+    table.locator("tbody tr").nth(2).locator('[data-player-id="p6"]'),
+  ).toContainText("Last place +10.0");
 });
 test("registration closes at seven and spectators can read standings", async ({
   page,
