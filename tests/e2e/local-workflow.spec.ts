@@ -14,11 +14,22 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   await expect(
     page.getByRole("link", { name: "Commissioner access" }),
   ).toHaveCount(0);
-  await expect(page.locator('a[href^="/players/"]')).toHaveCount(0);
+  await expect(page.locator('.standing-row[href^="/players/"]')).toHaveCount(7);
   const publicData = await (
     await request.get("http://localhost:3002/api/state")
   ).json();
   expect(publicData.readOnly).toBe(true);
+  await page.locator(".standing-row").first().locator(".avatar").click();
+  await expect(page).toHaveURL(
+    new RegExp(`/players/${publicData.standings[0].id}$`),
+  );
+  await expect(
+    page.getByRole("heading", { name: "Event performance" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Save|Edit|Upload/ }),
+  ).toHaveCount(0);
+  await page.goto("http://localhost:3002/");
   expect(
     publicData.events.find(
       (event: { kind: string }) => event.kind === "fantasy",

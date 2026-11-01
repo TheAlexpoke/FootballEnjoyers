@@ -298,6 +298,42 @@ test("exact history tables separate cumulative event points and current awards",
       .locator('[data-player-id="p6"]'),
   ).toContainText("10.0");
 });
+test("player photos navigate from notes, comparison tables, and chart markers and retain sandbox", async ({
+  page,
+}) => {
+  const state = fixture();
+  state.snapshots = [
+    {
+      id: "final-event-1",
+      eventId: "event-1",
+      at: "2026-10-31T12:00:00.000Z",
+      label: "Beer Pong",
+      standings: state.standings,
+    },
+  ];
+  await page.route("**/api/state*", (route) => route.fulfill({ json: state }));
+  for (const [selector, id] of [
+    [".winner-note .avatar", "p0"],
+    [".last-place-note .avatar", "p6"],
+  ]) {
+    await page.goto("/events?env=practice");
+    await page.locator(selector).first().click();
+    await expect(page).toHaveURL(new RegExp(`/players/${id}\\?env=practice$`));
+    await expect(
+      page.getByRole("heading", { name: "Event performance" }),
+    ).toBeVisible();
+  }
+  await page.goto("/history?env=practice");
+  await page.locator('[data-history-marker="p2"]').click();
+  await expect(page).toHaveURL(/\/players\/p2\?env=practice$/);
+  await page
+    .getByRole("table", { name: "Beer Pong: all player results" })
+    .locator('thead [data-player-id="p3"] .avatar')
+    .click();
+  await expect(page).toHaveURL(/\/players\/p3\?env=practice$/);
+  expect(await page.locator("a a").count()).toBe(0);
+});
+
 test("registration closes at seven and spectators can read standings", async ({
   page,
 }) => {
@@ -631,7 +667,9 @@ test("completed event posters pin winner photos and include tied winners", async
   }));
   await page.route("**/api/state*", (r) => r.fulfill({ json: s }));
   await page.goto("/events");
-  const first = page.locator('.event-card[href="/events/event-1"]');
+  const first = page.locator(
+    '.event-card:has(.event-card-link[href="/events/event-1"])',
+  );
   await expect(
     first.getByRole("group", { name: "EVENT WINNER: Mark", exact: true }),
   ).toBeVisible();
@@ -667,9 +705,11 @@ test("completed event posters pin winner photos and include tied winners", async
   ).toBeVisible();
   await expect(first.locator(".last-place-note img")).toHaveCount(2);
   await expect(
-    page.locator('.event-card[href="/events/event-4"] .last-place-note img'),
+    page.locator(
+      '.event-card:has(.event-card-link[href="/events/event-4"]) .last-place-note img',
+    ),
   ).toHaveCount(3);
-  await first.click();
+  await first.locator(".event-card-link").click();
   await expect(
     page.locator(".event-detail-banner .winner-note img"),
   ).toHaveCount(2);

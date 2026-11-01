@@ -1203,3 +1203,32 @@ textarea:focus {
     font-size: 8px;
   }
 }
+.event-card {
+  position: relative;
+}
+.event-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.event-card .avatar {
+  position: relative;
+  z-index: 3;
+}
+.avatar[href],
+.chart-scroll a {
+  cursor: pointer;
+}
+.avatar[href]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+.chart-scroll a:focus-visible > g > circle {
+  stroke: #fff;
+  stroke-width: 4;
+}
+.event-card .winner-note,
+.event-card .last-place-note {
+  z-index: 2;
+}

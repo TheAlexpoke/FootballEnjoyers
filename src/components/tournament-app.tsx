@@ -1,6 +1,8 @@
 "use client";
 import {
   useCallback,
+  createContext,
+  useContext,
   useEffect,
   useState,
   useId,
@@ -60,24 +62,37 @@ export const fallback: PublicState = {
   phase: phase(empty),
   configured: false,
 };
+const ProfileQueryContext = createContext("");
+const InsidePlayerLink = createContext(false);
 export function Avatar({
   player,
   small = false,
+  linked = true,
 }: {
-  player: { name: string; avatar?: string };
+  player: { id?: string; name: string; avatar?: string };
   small?: boolean;
+  linked?: boolean;
 }) {
-  return (
-    <span
-      className={`avatar avatar-${NAMES.indexOf(player.name as (typeof NAMES)[number])} ${small ? "small" : ""}`}
-    >
-      {player.avatar ? (
-        <img src={player.avatar} alt="" />
-      ) : (
-        player.name.slice(0, 2).toUpperCase()
-      )}
-    </span>
+  const query = useContext(ProfileQueryContext);
+  const insideLink = useContext(InsidePlayerLink);
+  const className = `avatar avatar-${NAMES.indexOf(player.name as (typeof NAMES)[number])} ${small ? "small" : ""}`;
+  const content = player.avatar ? (
+    <img src={player.avatar} alt="" />
+  ) : (
+    player.name.slice(0, 2).toUpperCase()
   );
+  if (player.id && linked && !insideLink)
+    return (
+      <Link
+        className={className}
+        href={`/players/${player.id}${query}`}
+        aria-label={`View ${player.name}'s profile`}
+        title={`${player.name}'s profile`}
+      >
+        {content}
+      </Link>
+    );
+  return <span className={className}>{content}</span>;
 }
 export function Badge({ event }: { event: Event }) {
   return (
@@ -107,7 +122,6 @@ export function TournamentProvider() {
   return null;
 }
 function PlayerLink({
-  readOnly,
   href,
   className,
   children,
@@ -117,11 +131,9 @@ function PlayerLink({
   className: string;
   children: ReactNode;
 }) {
-  return readOnly ? (
-    <div className={className}>{children}</div>
-  ) : (
+  return (
     <Link href={href} className={className}>
-      {children}
+      <InsidePlayerLink value={true}>{children}</InsidePlayerLink>
     </Link>
   );
 }
@@ -240,7 +252,7 @@ export default function TournamentApp({
   const segments = pathname.split("/").filter(Boolean);
   const page = segments[0] ?? "home";
   return (
-    <>
+    <ProfileQueryContext value={env === "practice" ? "?env=practice" : ""}>
       <header className="site-header">
         <div className="header-inner">
           <Link
@@ -801,7 +813,7 @@ export default function TournamentApp({
           )}
         </span>
       </footer>
-    </>
+    </ProfileQueryContext>
   );
 }
 export const displayPoints = (s: string) =>
@@ -1052,9 +1064,8 @@ function EventCard({
   link: (p: string) => string;
 }) {
   return (
-    <Link
+    <div
       className={`event-card panel ${event.status} ${event.kind === "fantasy" ? "event-card--finale" : ""}`}
-      href={link(`/events/${event.id}`)}
     >
       <div className="event-card-top">
         <span className="event-number">
@@ -1062,7 +1073,11 @@ function EventCard({
         </span>
         <span className="weight">{event.weight}×</span>
       </div>
-      <h3>{event.name}</h3>
+      <h3>
+        <Link className="event-card-link" href={link(`/events/${event.id}`)}>
+          {event.name}
+        </Link>
+      </h3>
       <p>{eventPresentation(event).subtitle}</p>
       <div className="event-card-illustration">
         <EventIllustration event={event} />
@@ -1075,7 +1090,7 @@ function EventCard({
           {event.status !== "finalized" && <ArrowUpRight size={17} />}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 function EventLastPlaceNote({
@@ -1947,6 +1962,7 @@ export function HistoryChart({
   initial?: string[];
   showExactStandings?: boolean;
 }) {
+  const profileQuery = useContext(ProfileQueryContext);
   const selected = initial ?? state.participants.map((p) => p.id);
   const chartId = useId().replace(/:/g, "");
   const [metric, setMetric] = useState<HistoryMetric>("finishes");
@@ -2269,76 +2285,82 @@ export function HistoryChart({
                     " points";
                   const clip = chartId + "-" + point.id + "-" + j;
                   return (
-                    <g
+                    <a
                       key={point.id + "-" + j}
-                      role="img"
-                      aria-label={label}
-                      data-history-marker={point.id}
+                      href={`/players/${point.id}${profileQuery}`}
+                      aria-label={`View ${point.player.name}'s profile: ${point.label}`}
                     >
-                      <title>{label}</title>
-                      {showPhoto ? (
-                        <>
-                          <defs>
-                            <clipPath id={clip}>
-                              <circle cx={markerX} cy={markerY} r="16" />
-                            </clipPath>
-                          </defs>
-                          <circle
-                            cx={markerX}
-                            cy={markerY}
-                            r="17"
-                            fill="#172332"
-                          />
-                          <text
-                            x={markerX}
-                            y={markerY + 4}
-                            textAnchor="middle"
-                            fontSize="11"
-                            fill={point.color}
-                            fontWeight="700"
-                          >
-                            {point.player.name.slice(0, 2).toUpperCase()}
-                          </text>
-                          {point.player.avatar && (
-                            <image
-                              href={point.player.avatar}
-                              x={markerX - 16}
-                              y={markerY - 16}
-                              width="32"
-                              height="32"
-                              preserveAspectRatio="xMidYMid slice"
-                              clipPath={"url(#" + clip + ")"}
+                      <g
+                        key={point.id + "-" + j}
+                        role="img"
+                        aria-label={label}
+                        data-history-marker={point.id}
+                      >
+                        <title>{label}</title>
+                        {showPhoto ? (
+                          <>
+                            <defs>
+                              <clipPath id={clip}>
+                                <circle cx={markerX} cy={markerY} r="16" />
+                              </clipPath>
+                            </defs>
+                            <circle
+                              cx={markerX}
+                              cy={markerY}
+                              r="17"
+                              fill="#172332"
                             />
-                          )}
-                          <circle
-                            cx={markerX}
-                            cy={markerY}
-                            r="17"
-                            fill="none"
-                            stroke={point.color}
-                            strokeWidth="2.5"
-                          />
-                          {metric === "finishes" && point.tie > 1 && (
                             <text
-                              x={markerX + 20}
+                              x={markerX}
                               y={markerY + 4}
-                              fontSize="9"
+                              textAnchor="middle"
+                              fontSize="11"
                               fill={point.color}
                               fontWeight="700"
                             >
-                              T{point.standing.rank}
+                              {point.player.name.slice(0, 2).toUpperCase()}
                             </text>
-                          )}
-                        </>
-                      ) : (
-                        <circle
-                          cx={point.x}
-                          cy={point.y}
-                          r="4"
-                          fill={point.color}
-                        />
-                      )}
-                    </g>
+                            {point.player.avatar && (
+                              <image
+                                href={point.player.avatar}
+                                x={markerX - 16}
+                                y={markerY - 16}
+                                width="32"
+                                height="32"
+                                preserveAspectRatio="xMidYMid slice"
+                                clipPath={"url(#" + clip + ")"}
+                              />
+                            )}
+                            <circle
+                              cx={markerX}
+                              cy={markerY}
+                              r="17"
+                              fill="none"
+                              stroke={point.color}
+                              strokeWidth="2.5"
+                            />
+                            {metric === "finishes" && point.tie > 1 && (
+                              <text
+                                x={markerX + 20}
+                                y={markerY + 4}
+                                fontSize="9"
+                                fill={point.color}
+                                fontWeight="700"
+                              >
+                                T{point.standing.rank}
+                              </text>
+                            )}
+                          </>
+                        ) : (
+                          <circle
+                            cx={point.x}
+                            cy={point.y}
+                            r="4"
+                            fill={point.color}
+                          />
+                        )}
+                      </g>
+                    </a>
                   );
                 }),
               )}
@@ -2498,7 +2520,7 @@ function Registration({
                   disabled={!!p || !state.configured}
                   onClick={() => setName(n)}
                 >
-                  <Avatar player={p ?? { name: n }} />
+                  <Avatar player={p ?? { name: n }} linked={false} />
                   <b>{n}</b>
                   <small>
                     {p ? (

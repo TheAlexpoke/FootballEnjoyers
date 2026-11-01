@@ -61,7 +61,7 @@ The `data` directory, environment files, generated OCR assets, dependencies and 
 
 ### Current public sharing mode
 
-The shared Vercel site contains Standings, Events, and History, including read-only event detail pages. Admin, Players, registration, private management pages, practice access, and all editing APIs are unavailable there. The full local control room remains unchanged.
+The shared Vercel site contains Standings, Events, and History, including read-only event detail and individual player profile pages. Player photos link to their profiles throughout the site, including chart markers, event sticky notes and comparison tables. Local sandbox photo links retain `?env=practice`. Hosted profiles are limited to published participants. Admin, the Players management tab, registration, private management pages, practice access, and all editing APIs are unavailable there. The full local control room remains unchanged.
 
 With the local server running, `npm run snapshot:prepare` prepares a public copy of the current **official** standings, roster, event schedule, rules, progression history, and profile photos. It does not change the local tournament. This creates `src/data/shared-tournament.json` and copies the displayed photos into `public/images/players/` with versioned filenames. These files are intentionally public when pushed to GitHub and deployed to Vercel. Private database files, audit records, backups, credentials and practice results are excluded.
 
