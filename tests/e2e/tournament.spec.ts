@@ -87,6 +87,9 @@ test("public dashboard fits viewport and shows all competitors", async ({
     page.getByRole("heading", { name: "Tournament standings" }),
   ).toBeVisible();
   await expect(page.locator(".standing-row")).toHaveCount(7);
+  await expect(
+    page.locator(".tournament-strip").getByText("COMPETITORS", { exact: true }),
+  ).toHaveCount(0);
   await expect(page.locator(".standing-row .rank-trophy")).toHaveCount(3);
   await expect(page.locator(".standing-row .rank").nth(3)).toHaveText("4");
   await expect(page.locator(".standing-row .points").first()).toHaveText(
@@ -109,7 +112,17 @@ test("public dashboard fits viewport and shows all competitors", async ({
   await expect(page.locator(".main-column>.next-card")).toBeVisible();
 });
 test("event rules and player details navigate correctly", async ({ page }) => {
-  await page.route("**/api/state*", (r) => r.fulfill({ json: fixture() }));
+  const s = fixture();
+  s.snapshots = [
+    {
+      id: "final-event-1",
+      eventId: "event-1",
+      at: "2026-10-31T12:00:00.000Z",
+      label: "Beer Pong",
+      standings: s.standings,
+    },
+  ];
+  await page.route("**/api/state*", (r) => r.fulfill({ json: s }));
   await page.goto("/events/event-5");
   await expect(
     page.getByRole("heading", { name: "Relay Race", exact: true }),
@@ -122,6 +135,13 @@ test("event rules and player details navigate correctly", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Event performance" }),
   ).toBeVisible();
+  await expect(page.locator(".history-table")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Standings progression" }),
+  ).toBeVisible();
+  await expect(page.locator(".profile-points-summary")).toContainText(
+    "(Consistency Award +10.0)",
+  );
   const comparison = page.getByRole("table", {
     name: "Beer Pong: all player results",
   });
@@ -166,6 +186,26 @@ test("exact history tables separate cumulative event points and current awards",
       standings: s.standings,
     },
   ];
+  const next = initialState();
+  next.participants = s.participants.map((player) => ({
+    ...player,
+    credentialHash: "",
+    deviceHash: "",
+  }));
+  next.events = structuredClone(s.events);
+  next.events[1].status = "finalized";
+  next.events[1].results = next.participants.map((player, i) => ({
+    participantId: player.id,
+    value: String([4, 1, 2, 3, 5, 6, 7][i]),
+    absent: false,
+  }));
+  s.snapshots.push({
+    id: "final-event-2",
+    eventId: "event-2",
+    at: "2026-10-31T13:00:00.000Z",
+    label: "Pigskin Accuracy Toss",
+    standings: standings(next),
+  });
   await page.route("**/api/state*", (route) => route.fulfill({ json: s }));
   await page.goto("/history");
   await page
@@ -183,7 +223,7 @@ test("exact history tables separate cumulative event points and current awards",
   ]);
   await expect(
     table.locator("tbody tr").nth(1).locator('[data-player-id="p0"]'),
-  ).toHaveText("15.0");
+  ).toHaveText("15.0(+15.0)");
   await expect(
     table.locator("tbody tr").nth(2).locator('[data-player-id="p0"]'),
   ).toContainText("10.0");
@@ -192,10 +232,22 @@ test("exact history tables separate cumulative event points and current awards",
   ).toHaveText("25.0");
   await expect(
     table.locator("tbody tr").nth(1).locator('[data-player-id="p6"]'),
-  ).toHaveText("0.0");
+  ).toHaveText("0.0(+0.0)");
   await expect(
     table.locator("tbody tr").nth(2).locator('[data-player-id="p6"]'),
   ).toContainText("Last place +10.0");
+  const second = page.getByRole("table", {
+    name: "Cumulative standings after Pigskin Accuracy Toss",
+  });
+  await expect(
+    second.locator("tbody tr").nth(1).locator('[data-player-id="p0"]'),
+  ).toHaveText("18.0(+3.0)");
+  await expect(
+    second.locator("tbody tr").nth(2).locator('[data-player-id="p0"]'),
+  ).toHaveText("0.0");
+  await expect(
+    second.locator("tbody tr").nth(3).locator('[data-player-id="p0"]'),
+  ).toHaveText("18.0");
 });
 test("registration closes at seven and spectators can read standings", async ({
   page,
@@ -421,6 +473,25 @@ test("history selects everyone after loading and gives tied players separate pho
   ).toBe(true);
   await expect(page.locator("[data-history-marker] image")).toHaveCount(7);
   await expect(page.locator("[data-history-connector]")).toHaveCount(7);
+  const photoXs = await page
+    .locator("[data-history-marker] image")
+    .evaluateAll((images) =>
+      images.map((image) => Number(image.getAttribute("x"))),
+    );
+  expect(new Set(photoXs).size).toBe(2);
+  const dataEnd = await page
+    .locator(".chart-scroll polyline")
+    .evaluateAll((lines) =>
+      Math.max(
+        ...lines.flatMap((line) =>
+          (line.getAttribute("points") ?? "")
+            .trim()
+            .split(/\s+/)
+            .map((pair) => Number(pair.split(",")[0])),
+        ),
+      ),
+    );
+  expect(Math.min(...photoXs)).toBeGreaterThan(dataEnd + 20);
   expect(
     await page
       .locator(".chart-scroll")

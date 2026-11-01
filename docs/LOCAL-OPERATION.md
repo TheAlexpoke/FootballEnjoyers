@@ -29,6 +29,8 @@ The History page shows all competitors automatically, without a separate player 
 
 “View exact standings by event” shows one comparison table per checkpoint, with seven player columns and rows for rank, cumulative event points, current bonus points and total. Bonus details distinguish Consistency from Most Last Places; earlier moving bonuses are not added again. Player profiles use the same table style to compare all competitors' event places, raw results (in the event's unit) and event points. The profile player's full column is highlighted, and a separate summary retains cumulative event, bonus and total points. Unplayed events display dashes.
 
+Cumulative event points include a parenthetical gain since the preceding checkpoint, such as `18.0 (+3.0)`, excluding bonus movements. Profiles retain their chart but omit its duplicate exact-standings section; their bonus summary names the award and explains any split. In the all-player chart, the most recent completed-event photos sit in staggered columns beyond the plotted lines, with curved connectors to the true data points. Connectors are drawn behind the photos.
+
 ## Moving Consistency Award
 
 The best unweighted average placement across finalized, non-deleted events earns **10 extra points**, already included in standings totals. Every player tied for the best average receives the full 10 points. Before the first completed event, nobody receives a bonus. The award moves as events finish; it is not added cumulatively. Provisional fantasy results contribute regular fantasy points but do not affect the award until finalized.

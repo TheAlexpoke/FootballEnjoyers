@@ -419,6 +419,20 @@ body {
   font-size: 21px;
   margin-top: 5px;
 }
+.profile-points-summary small {
+  display: block;
+  margin-top: 8px;
+  color: #d3c49d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.points-delta {
+  display: inline-block;
+  margin-left: 4px;
+  color: #91cba6;
+  font-size: 10px;
+  white-space: nowrap;
+}
 @media (max-width: 760px) {
   .player-hero {
     display: grid;
@@ -485,6 +499,14 @@ body {
   }
   .profile-points-summary > span {
     padding: 10px 8px;
+    font-size: 8px;
+  }
+  .profile-points-summary small {
+    font-size: 8px;
+  }
+  .points-delta {
+    display: block;
+    margin: 3px 0 0;
     font-size: 8px;
   }
 }

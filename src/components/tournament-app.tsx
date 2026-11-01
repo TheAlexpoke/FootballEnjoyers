@@ -403,13 +403,6 @@ export default function TournamentApp({
                   </div>
                   <div className="strip-stat">
                     <b>
-                      {state.participants.length}
-                      <span> / 7</span>
-                    </b>
-                    <small>COMPETITORS</small>
-                  </div>
-                  <div className="strip-stat">
-                    <b>
                       {state.events
                         .filter((e) => !e.deleted)
                         .reduce((n, e) => n + Number(e.weight) * 15, 20)}
@@ -1475,6 +1468,8 @@ const comparisonPoints = (value: number | string) =>
   });
 const bonusPoints = (row?: PublicState["standings"][number]) =>
   Number(row?.consistencyBonus ?? 0) + Number(row?.lastPlaceBonus ?? 0);
+const regularPoints = (row?: PublicState["standings"][number]) =>
+  Number(row?.points ?? 0) - bonusPoints(row);
 function PlayerComparisonTable({
   players,
   rows,
@@ -1606,10 +1601,12 @@ function EventComparisonTable({
 function HistoryStandingsTable({
   state,
   snapshot,
+  previousSnapshot,
   highlightId,
 }: {
   state: PublicState;
   snapshot: PublicState["snapshots"][number];
+  previousSnapshot?: PublicState["snapshots"][number];
   highlightId?: string;
 }) {
   const players = snapshot.standings.flatMap((row) => {
@@ -1637,11 +1634,25 @@ function HistoryStandingsTable({
           },
           {
             label: "Event points",
-            render: (player) =>
-              comparisonPoints(
-                Number(standing(player)?.points ?? 0) -
-                  bonusPoints(standing(player)),
-              ),
+            render: (player) => {
+              const cumulative = regularPoints(standing(player));
+              const delta =
+                cumulative -
+                regularPoints(
+                  previousSnapshot?.standings.find(
+                    (row) => row.id === player.id,
+                  ),
+                );
+              return (
+                <>
+                  {comparisonPoints(cumulative)}
+                  <span className="points-delta">
+                    ({delta < -0.00001 ? "−" : "+"}
+                    {comparisonPoints(Math.abs(delta))})
+                  </span>
+                </>
+              );
+            },
           },
           {
             label: "Bonus points",
@@ -1686,6 +1697,23 @@ function PlayerDetail({
   const p = state.participants.find((p) => p.id === id);
   if (!p) return <PageHeading label="COMPETITOR" title="Profile not found" />;
   const r = state.standings.find((r) => r.id === id);
+  const bonusDetails: string[] = [];
+  if (Number(r?.consistencyBonus) > 0) {
+    const recipients = state.standings.filter(
+      (row) => Number(row.consistencyBonus) > 0,
+    ).length;
+    bonusDetails.push(
+      `Consistency Award +${comparisonPoints(r!.consistencyBonus!)}${recipients > 1 ? `; ${recipients} tied leaders each receive the full 10 points` : ""}`,
+    );
+  }
+  if (Number(r?.lastPlaceBonus) > 0) {
+    const recipients = state.standings.filter(
+      (row) => Number(row.lastPlaceBonus) > 0,
+    ).length;
+    bonusDetails.push(
+      `Most Last Places +${comparisonPoints(r!.lastPlaceBonus!)}${recipients > 1 ? `; 10-point pool split among ${recipients} players` : "; full 10-point award"}`,
+    );
+  }
   const ranked = state.events.some(
     (event) => !event.deleted && event.status === "finalized",
   );
@@ -1726,6 +1754,9 @@ function PlayerDetail({
           </span>
           <span>
             Bonus points <b>{comparisonPoints(bonusPoints(r))}</b>
+            {bonusDetails.length > 0 && (
+              <small>({bonusDetails.join("; ")})</small>
+            )}
           </span>
           <span>
             Cumulative total <b>{comparisonPoints(r.points)}</b>
@@ -1785,16 +1816,18 @@ function PlayerDetail({
             />
           ))}
       </section>
-      <HistoryChart state={state} initial={[id]} />
+      <HistoryChart state={state} initial={[id]} showExactStandings={false} />
     </>
   );
 }
 export function HistoryChart({
   state,
   initial,
+  showExactStandings = true,
 }: {
   state: PublicState;
   initial?: string[];
+  showExactStandings?: boolean;
 }) {
   const selected = initial ?? state.participants.map((p) => p.id);
   const chartId = useId().replace(/:/g, "");
@@ -1820,9 +1853,10 @@ export function HistoryChart({
     ...snapshots.flatMap((s) => s.standings.map((r) => Number(r.points))),
   );
   const width = 850;
+  const plotSpan = width - (selected.length > 1 ? 300 : 220);
   const labelLength = Math.min(
     18,
-    Math.max(8, Math.floor(630 / Math.max(snapshots.length - 1, 1) / 9)),
+    Math.max(8, Math.floor(plotSpan / Math.max(snapshots.length - 1, 1) / 9)),
   );
   const eventLabels = snapshots.map((snapshot) =>
     (
@@ -1843,7 +1877,7 @@ export function HistoryChart({
     465 + Math.max(0, ...eventLabels.map((lines) => lines.length)) * 20,
   );
   const x = (i: number) =>
-    110 + (i / Math.max(snapshots.length - 1, 1)) * (width - 220);
+    110 + (i / Math.max(snapshots.length - 1, 1)) * plotSpan;
   const y = (v: number) =>
     metric === "rank" ? 80 + ((v - 1) / 6) * 280 : 360 - (v / max) * 280;
   const chartPoints = snapshots.map((snapshot, j) =>
@@ -1870,6 +1904,16 @@ export function HistoryChart({
           ];
         }),
     ),
+  );
+  const latestPhotoIndex = snapshots.findIndex(
+    (snapshot) => snapshot.id === latestCompletedId,
+  );
+  const photoMarkers = (chartPoints[latestPhotoIndex] ?? []).map(
+    (point, index) => ({
+      ...point,
+      markerX: selected.length > 1 ? width - 88 + (index % 2) * 48 : point.x,
+      markerY: point.markerY + (selected.length > 1 ? (index % 2 ? 5 : -5) : 0),
+    }),
   );
   return (
     <section className="panel history-panel">
@@ -2011,13 +2055,40 @@ export function HistoryChart({
                     />
                   );
                 })}
+              <g className="history-photo-connectors" aria-hidden="true">
+                {photoMarkers
+                  .filter(
+                    (point) =>
+                      Math.abs(point.markerX - point.x) > 0.1 ||
+                      Math.abs(point.markerY - point.y) > 0.1,
+                  )
+                  .map((point) => (
+                    <g key={point.id}>
+                      <path
+                        data-history-connector={point.id}
+                        d={`M${point.x},${point.y} C${point.x + 40},${point.y} ${point.markerX - 40},${point.markerY} ${point.markerX},${point.markerY}`}
+                        fill="none"
+                        stroke={point.color}
+                        strokeWidth="1.4"
+                        opacity="0.7"
+                      />
+                      <circle
+                        cx={point.x}
+                        cy={point.y}
+                        r="3.5"
+                        fill={point.color}
+                      />
+                    </g>
+                  ))}
+              </g>
               {chartPoints.map((points, j) =>
                 points.map((point) => {
                   const showPhoto = snapshots[j].id === latestCompletedId;
-                  const tied =
-                    points.filter((other) => Math.abs(other.y - point.y) < 0.01)
-                      .length > 1;
-                  const markerX = point.x + (tied ? 38 : 0);
+                  const parked = photoMarkers.find(
+                    (marker) => marker.id === point.id,
+                  );
+                  const markerX = parked?.markerX ?? point.x;
+                  const markerY = parked?.markerY ?? point.markerY;
                   const label =
                     point.player.name +
                     ": " +
@@ -2038,41 +2109,20 @@ export function HistoryChart({
                       <title>{label}</title>
                       {showPhoto ? (
                         <>
-                          {(tied ||
-                            Math.abs(point.markerY - point.y) > 0.1) && (
-                            <>
-                              <line
-                                data-history-connector={point.id}
-                                x1={point.x}
-                                y1={point.y}
-                                x2={markerX}
-                                y2={point.markerY}
-                                stroke={point.color}
-                                strokeWidth="1.5"
-                                opacity="0.8"
-                              />
-                              <circle
-                                cx={point.x}
-                                cy={point.y}
-                                r="3"
-                                fill={point.color}
-                              />
-                            </>
-                          )}
                           <defs>
                             <clipPath id={clip}>
-                              <circle cx={markerX} cy={point.markerY} r="16" />
+                              <circle cx={markerX} cy={markerY} r="16" />
                             </clipPath>
                           </defs>
                           <circle
                             cx={markerX}
-                            cy={point.markerY}
+                            cy={markerY}
                             r="17"
                             fill="#172332"
                           />
                           <text
                             x={markerX}
-                            y={point.markerY + 4}
+                            y={markerY + 4}
                             textAnchor="middle"
                             fontSize="11"
                             fill={point.color}
@@ -2084,7 +2134,7 @@ export function HistoryChart({
                             <image
                               href={point.player.avatar}
                               x={markerX - 16}
-                              y={point.markerY - 16}
+                              y={markerY - 16}
                               width="32"
                               height="32"
                               preserveAspectRatio="xMidYMid slice"
@@ -2093,7 +2143,7 @@ export function HistoryChart({
                           )}
                           <circle
                             cx={markerX}
-                            cy={point.markerY}
+                            cy={markerY}
                             r="17"
                             fill="none"
                             stroke={point.color}
@@ -2114,21 +2164,26 @@ export function HistoryChart({
               )}
             </svg>
           </div>
-          <details className="history-table">
-            <summary>View exact standings by event</summary>
-            <p className="comparison-help">
-              Event points are cumulative. Bonus points show the awards held at
-              that checkpoint, rather than adding earlier bonuses again.
-            </p>
-            {snapshots.map((snapshot) => (
-              <HistoryStandingsTable
-                key={snapshot.id}
-                state={state}
-                snapshot={snapshot}
-                highlightId={initial?.length === 1 ? initial[0] : undefined}
-              />
-            ))}
-          </details>
+          {showExactStandings && (
+            <details className="history-table">
+              <summary>View exact standings by event</summary>
+              <p className="comparison-help">
+                Event points are cumulative. Bonus points show the awards held
+                at that checkpoint, rather than adding earlier bonuses again.
+                Parentheses show event points gained since the previous
+                checkpoint.
+              </p>
+              {snapshots.map((snapshot, index) => (
+                <HistoryStandingsTable
+                  key={snapshot.id}
+                  state={state}
+                  snapshot={snapshot}
+                  previousSnapshot={snapshots[index - 1]}
+                  highlightId={initial?.length === 1 ? initial[0] : undefined}
+                />
+              ))}
+            </details>
+          )}
         </>
       ) : (
         <div className="empty-small">
