@@ -19,6 +19,11 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
     await request.get("http://localhost:3002/api/state")
   ).json();
   expect(publicData.readOnly).toBe(true);
+  if (publicData.sharedDemo) {
+    await expect(page.getByRole("note")).toContainText(
+      "EXAMPLE TOURNAMENT · Simulated results through event 7. Not official standings.",
+    );
+  }
   await page.locator(".standing-row").first().locator(".avatar").click();
   await expect(page).toHaveURL(
     new RegExp(`/players/${publicData.standings[0].id}$`),

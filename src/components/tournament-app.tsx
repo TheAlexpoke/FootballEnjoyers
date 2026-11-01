@@ -334,6 +334,12 @@ export default function TournamentApp({
           official tournament <a href="/admin">Return to production</a>
         </div>
       )}
+      {sharedView && state.sharedDemo && (
+        <div className="practice-banner" role="note">
+          <Flag size={15} /> EXAMPLE TOURNAMENT · Simulated results through
+          event {completed}. Not official standings.
+        </div>
+      )}
       <main
         className={`container ${state.participants.length ? "has-players" : ""}`}
       >

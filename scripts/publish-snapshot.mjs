@@ -3,12 +3,20 @@ import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const origin = "http://127.0.0.1:3000";
-const response = await fetch(origin + "/api/state");
+const demo = process.argv.includes("--demo");
+const response = await fetch(
+  origin + "/api/state" + (demo ? "?env=practice" : ""),
+);
 if (!response.ok)
   throw Error("Start the local site before publishing a snapshot.");
 const local = await response.json();
-if (local.environment !== "production" || !local.localMode)
-  throw Error("Only the official local tournament may be published.");
+if (
+  local.environment !== (demo ? "practice" : "production") ||
+  !local.localMode
+)
+  throw Error(
+    "Snapshot source does not match the requested local environment.",
+  );
 const participants = [];
 for (const player of local.participants) {
   let avatar = "";
@@ -146,6 +154,7 @@ const snapshot = {
   readOnly: true,
   localMode: false,
   sharedSnapshotAt: new Date().toISOString(),
+  sharedDemo: demo,
 };
 await mkdir(resolve(root, "src/data"), { recursive: true });
 await writeFile(
@@ -153,5 +162,5 @@ await writeFile(
   JSON.stringify(snapshot, null, 2) + "\n",
 );
 console.log(
-  `Prepared public snapshot: ${participants.length} players, ${events.length} events. Local scores and originals unchanged.`,
+  `Prepared ${demo ? "simulated example" : "official"} public snapshot: ${participants.length} players, ${events.length} events. Local scores and originals unchanged.`,
 );

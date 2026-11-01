@@ -136,6 +136,7 @@ export type PublicState = Omit<State, "participants" | "audit"> & {
   localMode?: boolean;
   readOnly?: boolean;
   sharedSnapshotAt?: string;
+  sharedDemo?: boolean;
   me?: string;
 };
 export function initialState(
