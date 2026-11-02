@@ -132,7 +132,11 @@ export function Admin({
         <PageHeading
           label="COMMISSIONER ACCESS"
           title="Run the tournament."
-          detail="Secure administration for the Football Enjoyers league."
+          detail={
+            state.localMode
+              ? "Enter the private phone sign-in code shown on your computer."
+              : "Secure administration for the Football Enjoyers league."
+          }
         />
         {!state.configured && (
           <div className="inline-note">
@@ -160,7 +164,7 @@ export function Admin({
           }}
         >
           <label>
-            Administrator password
+            {state.localMode ? "Phone sign-in code" : "Administrator password"}
             <input
               type="password"
               name="password"
@@ -179,7 +183,7 @@ export function Admin({
           </button>
         </form>
         <p className="fine-print">
-          12-hour server session · Password never stored in the browser
+          12-hour server session · Sign-in code is not stored in the browser
         </p>
       </section>
     );
@@ -191,7 +195,7 @@ export function Admin({
           label="COMMISSIONER CONTROL ROOM"
           title="Make every result count."
         />
-        {!state.localMode && (
+        {(!state.localMode || state.phoneAccess) && (
           <button
             className="button secondary"
             onClick={() =>
@@ -210,7 +214,11 @@ export function Admin({
         <b>{env === "practice" ? "PRACTICE SANDBOX" : "OFFICIAL TOURNAMENT"}</b>
         <span>Changes save to {env} only.</span>
         {state.localMode && (
-          <span>Saved on this computer · No login required</span>
+          <span>
+            {state.phoneAccess
+              ? "Phone connected · Saved on the host computer"
+              : "Saved on this computer · No login required"}
+          </span>
         )}
         <a
           className="button secondary"

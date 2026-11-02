@@ -37,7 +37,7 @@ test("hosted deployment stays read-only even with LOCAL_MODE=true", async ({
   }
   if (publicData.sharedDemo) {
     await expect(page.getByRole("note")).toContainText(
-      "EXAMPLE TOURNAMENT · Simulated results through event 7. Not official standings.",
+      `EXAMPLE TOURNAMENT · Simulated results through event ${publicData.events.filter((event: { status: string }) => event.status === "finalized").length}. Not official standings.`,
     );
   }
   await page.locator(".standing-row").first().locator(".avatar").click();

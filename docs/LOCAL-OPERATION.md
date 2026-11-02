@@ -17,6 +17,8 @@ Local mode is the default. Copying `.env.example` is optional. `LOCAL_DATA_DIR` 
 
 ## Competitors and events
 
+For phone score entry on the same Wi-Fi, see [Phone Control room](PHONE-CONTROL.md). The computer stays on and keeps storing the data; a separate private sign-in code protects phone editing.
+
 1. Open Control room → Players. Add each of the seven names and a team name. Edit their profiles and upload their photos here. Nobody needs to sign up or save a private link. Score-entry forms have no absent checkboxes.
 2. For a rehearsal, choose Open practice sandbox and Populate seven sample competitors. Return to OFFICIAL TOURNAMENT for real scores. Practice and official records remain separate.
 3. Start each physical event individually, confirm competitor order, enter results and finalize it. The existing scoring, multipliers, ties, Mario Kart brackets and ranking history remain in use. There is no global tournament-start button.

@@ -134,6 +134,7 @@ export type PublicState = Omit<State, "participants" | "audit"> & {
   phase: string;
   configured: boolean;
   localMode?: boolean;
+  phoneAccess?: boolean;
   readOnly?: boolean;
   sharedSnapshotAt?: string;
   sharedDemo?: boolean;
