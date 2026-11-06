@@ -958,8 +958,9 @@ function ScoringCard({ events }: { events: Event[] }) {
       </div>
       <div className="fine-print">
         Ties share the average of occupied places.
-        <br />
-        Mario Kart Wild Card losers: 1 base point each.
+        {events.some((event) => !event.deleted && event.kind === "kart") && (
+          <><br />Mario Kart Wild Card losers: 1 base point each.</>
+        )}
       </div>
       <div className="scoring-maximum">
         <strong>MAX {displayPoints(remaining)} Points Remaining</strong>

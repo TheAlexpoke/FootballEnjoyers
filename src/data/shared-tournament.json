@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 85,
+  "revision": 87,
   "environment": "production",
   "participants": [
     {
@@ -413,16 +413,14 @@
       "id": "event-4",
       "name": "Mario Kart",
       "weight": "2",
-      "kind": "kart",
+      "kind": "count",
       "unit": "place",
       "direction": "asc",
-      "description": "Time trial on the same course; own kart and character allowed. Resolve tied seeds explicitly.",
+      "description": "Direct Mario Kart race results, ranked 1st through 7th. No bracket.",
       "rules": [
-        "Time trial on the same course (one lap); choose own kart and character allowed. Resolve tied seeds explicitly.",
-        "Seed 1 gets a bye. Wild Card: 2 vs 7, 3 vs 6, 4 vs 5.",
-        "Higher seed chooses the course. Own kart and character; no items.",
-        "Reseed semifinals: seed 1 faces the highest numerical remaining seed.",
-        "Championship and third-place races decide places 1–4. Wild Card losers tie for 5th and each receive 1 base point."
+        "Enter each player’s final race placement from 1st through 7th.",
+        "Normal placement points at 2×: 30, 20, 12, 6, 4, 2, 0.",
+        "No time trials, bracket, bye, or shared fifth place."
       ],
       "status": "scheduled",
       "order": [],
@@ -457,7 +455,7 @@
     {
       "id": "event-8",
       "name": "Single Week Fantasy Score",
-      "weight": "3",
+      "weight": "4",
       "kind": "fantasy",
       "unit": "pts",
       "direction": "desc",
@@ -1308,7 +1306,6 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T22:15:38.194Z",
+  "sharedSnapshotAt": "2026-11-06T22:20:24.210Z",
   "sharedDemo": false
 }
-

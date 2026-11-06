@@ -1,0 +1,21 @@
+import { expect, it } from "vitest";
+import { initialState } from "../src/lib/model";
+import { actionSchema, applyAction } from "../src/lib/actions";
+import { placements } from "../src/lib/scoring";
+const auth = { admin: true, credentialHash: "", deviceHash: "" };
+it("converts an unstarted kart bracket to ordinary 1st–7th scoring", () => {
+  let s = initialState("practice");
+  s = applyAction(s, { type: "populate", confirm: "PRACTICE ONLY" }, auth);
+  const e = s.events.find(e => e.kind === "kart")!;
+  const edit = actionSchema.parse({ type: "event", eventId: e.id, directPlacements: true, name: e.name, weight: "2", unit: "place", direction: "asc", description: "Direct race finishes", rules: ["Record first through seventh."] });
+  s = applyAction(s, edit, auth);
+  const order = s.participants.map(p => p.id);
+  s = applyAction(s, { type: "start", eventId: e.id, order }, auth);
+  for (let i = 0; i < 7; i++) s = applyAction(s, { type: "result", eventId: e.id, participantId: order[i], value: String(i + 1), absent: false }, auth);
+  s = applyAction(s, { type: "finalize", eventId: e.id, confirm: "FINALIZE" }, auth);
+  const event = s.events.find(x => x.id === e.id)!;
+  expect(event.kind).toBe("count");
+  expect(event.matches).toEqual([]);
+  expect(placements(event).map(r => r.points)).toEqual(["30", "20", "12", "6", "4", "2", "0"]);
+  expect(() => applyAction(s, edit, auth)).toThrow("Only an unstarted");
+});

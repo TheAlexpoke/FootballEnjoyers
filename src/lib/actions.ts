@@ -79,6 +79,7 @@ export const actionSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("event"),
     eventId: id,
+    directPlacements: z.boolean().optional(),
     name: z.string().min(1).max(80),
     weight: number,
     unit: z.string().min(1).max(20),
@@ -372,6 +373,16 @@ export function applyAction(
       e!.order = [...a.order];
       break;
     case "event":
+      if (a.directPlacements) {
+        if (e!.status !== "scheduled" || e!.kind !== "kart")
+          throw Error("Only an unstarted kart bracket can switch to direct placements.");
+        if (a.unit !== "place" || a.direction !== "asc")
+          throw Error("Direct placements require places with lowest first.");
+        e!.kind = "count";
+        e!.seeds = [];
+        e!.trials = {};
+        e!.matches = [];
+      }
       if (new Decimal(a.weight).lte(0) || new Decimal(a.weight).gt(100))
         throw Error("Weight must be above 0 and at most 100.");
       Object.assign(e!, {

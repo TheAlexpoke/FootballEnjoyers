@@ -136,7 +136,7 @@ export function standingsCommentary(
     ) &&
     recentLeads[1]!.gap > recentLeads[0]!.gap &&
     recentLeads[2]!.gap > recentLeads[1]!.gap;
-  const kartComplete = completed.some((event) => event.kind === "kart");
+  const kartComplete = completed.some((event) => event.kind === "kart" || event.name === "Mario Kart");
   const round = Math.max(0, completed.length - 1);
   return Object.fromEntries(
     state.participants.map((player) => {
@@ -211,7 +211,7 @@ export function standingsCommentary(
         text = "Currently breathing down the king's neck.";
       else if (
         row.rank === 5 &&
-        completed.at(-1)?.kind === "kart" &&
+        (completed.at(-1)?.kind === "kart" || completed.at(-1)?.name === "Mario Kart") &&
         (recent?.place ?? 0) >= 5
       )
         text = "Somebody check his controller.";
