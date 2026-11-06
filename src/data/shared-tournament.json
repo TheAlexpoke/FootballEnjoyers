@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "revision": 628,
+  "revision": 34,
   "environment": "production",
   "participants": [
     {
-      "id": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
+      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
       "name": "Mark",
       "team": "Mark",
       "nickname": "",
@@ -12,7 +12,7 @@
       "avatar": "/images/players/mark-37c3b031c14a.png"
     },
     {
-      "id": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
+      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
       "name": "Hong",
       "team": "Hong",
       "nickname": "",
@@ -20,7 +20,7 @@
       "avatar": "/images/players/hong-2cf6405632d7.png"
     },
     {
-      "id": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
+      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
       "name": "Li",
       "team": "Li",
       "nickname": "",
@@ -28,7 +28,7 @@
       "avatar": "/images/players/li-e7562e6c38cb.png"
     },
     {
-      "id": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
+      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
       "name": "Arun",
       "team": "Arun",
       "nickname": "",
@@ -36,7 +36,7 @@
       "avatar": "/images/players/arun-e6ffcca6548c.png"
     },
     {
-      "id": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
+      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
       "name": "Erfan",
       "team": "Erfan",
       "nickname": "",
@@ -44,7 +44,7 @@
       "avatar": "/images/players/erfan-8b2855b34a9a.png"
     },
     {
-      "id": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
+      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
       "name": "Dabin",
       "team": "Dabin",
       "nickname": "",
@@ -52,7 +52,7 @@
       "avatar": "/images/players/dabin-77854e6c0b93.png"
     },
     {
-      "id": "75fd721d-3dde-4127-9483-4816a24af5f0",
+      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
       "name": "Alex",
       "team": "Alex",
       "nickname": "",
@@ -70,58 +70,12 @@
       "direction": "asc",
       "description": "Three throws at a target marker. Only the closest throw counts.",
       "rules": [
-        "Three throws at a target marker. Only the closest throw counts.",
-        "Measure every throw's distance in inches. Smallest distance wins."
+        "Three attempts to throw a football as close to a target marker. Only the closest throw counts.",
+        "Measure every throw's distance in inches. Shortest distance wins."
       ],
-      "status": "finalized",
-      "finalizedAt": "2026-11-01T21:52:07.760Z",
-      "startedAt": "2026-11-01T21:49:55.787Z",
-      "order": [
-        "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-        "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-        "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-        "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-        "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-        "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-        "75fd721d-3dde-4127-9483-4816a24af5f0"
-      ],
-      "results": [
-        {
-          "participantId": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-          "value": "2",
-          "absent": false
-        },
-        {
-          "participantId": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-          "value": "5",
-          "absent": false
-        },
-        {
-          "participantId": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-          "value": "3.2",
-          "absent": false
-        },
-        {
-          "participantId": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-          "value": "5.3",
-          "absent": false
-        },
-        {
-          "participantId": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-          "value": "3",
-          "absent": false
-        },
-        {
-          "participantId": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-          "value": "1",
-          "absent": false
-        },
-        {
-          "participantId": "75fd721d-3dde-4127-9483-4816a24af5f0",
-          "value": "1.2",
-          "absent": false
-        }
-      ],
+      "status": "scheduled",
+      "order": [],
+      "results": [],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -133,60 +87,14 @@
       "kind": "time",
       "unit": "sec",
       "direction": "asc",
-      "description": "Run the same marked sprint course; it need not be exactly 40 meters.",
+      "description": "Run the same marked sprint course; it doesn't need to be exactly 40 meters",
       "rules": [
-        "Run the same marked sprint course; it need not be exactly 40 meters.",
-        "Use an external stopwatch. Fastest completion wins."
+        "Run the same marked sprint course;",
+        "Use an external stopwatch. Fastest time wins."
       ],
-      "status": "finalized",
-      "finalizedAt": "2026-11-01T21:58:10.269Z",
-      "startedAt": "2026-11-01T21:57:26.534Z",
-      "order": [
-        "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-        "75fd721d-3dde-4127-9483-4816a24af5f0",
-        "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-        "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-        "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-        "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-        "c8546f52-785f-45c5-b4b2-20e3ee6a3583"
-      ],
-      "results": [
-        {
-          "participantId": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-          "value": "4.5",
-          "absent": false
-        },
-        {
-          "participantId": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-          "value": "2.3",
-          "absent": false
-        },
-        {
-          "participantId": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-          "value": "9.4",
-          "absent": false
-        },
-        {
-          "participantId": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-          "value": "3.5",
-          "absent": false
-        },
-        {
-          "participantId": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-          "value": "0.2",
-          "absent": false
-        },
-        {
-          "participantId": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-          "value": "9.3",
-          "absent": false
-        },
-        {
-          "participantId": "75fd721d-3dde-4127-9483-4816a24af5f0",
-          "value": "199",
-          "absent": false
-        }
-      ],
+      "status": "scheduled",
+      "order": [],
+      "results": [],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -220,7 +128,7 @@
       "description": "60 seconds, using the same bottle for everyone.",
       "rules": [
         "60 seconds, using the same bottle for everyone.",
-        "Count successful bottle flips. Most successful flips wins."
+        "Count successful bottle flips. Most successful flips within 60 seconds wins."
       ],
       "status": "scheduled",
       "order": [],
@@ -251,7 +159,7 @@
       "matches": []
     },
     {
-      "id": "7f2cceab-3f92-4a39-b97a-1da6650078fb",
+      "id": "209a05fa-a47f-4143-9651-035b3811ee0a",
       "name": "Choose Your Character",
       "weight": "1",
       "kind": "count",
@@ -280,7 +188,7 @@
       "direction": "asc",
       "description": "Time trial on the same course; own kart and character allowed. Resolve tied seeds explicitly.",
       "rules": [
-        "Time trial on the same course; own kart and character allowed. Resolve tied seeds explicitly.",
+        "Time trial on the same course (one lap); choose own kart and character allowed. Resolve tied seeds explicitly.",
         "Seed 1 gets a bye. Wild Card: 2 vs 7, 3 vs 6, 4 vs 5.",
         "Higher seed chooses the course. Own kart and character; no items.",
         "Reseed semifinals: seed 1 faces the highest numerical remaining seed.",
@@ -337,276 +245,7 @@
       "matches": []
     }
   ],
-  "snapshots": [
-    {
-      "id": "final-event-2",
-      "eventId": "event-2",
-      "at": "2026-11-01T21:52:07.760Z",
-      "label": "Pigskin Accuracy Toss",
-      "standings": [
-        {
-          "id": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-          "rank": 1,
-          "points": "25",
-          "finishes": [
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "1",
-          "consistencyBonus": "10",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "75fd721d-3dde-4127-9483-4816a24af5f0",
-          "rank": 2,
-          "points": "10",
-          "finishes": [
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "2",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-          "rank": 3,
-          "points": "10",
-          "finishes": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1
-          ],
-          "averagePlacement": "7",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "10",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-          "rank": 4,
-          "points": "6",
-          "finishes": [
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "3",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-          "rank": 5,
-          "points": "3",
-          "finishes": [
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-          "rank": 6,
-          "points": "2",
-          "finishes": [
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0
-          ],
-          "averagePlacement": "5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-          "rank": 7,
-          "points": "1",
-          "finishes": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0
-          ],
-          "averagePlacement": "6",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        }
-      ]
-    },
-    {
-      "id": "final-event-3",
-      "eventId": "event-3",
-      "at": "2026-11-01T21:58:10.269Z",
-      "label": "40M Dash",
-      "standings": [
-        {
-          "id": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
-          "rank": 1,
-          "points": "28",
-          "finishes": [
-            1,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "2.5",
-          "consistencyBonus": "10",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-          "rank": 2,
-          "points": "17",
-          "finishes": [
-            1,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0
-          ],
-          "averagePlacement": "3",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "75fd721d-3dde-4127-9483-4816a24af5f0",
-          "rank": 3,
-          "points": "15",
-          "finishes": [
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            1
-          ],
-          "averagePlacement": "4.5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-          "rank": 4,
-          "points": "11",
-          "finishes": [
-            0,
-            1,
-            0,
-            0,
-            0,
-            1,
-            0
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-          "rank": 5,
-          "points": "11",
-          "finishes": [
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            1
-          ],
-          "averagePlacement": "5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-          "rank": 6,
-          "points": "9",
-          "finishes": [
-            0,
-            0,
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "averagePlacement": "3.5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-          "rank": 7,
-          "points": "3",
-          "finishes": [
-            0,
-            0,
-            0,
-            0,
-            1,
-            1,
-            0
-          ],
-          "averagePlacement": "5.5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        }
-      ]
-    }
-  ],
+  "snapshots": [],
   "config": {
     "layout": "standings",
     "draftOrder": []
@@ -631,143 +270,137 @@
   },
   "standings": [
     {
-      "id": "0e07588b-ba57-4373-a427-9e086ad1f9a8",
+      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
       "rank": 1,
-      "previousRank": 5,
-      "points": "28",
+      "points": "0",
       "finishes": [
-        1,
         0,
         0,
-        1,
+        0,
+        0,
         0,
         0,
         0
       ],
-      "averagePlacement": "2.5",
-      "consistencyBonus": "10",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
-      "id": "53fc6bbd-e86e-44d1-9816-703cf4a1d4de",
-      "rank": 2,
-      "previousRank": 1,
-      "points": "17",
-      "finishes": [
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      "averagePlacement": "3",
+      "averagePlacement": null,
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
-      "id": "75fd721d-3dde-4127-9483-4816a24af5f0",
-      "rank": 3,
-      "previousRank": 2,
-      "points": "15",
+      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+      "rank": 1,
+      "points": "0",
       "finishes": [
         0,
-        1,
         0,
         0,
         0,
         0,
-        1
-      ],
-      "averagePlacement": "4.5",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
-      "lastPlaceFinishes": 1
-    },
-    {
-      "id": "c8546f52-785f-45c5-b4b2-20e3ee6a3583",
-      "rank": 4,
-      "previousRank": 7,
-      "points": "11",
-      "finishes": [
         0,
-        1,
-        0,
-        0,
-        0,
-        1,
         0
       ],
-      "averagePlacement": "4",
+      "averagePlacement": null,
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
-      "id": "213b98a6-1cbd-4214-bd33-5da4ff6ea3d2",
-      "rank": 5,
-      "previousRank": 3,
-      "points": "11",
+      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+      "rank": 1,
+      "points": "0",
       "finishes": [
         0,
         0,
-        1,
         0,
         0,
-        0,
-        1
-      ],
-      "averagePlacement": "5",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
-      "lastPlaceFinishes": 1
-    },
-    {
-      "id": "e1a3a62d-35fd-4ad7-9290-40aaabbf97dc",
-      "rank": 6,
-      "previousRank": 4,
-      "points": "9",
-      "finishes": [
-        0,
-        0,
-        1,
-        1,
         0,
         0,
         0
       ],
-      "averagePlacement": "3.5",
+      "averagePlacement": null,
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
-      "id": "da4f3fa2-feb2-40a3-adf9-bdd4e38f4785",
-      "rank": 7,
-      "previousRank": 6,
-      "points": "3",
+      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+      "rank": 1,
+      "points": "0",
       "finishes": [
         0,
         0,
         0,
         0,
-        1,
-        1,
+        0,
+        0,
         0
       ],
-      "averagePlacement": "5.5",
+      "averagePlacement": null,
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+      "rank": 1,
+      "points": "0",
+      "finishes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "averagePlacement": null,
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+      "rank": 1,
+      "points": "0",
+      "finishes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "averagePlacement": null,
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+      "rank": 1,
+      "points": "0",
+      "finishes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "averagePlacement": null,
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     }
   ],
-  "phase": "In Progress",
+  "phase": "Ready",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-01T21:58:10.685Z",
-  "sharedDemo": true
+  "sharedSnapshotAt": "2026-11-06T15:19:51.599Z",
+  "sharedDemo": false
 }
+
