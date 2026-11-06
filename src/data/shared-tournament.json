@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 83,
+  "revision": 85,
   "environment": "production",
   "participants": [
     {
@@ -391,7 +391,7 @@
     {
       "id": "209a05fa-a47f-4143-9651-035b3811ee0a",
       "name": "Choose Your Character",
-      "weight": "1",
+      "weight": "2",
       "kind": "count",
       "unit": "place",
       "direction": "asc",
@@ -434,7 +434,7 @@
     {
       "id": "event-5",
       "name": "Relay Race",
-      "weight": "2",
+      "weight": "3",
       "kind": "time",
       "unit": "sec",
       "direction": "asc",
@@ -1308,7 +1308,7 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T22:01:37.448Z",
+  "sharedSnapshotAt": "2026-11-06T22:15:38.194Z",
   "sharedDemo": false
 }
 
