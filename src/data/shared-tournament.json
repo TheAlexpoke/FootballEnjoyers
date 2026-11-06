@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 34,
+  "revision": 35,
   "environment": "production",
   "participants": [
     {
@@ -62,44 +62,6 @@
   ],
   "events": [
     {
-      "id": "event-2",
-      "name": "Pigskin Accuracy Toss",
-      "weight": "1",
-      "kind": "distance",
-      "unit": "inches",
-      "direction": "asc",
-      "description": "Three throws at a target marker. Only the closest throw counts.",
-      "rules": [
-        "Three attempts to throw a football as close to a target marker. Only the closest throw counts.",
-        "Measure every throw's distance in inches. Shortest distance wins."
-      ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
-      "seeds": [],
-      "trials": {},
-      "matches": []
-    },
-    {
-      "id": "event-3",
-      "name": "40M Dash",
-      "weight": "1",
-      "kind": "time",
-      "unit": "sec",
-      "direction": "asc",
-      "description": "Run the same marked sprint course; it doesn't need to be exactly 40 meters",
-      "rules": [
-        "Run the same marked sprint course;",
-        "Use an external stopwatch. Fastest time wins."
-      ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
-      "seeds": [],
-      "trials": {},
-      "matches": []
-    },
-    {
       "id": "event-1",
       "name": "Beer Pong",
       "weight": "1",
@@ -150,6 +112,44 @@
         "Reveal a reference card. Predict higher or lower. Correct guesses add to the current streak.",
         "Wrong or equal rank resets the streak to zero; the revealed card becomes the next reference. Continue immediately.",
         "Stop at 60 seconds or deck exhaustion. No stopping or banking. Only the longest consecutive correct streak counts."
+      ],
+      "status": "scheduled",
+      "order": [],
+      "results": [],
+      "seeds": [],
+      "trials": {},
+      "matches": []
+    },
+    {
+      "id": "event-2",
+      "name": "Pigskin Accuracy Toss",
+      "weight": "1",
+      "kind": "distance",
+      "unit": "inches",
+      "direction": "asc",
+      "description": "Three throws at a target marker. Only the closest throw counts.",
+      "rules": [
+        "Three attempts to throw a football as close to a target marker. Only the closest throw counts.",
+        "Measure every throw's distance in inches. Shortest distance wins."
+      ],
+      "status": "scheduled",
+      "order": [],
+      "results": [],
+      "seeds": [],
+      "trials": {},
+      "matches": []
+    },
+    {
+      "id": "event-3",
+      "name": "40M Dash",
+      "weight": "1",
+      "kind": "time",
+      "unit": "sec",
+      "direction": "asc",
+      "description": "Run the same marked sprint course; it doesn't need to be exactly 40 meters",
+      "rules": [
+        "Run the same marked sprint course;",
+        "Use an external stopwatch. Fastest time wins."
       ],
       "status": "scheduled",
       "order": [],
@@ -400,7 +400,7 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T15:19:51.599Z",
+  "sharedSnapshotAt": "2026-11-06T15:28:30.569Z",
   "sharedDemo": false
 }
 
