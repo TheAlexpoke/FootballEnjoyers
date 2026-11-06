@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 87,
+  "revision": 96,
   "environment": "production",
   "participants": [
     {
@@ -402,9 +402,55 @@
         "Record the full elimination order: the last character standing finishes 1st; the first eliminated finishes 7th.",
         "Enter a finishing place from 1 to 7 for each competitor. Shared finishing places use the normal tournament tie rules."
       ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
+      "status": "finalized",
+      "finalizedAt": "2026-11-06T23:14:42.669Z",
+      "startedAt": "2026-11-06T23:14:42.492Z",
+      "order": [
+        "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+        "5a28ce27-e05b-4361-954b-b4a5e1369529",
+        "84f214e0-8689-4884-a86e-6b18a9e227c0",
+        "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+        "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+        "a52ecf53-786a-4390-a499-87c0a1182f42",
+        "73976db5-106f-44fa-8f8a-580db27553d2"
+      ],
+      "results": [
+        {
+          "participantId": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "value": "1",
+          "absent": false
+        },
+        {
+          "participantId": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "value": "2",
+          "absent": false
+        },
+        {
+          "participantId": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "value": "3",
+          "absent": false
+        },
+        {
+          "participantId": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "value": "4",
+          "absent": false
+        },
+        {
+          "participantId": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "value": "5",
+          "absent": false
+        },
+        {
+          "participantId": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "value": "6",
+          "absent": false
+        },
+        {
+          "participantId": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "value": "7",
+          "absent": false
+        }
+      ],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -1143,6 +1189,140 @@
           "lastPlaceFinishes": 2
         }
       ]
+    },
+    {
+      "id": "final-209a05fa-a47f-4143-9651-035b3811ee0a",
+      "eventId": "209a05fa-a47f-4143-9651-035b3811ee0a",
+      "at": "2026-11-06T23:14:42.669Z",
+      "label": "Choose Your Character",
+      "standings": [
+        {
+          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "rank": 1,
+          "points": "73",
+          "finishes": [
+            2,
+            2,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          "averagePlacement": "2.8333333333333333333",
+          "consistencyBonus": "10",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "rank": 2,
+          "points": "58",
+          "finishes": [
+            2,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          "averagePlacement": "3.6666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "rank": 3,
+          "points": "37",
+          "finishes": [
+            0,
+            1,
+            2,
+            3,
+            0,
+            0,
+            0
+          ],
+          "averagePlacement": "3.3333333333333333333",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "rank": 4,
+          "points": "35",
+          "finishes": [
+            2,
+            0,
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          "averagePlacement": "4.1666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "rank": 5,
+          "points": "30",
+          "finishes": [
+            0,
+            1,
+            2,
+            1,
+            1,
+            0,
+            1
+          ],
+          "averagePlacement": "4",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "rank": 6,
+          "points": "24",
+          "finishes": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            2
+          ],
+          "averagePlacement": "5.3333333333333333333",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "10",
+          "lastPlaceFinishes": 2
+        },
+        {
+          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "rank": 7,
+          "points": "22",
+          "finishes": [
+            0,
+            1,
+            1,
+            1,
+            0,
+            2,
+            1
+          ],
+          "averagePlacement": "4.6666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        }
+      ]
     }
   ],
   "config": {
@@ -1172,7 +1352,26 @@
       "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
       "rank": 1,
       "previousRank": 1,
-      "points": "53",
+      "points": "73",
+      "finishes": [
+        2,
+        2,
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "averagePlacement": "2.8333333333333333333",
+      "consistencyBonus": "10",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+      "rank": 2,
+      "previousRank": 3,
+      "points": "58",
       "finishes": [
         2,
         1,
@@ -1180,17 +1379,36 @@
         0,
         1,
         1,
+        1
+      ],
+      "averagePlacement": "3.6666666666666666667",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 1
+    },
+    {
+      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+      "rank": 3,
+      "previousRank": 4,
+      "points": "37",
+      "finishes": [
+        0,
+        1,
+        2,
+        3,
+        0,
+        0,
         0
       ],
-      "averagePlacement": "3",
-      "consistencyBonus": "10",
+      "averagePlacement": "3.3333333333333333333",
+      "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
       "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
-      "rank": 2,
-      "previousRank": 5,
+      "rank": 4,
+      "previousRank": 2,
       "points": "35",
       "finishes": [
         2,
@@ -1199,61 +1417,23 @@
         0,
         2,
         1,
-        0
-      ],
-      "averagePlacement": "3.6",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
-      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-      "rank": 3,
-      "previousRank": 2,
-      "points": "28",
-      "finishes": [
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
         1
       ],
-      "averagePlacement": "4.2",
+      "averagePlacement": "4.1666666666666666667",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
-      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-      "rank": 4,
-      "previousRank": 4,
-      "points": "25",
-      "finishes": [
-        0,
-        1,
-        1,
-        3,
-        0,
-        0,
-        0
-      ],
-      "averagePlacement": "3.4",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
       "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
       "rank": 5,
-      "previousRank": 3,
-      "points": "24",
+      "previousRank": 5,
+      "points": "30",
       "finishes": [
         0,
         1,
         2,
-        0,
+        1,
         1,
         0,
         1
@@ -1264,48 +1444,49 @@
       "lastPlaceFinishes": 1
     },
     {
-      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
       "rank": 6,
       "previousRank": 7,
-      "points": "20",
-      "finishes": [
-        0,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1
-      ],
-      "averagePlacement": "4.4",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 1
-    },
-    {
-      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
-      "rank": 7,
-      "previousRank": 6,
-      "points": "20",
+      "points": "24",
       "finishes": [
         0,
         0,
         1,
         1,
-        0,
+        1,
         1,
         2
       ],
-      "averagePlacement": "5.4",
+      "averagePlacement": "5.3333333333333333333",
       "consistencyBonus": "0",
       "lastPlaceBonus": "10",
       "lastPlaceFinishes": 2
+    },
+    {
+      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+      "rank": 7,
+      "previousRank": 6,
+      "points": "22",
+      "finishes": [
+        0,
+        1,
+        1,
+        1,
+        0,
+        2,
+        1
+      ],
+      "averagePlacement": "4.6666666666666666667",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 1
     }
   ],
   "phase": "In Progress",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T22:20:24.210Z",
+  "sharedSnapshotAt": "2026-11-06T23:14:42.869Z",
   "sharedDemo": false
 }
+
