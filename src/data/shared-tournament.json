@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 55,
+  "revision": 65,
   "environment": "production",
   "participants": [
     {
@@ -197,18 +197,63 @@
       "name": "Higher or Lower",
       "weight": "1",
       "kind": "count",
-      "unit": "streak",
-      "direction": "desc",
-      "description": "Freshly shuffled 52-card deck for each competitor; external 60-second timer.",
+      "unit": "place",
+      "direction": "asc",
+      "description": "Higher or Lower: highest streak wins. Scores: Erfan 15, Li 10, Hong 10, Dabin 8, Mark 8, Alex 6, Arun 6. Organizer-confirmed placements resolve ties.",
       "rules": [
-        "Freshly shuffled 52-card deck for each competitor; external 60-second timer.",
-        "Reveal a reference card. Predict higher or lower. Correct guesses add to the current streak.",
-        "Wrong or equal rank resets the streak to zero; the revealed card becomes the next reference. Continue immediately.",
-        "Stop at 60 seconds or deck exhaustion. No stopping or banking. Only the longest consecutive correct streak counts."
+        "Highest streak wins; official finishing placements determine event points.",
+        "Scores: Erfan 15; Li 10; Hong 10; Dabin 8; Mark 8; Alex 6; Arun 6.",
+        "Organizer-resolved ties: Li 2nd ahead of Hong 3rd; Dabin 4th ahead of Mark 5th; Alex 6th ahead of Arun 7th."
       ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
+      "status": "finalized",
+      "finalizedAt": "2026-11-06T21:27:10.241Z",
+      "startedAt": "2026-11-06T21:27:10.094Z",
+      "order": [
+        "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+        "5a28ce27-e05b-4361-954b-b4a5e1369529",
+        "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+        "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+        "84f214e0-8689-4884-a86e-6b18a9e227c0",
+        "a52ecf53-786a-4390-a499-87c0a1182f42",
+        "73976db5-106f-44fa-8f8a-580db27553d2"
+      ],
+      "results": [
+        {
+          "participantId": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "value": "1",
+          "absent": false
+        },
+        {
+          "participantId": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "value": "2",
+          "absent": false
+        },
+        {
+          "participantId": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "value": "3",
+          "absent": false
+        },
+        {
+          "participantId": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "value": "4",
+          "absent": false
+        },
+        {
+          "participantId": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "value": "5",
+          "absent": false
+        },
+        {
+          "participantId": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "value": "6",
+          "absent": false
+        },
+        {
+          "participantId": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "value": "7",
+          "absent": false
+        }
+      ],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -606,6 +651,140 @@
           "lastPlaceFinishes": 0
         }
       ]
+    },
+    {
+      "id": "final-event-7",
+      "eventId": "event-7",
+      "at": "2026-11-06T21:27:10.241Z",
+      "label": "Higher or Lower",
+      "standings": [
+        {
+          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "rank": 1,
+          "points": "32",
+          "finishes": [
+            0,
+            1,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "averagePlacement": "2.6666666666666666667",
+          "consistencyBonus": "10",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "rank": 2,
+          "points": "26",
+          "finishes": [
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "averagePlacement": "3",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "rank": 3,
+          "points": "20.33333333",
+          "finishes": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          "averagePlacement": "4.3333333333333333333",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "3.33333333",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "rank": 4,
+          "points": "19",
+          "finishes": [
+            1,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0
+          ],
+          "averagePlacement": "3.6666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "rank": 5,
+          "points": "19",
+          "finishes": [
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          "averagePlacement": "3",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "rank": 6,
+          "points": "7.33333333",
+          "finishes": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          "averagePlacement": "5.6666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "3.33333333",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "rank": 6,
+          "points": "7.33333333",
+          "finishes": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          "averagePlacement": "5.6666666666666666667",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "3.33333333",
+          "lastPlaceFinishes": 1
+        }
+      ]
     }
   ],
   "config": {
@@ -632,35 +811,92 @@
   },
   "standings": [
     {
-      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
       "rank": 1,
-      "previousRank": 2,
-      "points": "35",
+      "previousRank": 3,
+      "points": "32",
       "finishes": [
-        1,
-        1,
         0,
+        1,
+        2,
         0,
         0,
         0,
         0
       ],
-      "averagePlacement": "1.5",
+      "averagePlacement": "2.6666666666666666667",
       "consistencyBonus": "10",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
-      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
       "rank": 2,
       "previousRank": 1,
-      "points": "17",
+      "points": "26",
+      "finishes": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "averagePlacement": "3",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+      "rank": 3,
+      "previousRank": 5,
+      "points": "20.33333333",
       "finishes": [
         1,
         0,
         0,
         0,
         1,
+        0,
+        1
+      ],
+      "averagePlacement": "4.3333333333333333333",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "3.33333333",
+      "lastPlaceFinishes": 1
+    },
+    {
+      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+      "rank": 4,
+      "previousRank": 2,
+      "points": "19",
+      "finishes": [
+        1,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "averagePlacement": "3.6666666666666666667",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+      "rank": 5,
+      "previousRank": 4,
+      "points": "19",
+      "finishes": [
+        0,
+        1,
+        1,
+        1,
+        0,
         0,
         0
       ],
@@ -670,106 +906,49 @@
       "lastPlaceFinishes": 0
     },
     {
-      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-      "rank": 3,
-      "previousRank": 4,
-      "points": "16",
-      "finishes": [
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "averagePlacement": "2.5",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
-      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-      "rank": 4,
-      "previousRank": 5,
-      "points": "9",
-      "finishes": [
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0
-      ],
-      "averagePlacement": "3.5",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
-      "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-      "rank": 5,
-      "previousRank": 6,
-      "points": "7",
+      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+      "rank": 6,
+      "previousRank": 7,
+      "points": "7.33333333",
       "finishes": [
         0,
         0,
         0,
-        0,
         1,
         0,
+        1,
         1
       ],
-      "averagePlacement": "6",
+      "averagePlacement": "5.6666666666666666667",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
+      "lastPlaceBonus": "3.33333333",
       "lastPlaceFinishes": 1
     },
     {
       "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
       "rank": 6,
-      "previousRank": 3,
-      "points": "6",
+      "previousRank": 6,
+      "points": "7.33333333",
       "finishes": [
         0,
         0,
         0,
-        0,
+        1,
         0,
         1,
         1
       ],
-      "averagePlacement": "6.5",
+      "averagePlacement": "5.6666666666666666667",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
+      "lastPlaceBonus": "3.33333333",
       "lastPlaceFinishes": 1
-    },
-    {
-      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
-      "rank": 7,
-      "previousRank": 7,
-      "points": "4",
-      "finishes": [
-        0,
-        0,
-        0,
-        1,
-        0,
-        1,
-        0
-      ],
-      "averagePlacement": "5",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
     }
   ],
   "phase": "In Progress",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T19:25:11.886Z",
+  "sharedSnapshotAt": "2026-11-06T21:27:10.452Z",
   "sharedDemo": false
 }
 
