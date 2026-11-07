@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 96,
+  "revision": 105,
   "environment": "production",
   "participants": [
     {
@@ -491,9 +491,55 @@
         "4 · Flip Cup Triple — three cups start upside down at the table edge. Flip each until upright.",
         "5 · Paper Plane Landing — build a plane while the clock runs, then throw until any part touches the target."
       ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
+      "status": "finalized",
+      "finalizedAt": "2026-11-07T00:19:28.285Z",
+      "startedAt": "2026-11-07T00:19:28.070Z",
+      "order": [
+        "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+        "84f214e0-8689-4884-a86e-6b18a9e227c0",
+        "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+        "5a28ce27-e05b-4361-954b-b4a5e1369529",
+        "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+        "73976db5-106f-44fa-8f8a-580db27553d2",
+        "a52ecf53-786a-4390-a499-87c0a1182f42"
+      ],
+      "results": [
+        {
+          "participantId": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "value": "382",
+          "absent": false
+        },
+        {
+          "participantId": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "value": "299",
+          "absent": false
+        },
+        {
+          "participantId": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "value": "238",
+          "absent": false
+        },
+        {
+          "participantId": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "value": "178",
+          "absent": false
+        },
+        {
+          "participantId": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "value": "418",
+          "absent": false
+        },
+        {
+          "participantId": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "value": "403",
+          "absent": false
+        },
+        {
+          "participantId": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "value": "167",
+          "absent": false
+        }
+      ],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -1323,6 +1369,140 @@
           "lastPlaceFinishes": 1
         }
       ]
+    },
+    {
+      "id": "final-event-5",
+      "eventId": "event-5",
+      "at": "2026-11-07T00:19:28.285Z",
+      "label": "Relay Race",
+      "standings": [
+        {
+          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "rank": 1,
+          "points": "79",
+          "finishes": [
+            2,
+            2,
+            0,
+            0,
+            2,
+            1,
+            0
+          ],
+          "averagePlacement": "3.1428571428571428571",
+          "consistencyBonus": "10",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "rank": 2,
+          "points": "67",
+          "finishes": [
+            2,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "averagePlacement": "3.7142857142857142857",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "rank": 3,
+          "points": "67",
+          "finishes": [
+            1,
+            1,
+            1,
+            1,
+            0,
+            2,
+            1
+          ],
+          "averagePlacement": "4.1428571428571428571",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "rank": 4,
+          "points": "65",
+          "finishes": [
+            2,
+            1,
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          "averagePlacement": "3.8571428571428571429",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "rank": 5,
+          "points": "55",
+          "finishes": [
+            0,
+            1,
+            3,
+            3,
+            0,
+            0,
+            0
+          ],
+          "averagePlacement": "3.2857142857142857143",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "rank": 6,
+          "points": "35",
+          "finishes": [
+            0,
+            1,
+            2,
+            1,
+            1,
+            0,
+            2
+          ],
+          "averagePlacement": "4.4285714285714285714",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "5",
+          "lastPlaceFinishes": 2
+        },
+        {
+          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "rank": 7,
+          "points": "22",
+          "finishes": [
+            0,
+            0,
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "averagePlacement": "5.4285714285714285714",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "5",
+          "lastPlaceFinishes": 2
+        }
+      ]
     }
   ],
   "config": {
@@ -1352,17 +1532,17 @@
       "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
       "rank": 1,
       "previousRank": 1,
-      "points": "73",
+      "points": "79",
       "finishes": [
         2,
         2,
         0,
         0,
-        1,
+        2,
         1,
         0
       ],
-      "averagePlacement": "2.8333333333333333333",
+      "averagePlacement": "3.1428571428571428571",
       "consistencyBonus": "10",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
@@ -1370,123 +1550,123 @@
     {
       "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
       "rank": 2,
-      "previousRank": 3,
-      "points": "58",
+      "previousRank": 2,
+      "points": "67",
+      "finishes": [
+        2,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "averagePlacement": "3.7142857142857142857",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 1
+    },
+    {
+      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+      "rank": 3,
+      "previousRank": 7,
+      "points": "67",
+      "finishes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        1
+      ],
+      "averagePlacement": "4.1428571428571428571",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 1
+    },
+    {
+      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+      "rank": 4,
+      "previousRank": 4,
+      "points": "65",
       "finishes": [
         2,
         1,
         0,
         0,
-        1,
+        2,
         1,
         1
       ],
-      "averagePlacement": "3.6666666666666666667",
+      "averagePlacement": "3.8571428571428571429",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
       "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-      "rank": 3,
-      "previousRank": 4,
-      "points": "37",
+      "rank": 5,
+      "previousRank": 3,
+      "points": "55",
       "finishes": [
         0,
         1,
-        2,
+        3,
         3,
         0,
         0,
         0
       ],
-      "averagePlacement": "3.3333333333333333333",
+      "averagePlacement": "3.2857142857142857143",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
     },
     {
-      "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
-      "rank": 4,
-      "previousRank": 2,
+      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+      "rank": 6,
+      "previousRank": 5,
       "points": "35",
       "finishes": [
-        2,
-        0,
-        0,
-        0,
-        2,
-        1,
-        1
-      ],
-      "averagePlacement": "4.1666666666666666667",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 1
-    },
-    {
-      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-      "rank": 5,
-      "previousRank": 5,
-      "points": "30",
-      "finishes": [
         0,
         1,
         2,
         1,
         1,
         0,
-        1
-      ],
-      "averagePlacement": "4",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 1
-    },
-    {
-      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
-      "rank": 6,
-      "previousRank": 7,
-      "points": "24",
-      "finishes": [
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
         2
       ],
-      "averagePlacement": "5.3333333333333333333",
+      "averagePlacement": "4.4285714285714285714",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "10",
+      "lastPlaceBonus": "5",
       "lastPlaceFinishes": 2
     },
     {
-      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+      "id": "73976db5-106f-44fa-8f8a-580db27553d2",
       "rank": 7,
       "previousRank": 6,
       "points": "22",
       "finishes": [
         0,
-        1,
-        1,
-        1,
         0,
+        1,
+        1,
+        1,
         2,
-        1
+        2
       ],
-      "averagePlacement": "4.6666666666666666667",
+      "averagePlacement": "5.4285714285714285714",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 1
+      "lastPlaceBonus": "5",
+      "lastPlaceFinishes": 2
     }
   ],
   "phase": "In Progress",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-06T23:14:42.869Z",
+  "sharedSnapshotAt": "2026-11-07T00:19:28.549Z",
   "sharedDemo": false
 }
 
