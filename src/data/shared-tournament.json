@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 105,
+  "revision": 114,
   "environment": "production",
   "participants": [
     {
@@ -468,9 +468,55 @@
         "Normal placement points at 2×: 30, 20, 12, 6, 4, 2, 0.",
         "No time trials, bracket, bye, or shared fifth place."
       ],
-      "status": "scheduled",
-      "order": [],
-      "results": [],
+      "status": "finalized",
+      "finalizedAt": "2026-11-07T01:13:48.306Z",
+      "startedAt": "2026-11-07T01:13:48.079Z",
+      "order": [
+        "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+        "84f214e0-8689-4884-a86e-6b18a9e227c0",
+        "a52ecf53-786a-4390-a499-87c0a1182f42",
+        "5a28ce27-e05b-4361-954b-b4a5e1369529",
+        "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+        "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+        "73976db5-106f-44fa-8f8a-580db27553d2"
+      ],
+      "results": [
+        {
+          "participantId": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "value": "1",
+          "absent": false
+        },
+        {
+          "participantId": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "value": "2",
+          "absent": false
+        },
+        {
+          "participantId": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "value": "3",
+          "absent": false
+        },
+        {
+          "participantId": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "value": "4",
+          "absent": false
+        },
+        {
+          "participantId": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "value": "5",
+          "absent": false
+        },
+        {
+          "participantId": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "value": "6",
+          "absent": false
+        },
+        {
+          "participantId": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "value": "7",
+          "absent": false
+        }
+      ],
       "seeds": [],
       "trials": {},
       "matches": []
@@ -1503,6 +1549,140 @@
           "lastPlaceFinishes": 2
         }
       ]
+    },
+    {
+      "id": "final-event-4",
+      "eventId": "event-4",
+      "at": "2026-11-07T01:13:48.306Z",
+      "label": "Mario Kart",
+      "standings": [
+        {
+          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
+          "rank": 1,
+          "points": "87",
+          "finishes": [
+            2,
+            2,
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "averagePlacement": "3.5",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+          "rank": 2,
+          "points": "71",
+          "finishes": [
+            0,
+            1,
+            3,
+            4,
+            0,
+            0,
+            0
+          ],
+          "averagePlacement": "3.375",
+          "consistencyBonus": "10",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 0
+        },
+        {
+          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+          "rank": 3,
+          "points": "69",
+          "finishes": [
+            2,
+            2,
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          "averagePlacement": "3.625",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
+          "rank": 4,
+          "points": "69",
+          "finishes": [
+            2,
+            1,
+            0,
+            0,
+            3,
+            1,
+            1
+          ],
+          "averagePlacement": "4",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
+          "rank": 5,
+          "points": "69",
+          "finishes": [
+            1,
+            1,
+            1,
+            1,
+            0,
+            3,
+            1
+          ],
+          "averagePlacement": "4.375",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "0",
+          "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "rank": 6,
+          "points": "65",
+          "finishes": [
+            1,
+            1,
+            2,
+            1,
+            1,
+            0,
+            2
+          ],
+          "averagePlacement": "4",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "5",
+          "lastPlaceFinishes": 2
+        },
+        {
+          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
+          "rank": 7,
+          "points": "34",
+          "finishes": [
+            0,
+            0,
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "averagePlacement": "5.125",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "5",
+          "lastPlaceFinishes": 2
+        }
+      ]
     }
   ],
   "config": {
@@ -1529,58 +1709,58 @@
   },
   "standings": [
     {
-      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
-      "rank": 1,
-      "previousRank": 1,
-      "points": "79",
-      "finishes": [
-        2,
-        2,
-        0,
-        0,
-        2,
-        1,
-        0
-      ],
-      "averagePlacement": "3.1428571428571428571",
-      "consistencyBonus": "10",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
-    },
-    {
       "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-      "rank": 2,
+      "rank": 1,
       "previousRank": 2,
-      "points": "67",
+      "points": "87",
       "finishes": [
         2,
-        1,
+        2,
         0,
         1,
         1,
         1,
         1
       ],
-      "averagePlacement": "3.7142857142857142857",
+      "averagePlacement": "3.5",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
-      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
-      "rank": 3,
-      "previousRank": 7,
-      "points": "67",
+      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+      "rank": 2,
+      "previousRank": 5,
+      "points": "71",
       "finishes": [
+        0,
         1,
-        1,
-        1,
-        1,
+        3,
+        4,
+        0,
+        0,
+        0
+      ],
+      "averagePlacement": "3.375",
+      "consistencyBonus": "10",
+      "lastPlaceBonus": "0",
+      "lastPlaceFinishes": 0
+    },
+    {
+      "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
+      "rank": 3,
+      "previousRank": 1,
+      "points": "69",
+      "finishes": [
+        2,
+        2,
+        0,
         0,
         2,
+        1,
         1
       ],
-      "averagePlacement": "4.1428571428571428571",
+      "averagePlacement": "3.625",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
@@ -1589,47 +1769,47 @@
       "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
       "rank": 4,
       "previousRank": 4,
-      "points": "65",
+      "points": "69",
       "finishes": [
         2,
         1,
         0,
         0,
-        2,
+        3,
         1,
         1
       ],
-      "averagePlacement": "3.8571428571428571429",
+      "averagePlacement": "4",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
-      "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
+      "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
       "rank": 5,
       "previousRank": 3,
-      "points": "55",
+      "points": "69",
       "finishes": [
-        0,
         1,
-        3,
-        3,
+        1,
+        1,
+        1,
         0,
-        0,
-        0
+        3,
+        1
       ],
-      "averagePlacement": "3.2857142857142857143",
+      "averagePlacement": "4.375",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 0
+      "lastPlaceFinishes": 1
     },
     {
       "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
       "rank": 6,
-      "previousRank": 5,
-      "points": "35",
+      "previousRank": 6,
+      "points": "65",
       "finishes": [
-        0,
+        1,
         1,
         2,
         1,
@@ -1637,7 +1817,7 @@
         0,
         2
       ],
-      "averagePlacement": "4.4285714285714285714",
+      "averagePlacement": "4",
       "consistencyBonus": "0",
       "lastPlaceBonus": "5",
       "lastPlaceFinishes": 2
@@ -1645,18 +1825,18 @@
     {
       "id": "73976db5-106f-44fa-8f8a-580db27553d2",
       "rank": 7,
-      "previousRank": 6,
-      "points": "22",
+      "previousRank": 7,
+      "points": "34",
       "finishes": [
         0,
         0,
-        1,
+        2,
         1,
         1,
         2,
         2
       ],
-      "averagePlacement": "5.4285714285714285714",
+      "averagePlacement": "5.125",
       "consistencyBonus": "0",
       "lastPlaceBonus": "5",
       "lastPlaceFinishes": 2
@@ -1666,7 +1846,7 @@
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-07T00:19:28.549Z",
+  "sharedSnapshotAt": "2026-11-07T01:13:48.562Z",
   "sharedDemo": false
 }
 
