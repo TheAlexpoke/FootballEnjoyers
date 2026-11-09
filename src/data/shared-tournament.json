@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 117,
+  "revision": 119,
   "environment": "production",
   "participants": [
     {
@@ -603,43 +603,44 @@
         "Use your actual ESPN league scoring settings and only eligible starters. The administrator verifies Sunday-only totals.",
         "The administrator enters all seven scores manually or uploads a screenshot matching all seven configured team names. Reviewed provisional fantasy points contribute to tournament totals. Finalization requires administrator confirmation."
       ],
-      "status": "active",
+      "status": "finalized",
+      "finalizedAt": "2026-11-09T04:42:30.833Z",
       "startedAt": "2026-11-08T19:41:51.764Z",
       "order": [],
       "results": [
         {
           "participantId": "5a28ce27-e05b-4361-954b-b4a5e1369529",
-          "value": "1297.74",
+          "value": "1321.8",
           "absent": false
         },
         {
           "participantId": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-          "value": "1172.02",
+          "value": "1218.7",
           "absent": false
         },
         {
           "participantId": "73976db5-106f-44fa-8f8a-580db27553d2",
-          "value": "1096.31",
+          "value": "1106.1",
           "absent": false
         },
         {
           "participantId": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-          "value": "1030.63",
+          "value": "1013.6",
           "absent": false
         },
         {
           "participantId": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-          "value": "955.37",
+          "value": "908.2",
           "absent": false
         },
         {
           "participantId": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
-          "value": "897.47",
+          "value": "877.9",
           "absent": false
         },
         {
           "participantId": "a52ecf53-786a-4390-a499-87c0a1182f42",
-          "value": "762.66",
+          "value": "819.5",
           "absent": false
         }
       ],
@@ -1722,278 +1723,10 @@
       ]
     },
     {
-      "id": "live-283d3d07-43c1-4449-b8b4-0b1dae69f752",
+      "id": "final-event-8",
       "eventId": "event-8",
-      "at": "2026-11-08T19:41:51.764Z",
-      "label": "Fantasy manual update",
-      "standings": [
-        {
-          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-          "rank": 1,
-          "points": "111",
-          "finishes": [
-            2,
-            2,
-            1,
-            1,
-            1,
-            1,
-            1
-          ],
-          "averagePlacement": "3.5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
-          "rank": 2,
-          "points": "109",
-          "finishes": [
-            2,
-            2,
-            0,
-            0,
-            3,
-            1,
-            1
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
-          "rank": 3,
-          "points": "94",
-          "finishes": [
-            1,
-            0,
-            2,
-            1,
-            1,
-            2,
-            2
-          ],
-          "averagePlacement": "5.125",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 2
-        },
-        {
-          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
-          "rank": 4,
-          "points": "81",
-          "finishes": [
-            2,
-            2,
-            0,
-            1,
-            2,
-            1,
-            1
-          ],
-          "averagePlacement": "3.625",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-          "rank": 5,
-          "points": "79",
-          "finishes": [
-            0,
-            1,
-            3,
-            4,
-            1,
-            0,
-            0
-          ],
-          "averagePlacement": "3.375",
-          "consistencyBonus": "10",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-          "rank": 6,
-          "points": "69",
-          "finishes": [
-            1,
-            1,
-            2,
-            1,
-            1,
-            1,
-            2
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 2
-        },
-        {
-          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
-          "rank": 7,
-          "points": "69",
-          "finishes": [
-            1,
-            1,
-            1,
-            1,
-            0,
-            3,
-            2
-          ],
-          "averagePlacement": "4.375",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        }
-      ]
-    },
-    {
-      "id": "live-e40d101d-04cf-4732-81a3-d1836c59339b",
-      "eventId": "event-8",
-      "at": "2026-11-08T20:42:16.973Z",
-      "label": "Fantasy manual update",
-      "standings": [
-        {
-          "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-          "rank": 1,
-          "points": "111",
-          "finishes": [
-            2,
-            2,
-            1,
-            1,
-            1,
-            1,
-            1
-          ],
-          "averagePlacement": "3.5",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
-          "rank": 2,
-          "points": "109",
-          "finishes": [
-            2,
-            2,
-            0,
-            0,
-            3,
-            1,
-            1
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "73976db5-106f-44fa-8f8a-580db27553d2",
-          "rank": 3,
-          "points": "94",
-          "finishes": [
-            1,
-            0,
-            2,
-            1,
-            1,
-            2,
-            2
-          ],
-          "averagePlacement": "5.125",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 2
-        },
-        {
-          "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
-          "rank": 4,
-          "points": "81",
-          "finishes": [
-            2,
-            2,
-            0,
-            1,
-            2,
-            1,
-            1
-          ],
-          "averagePlacement": "3.625",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        },
-        {
-          "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
-          "rank": 5,
-          "points": "75",
-          "finishes": [
-            0,
-            1,
-            3,
-            4,
-            0,
-            1,
-            0
-          ],
-          "averagePlacement": "3.375",
-          "consistencyBonus": "10",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 0
-        },
-        {
-          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-          "rank": 6,
-          "points": "73",
-          "finishes": [
-            1,
-            1,
-            2,
-            1,
-            2,
-            0,
-            2
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 2
-        },
-        {
-          "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
-          "rank": 7,
-          "points": "69",
-          "finishes": [
-            1,
-            1,
-            1,
-            1,
-            0,
-            3,
-            2
-          ],
-          "averagePlacement": "4.375",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
-        }
-      ]
-    },
-    {
-      "id": "live-0f91537f-02c0-4194-9d3f-13bd33197ae8",
-      "eventId": "event-8",
-      "at": "2026-11-09T02:06:47.363Z",
-      "label": "Fantasy manual update",
+      "at": "2026-11-09T04:42:30.833Z",
+      "label": "Single Week Fantasy Score",
       "standings": [
         {
           "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
@@ -2008,33 +1741,15 @@
             1,
             1
           ],
-          "averagePlacement": "4",
+          "averagePlacement": "3.6666666666666666667",
           "consistencyBonus": "0",
           "lastPlaceBonus": "0",
           "lastPlaceFinishes": 1
         },
         {
-          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-          "rank": 2,
-          "points": "105",
-          "finishes": [
-            1,
-            2,
-            2,
-            1,
-            1,
-            0,
-            2
-          ],
-          "averagePlacement": "4",
-          "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
-          "lastPlaceFinishes": 2
-        },
-        {
           "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-          "rank": 3,
-          "points": "99",
+          "rank": 2,
+          "points": "109",
           "finishes": [
             2,
             2,
@@ -2044,10 +1759,28 @@
             1,
             1
           ],
-          "averagePlacement": "3.5",
-          "consistencyBonus": "0",
+          "averagePlacement": "3.5555555555555555556",
+          "consistencyBonus": "10",
           "lastPlaceBonus": "0",
           "lastPlaceFinishes": 1
+        },
+        {
+          "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+          "rank": 3,
+          "points": "103.33333333",
+          "finishes": [
+            1,
+            2,
+            2,
+            1,
+            1,
+            0,
+            2
+          ],
+          "averagePlacement": "3.7777777777777777778",
+          "consistencyBonus": "0",
+          "lastPlaceBonus": "3.33333333",
+          "lastPlaceFinishes": 2
         },
         {
           "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
@@ -2062,7 +1795,7 @@
             0,
             0
           ],
-          "averagePlacement": "3.375",
+          "averagePlacement": "3.5555555555555555556",
           "consistencyBonus": "10",
           "lastPlaceBonus": "0",
           "lastPlaceFinishes": 0
@@ -2080,7 +1813,7 @@
             2,
             1
           ],
-          "averagePlacement": "3.625",
+          "averagePlacement": "3.8888888888888888889",
           "consistencyBonus": "0",
           "lastPlaceBonus": "0",
           "lastPlaceFinishes": 1
@@ -2088,7 +1821,7 @@
         {
           "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
           "rank": 6,
-          "points": "69",
+          "points": "72.33333333",
           "finishes": [
             1,
             1,
@@ -2098,15 +1831,15 @@
             3,
             2
           ],
-          "averagePlacement": "4.375",
+          "averagePlacement": "4.6666666666666666667",
           "consistencyBonus": "0",
-          "lastPlaceBonus": "0",
-          "lastPlaceFinishes": 1
+          "lastPlaceBonus": "3.33333333",
+          "lastPlaceFinishes": 2
         },
         {
           "id": "73976db5-106f-44fa-8f8a-580db27553d2",
           "rank": 7,
-          "points": "58",
+          "points": "56.33333333",
           "finishes": [
             0,
             0,
@@ -2116,9 +1849,9 @@
             2,
             2
           ],
-          "averagePlacement": "5.125",
+          "averagePlacement": "4.8888888888888888889",
           "consistencyBonus": "0",
-          "lastPlaceBonus": "5",
+          "lastPlaceBonus": "3.33333333",
           "lastPlaceFinishes": 2
         }
       ]
@@ -2150,7 +1883,7 @@
     {
       "id": "5a28ce27-e05b-4361-954b-b4a5e1369529",
       "rank": 1,
-      "previousRank": 2,
+      "previousRank": 4,
       "points": "129",
       "finishes": [
         3,
@@ -2161,35 +1894,16 @@
         1,
         1
       ],
-      "averagePlacement": "4",
+      "averagePlacement": "3.6666666666666666667",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
-      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
-      "rank": 2,
-      "previousRank": 6,
-      "points": "105",
-      "finishes": [
-        1,
-        2,
-        2,
-        1,
-        1,
-        0,
-        2
-      ],
-      "averagePlacement": "4",
-      "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
-      "lastPlaceFinishes": 2
-    },
-    {
       "id": "84f214e0-8689-4884-a86e-6b18a9e227c0",
-      "rank": 3,
+      "rank": 2,
       "previousRank": 1,
-      "points": "99",
+      "points": "109",
       "finishes": [
         2,
         2,
@@ -2199,15 +1913,34 @@
         1,
         1
       ],
-      "averagePlacement": "3.5",
-      "consistencyBonus": "0",
+      "averagePlacement": "3.5555555555555555556",
+      "consistencyBonus": "10",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
     },
     {
+      "id": "d5438793-69d1-4ae2-bc1a-3aeb39c859b2",
+      "rank": 3,
+      "previousRank": 6,
+      "points": "103.33333333",
+      "finishes": [
+        1,
+        2,
+        2,
+        1,
+        1,
+        0,
+        2
+      ],
+      "averagePlacement": "3.7777777777777777778",
+      "consistencyBonus": "0",
+      "lastPlaceBonus": "3.33333333",
+      "lastPlaceFinishes": 2
+    },
+    {
       "id": "d35d92e9-cb2a-40c1-8b10-34391cfa71c5",
       "rank": 4,
-      "previousRank": 5,
+      "previousRank": 2,
       "points": "79",
       "finishes": [
         0,
@@ -2218,7 +1951,7 @@
         0,
         0
       ],
-      "averagePlacement": "3.375",
+      "averagePlacement": "3.5555555555555555556",
       "consistencyBonus": "10",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 0
@@ -2226,7 +1959,7 @@
     {
       "id": "c86b4a7c-8490-4e2a-bc7d-c5c206679a97",
       "rank": 5,
-      "previousRank": 4,
+      "previousRank": 3,
       "points": "73",
       "finishes": [
         2,
@@ -2237,7 +1970,7 @@
         2,
         1
       ],
-      "averagePlacement": "3.625",
+      "averagePlacement": "3.8888888888888888889",
       "consistencyBonus": "0",
       "lastPlaceBonus": "0",
       "lastPlaceFinishes": 1
@@ -2245,8 +1978,8 @@
     {
       "id": "a52ecf53-786a-4390-a499-87c0a1182f42",
       "rank": 6,
-      "previousRank": 7,
-      "points": "69",
+      "previousRank": 5,
+      "points": "72.33333333",
       "finishes": [
         1,
         1,
@@ -2256,16 +1989,16 @@
         3,
         2
       ],
-      "averagePlacement": "4.375",
+      "averagePlacement": "4.6666666666666666667",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "0",
-      "lastPlaceFinishes": 1
+      "lastPlaceBonus": "3.33333333",
+      "lastPlaceFinishes": 2
     },
     {
       "id": "73976db5-106f-44fa-8f8a-580db27553d2",
       "rank": 7,
-      "previousRank": 3,
-      "points": "58",
+      "previousRank": 7,
+      "points": "56.33333333",
       "finishes": [
         0,
         0,
@@ -2275,17 +2008,17 @@
         2,
         2
       ],
-      "averagePlacement": "5.125",
+      "averagePlacement": "4.8888888888888888889",
       "consistencyBonus": "0",
-      "lastPlaceBonus": "5",
+      "lastPlaceBonus": "3.33333333",
       "lastPlaceFinishes": 2
     }
   ],
-  "phase": "Fantasy Finale",
+  "phase": "Complete",
   "configured": true,
   "readOnly": true,
   "localMode": false,
-  "sharedSnapshotAt": "2026-11-09T02:06:47.644Z",
+  "sharedSnapshotAt": "2026-11-09T04:42:31.043Z",
   "sharedDemo": false
 }
 
